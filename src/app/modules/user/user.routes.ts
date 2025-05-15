@@ -38,4 +38,8 @@ router.patch(
   UserController.updateProfile
 );
 
+router.patch("/block-user/:id", UserController.toggleUserBlocking);
+
+router.delete("/:id", UserController.deleteSingleUser);
+
 export const UserRoutes = router;

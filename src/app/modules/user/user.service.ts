@@ -85,6 +85,22 @@ const updateProfileToDB = async (
   return updateDoc;
 };
 
+// block/unblock user
+const toggleUserBlockingIntoDB = async (id: string) => {
+  const isExistUser: any = await User.isExistUserById(id);
+  if (!isExistUser) {
+    throw new ApiError(StatusCodes.BAD_REQUEST, "User doesn't exist!");
+  }
+
+  const result = await User.findByIdAndUpdate(
+    id,
+    { isBlocked: !isExistUser.isBlocked },
+    { new: true }
+  );
+
+  return result;
+};
+
 // delete user
 const deleteUserFromDB = async (id: string) => {
   const isExistUser: any = await User.isExistUserById(id);
@@ -138,6 +154,7 @@ export const UserService = {
   createUserToDB,
   createAdminToDB,
   updateProfileToDB,
+  toggleUserBlockingIntoDB,
   deleteUserFromDB,
   getUserProfileFromDB,
   getAllUsers,

@@ -54,6 +54,30 @@ const updateProfile = catchAsync(
   }
 );
 
+// delete user
+const deleteSingleUser = catchAsync(async (req: Request, res: Response) => {
+  const result = await UserService.deleteUserFromDB(req.params.id);
+
+  sendResponse(res, {
+    success: true,
+    statusCode: StatusCodes.OK,
+    message: "User deleted successfully",
+    data: result,
+  });
+})
+
+// toggle user blocking
+const toggleUserBlocking = catchAsync(async (req: Request, res: Response) => {
+  const result = await UserService.toggleUserBlockingIntoDB(req.params.id);
+
+  sendResponse(res, {
+    success: true,
+    statusCode: StatusCodes.OK,
+    message: "User status updated successfully",
+    data: result,
+  });
+})
+
 // retrieved user profile
 const getUserProfile = catchAsync(async (req: Request, res: Response) => {
   const user = req.user;
@@ -82,7 +106,9 @@ const getAllUsers = catchAsync(async (req: Request, res: Response) => {
 export const UserController = { 
     createUser, 
     createAdmin, 
+    updateProfile,
+    deleteSingleUser,
+    toggleUserBlocking,
     getUserProfile, 
     getAllUsers,
-    updateProfile
 };
