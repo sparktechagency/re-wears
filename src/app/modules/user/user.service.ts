@@ -62,17 +62,7 @@ const createUserToDB = async (payload: Partial<IUser>): Promise<IUser> => {
   return createUser;
 };
 
-const getUserProfileFromDB = async (
-  user: JwtPayload
-): Promise<Partial<IUser>> => {
-  const { id } = user;
-  const isExistUser: any = await User.isExistUserById(id);
-  if (!isExistUser) {
-    throw new ApiError(StatusCodes.BAD_REQUEST, "User doesn't exist!");
-  }
-  return isExistUser;
-};
-
+// update profile
 const updateProfileToDB = async (
   user: JwtPayload,
   payload: Partial<IUser>
@@ -93,6 +83,32 @@ const updateProfileToDB = async (
   });
   return updateDoc;
 };
+
+// get profile data
+const getUserProfileFromDB = async (
+  user: JwtPayload
+): Promise<Partial<IUser>> => {
+  const { id } = user;
+  const isExistUser: any = await User.isExistUserById(id);
+  if (!isExistUser) {
+    throw new ApiError(StatusCodes.BAD_REQUEST, "User doesn't exist!");
+  }
+  return isExistUser;
+};
+
+// get all users data
+const getAllUsersFromDB = async (
+  user: JwtPayload
+): Promise<Partial<IUser>> => {
+  const { id } = user;
+  const isExistUser: any = await User.isExistUserById(id);
+  if (!isExistUser) {
+    throw new ApiError(StatusCodes.BAD_REQUEST, "User doesn't exist!");
+  }
+  return isExistUser;
+};
+
+
 
 export const UserService = {
     createUserToDB,

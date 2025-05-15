@@ -19,16 +19,17 @@ router.post(
     UserController.createAdmin
 );
 
-router
-  .route("/create-user")
-  .post(
-    validateRequest(UserValidation.createUserZodSchema),
-    UserController.createUser
-  )
-  .patch(
-    auth(USER_ROLES.ADMIN, USER_ROLES.USER),
-    fileUploadHandler(),
-    UserController.updateProfile
-  );
+router.post(
+  "/create-user",
+  validateRequest(UserValidation.createUserZodSchema),
+  UserController.createUser
+);
+
+router.patch(
+  "/update-profile",
+  auth(USER_ROLES.ADMIN, USER_ROLES.USER),
+  fileUploadHandler(),
+  UserController.updateProfile
+);
 
 export const UserRoutes = router;
