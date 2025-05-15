@@ -29,31 +29,18 @@ const createAdmin = catchAsync( async (req: Request, res: Response, next: NextFu
     });
 });
 
-// retrieved user profile
-const getUserProfile = catchAsync(async (req: Request, res: Response) => {
-  const user = req.user;
-  const result = await UserService.getUserProfileFromDB(user!);
-
-  sendResponse(res, {
-    success: true,
-    statusCode: StatusCodes.OK,
-    message: "Profile data retrieved successfully",
-    data: result,
-  });
-});
-
 //update profile
 const updateProfile = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const user = req.user;
 
-    let profile;
+    let image;
     if (req.files && "image" in req.files && req.files.image[0]) {
-      profile = `/images/${req.files.image[0].filename}`;
+      image = `/images/${req.files.image[0].filename}`;
     }
 
     const data = {
-      profile,
+      image,
       ...req.body,
     };
     const result = await UserService.updateProfileToDB(user!, data);
@@ -67,9 +54,74 @@ const updateProfile = catchAsync(
   }
 );
 
+// update user role
+const updateUserRole = catchAsync(async (req: Request, res: Response) => {
+  const result = await UserService.updateUserRole(req.params.id, req.body);
+
+  sendResponse(res, {
+    success: true,
+    statusCode: StatusCodes.OK,
+    message: "User role updated successfully",
+    data: result,
+  });
+})
+
+// delete user
+const deleteSingleUser = catchAsync(async (req: Request, res: Response) => {
+  const result = await UserService.deleteUserFromDB(req.params.id);
+
+  sendResponse(res, {
+    success: true,
+    statusCode: StatusCodes.OK,
+    message: "User deleted successfully",
+    data: result,
+  });
+})
+
+// toggle user blocking
+const toggleUserBlocking = catchAsync(async (req: Request, res: Response) => {
+  const result = await UserService.toggleUserBlockingIntoDB(req.params.id);
+
+  sendResponse(res, {
+    success: true,
+    statusCode: StatusCodes.OK,
+    message: "User status updated successfully",
+    data: result,
+  });
+})
+
+// retrieved user profile
+const getUserProfile = catchAsync(async (req: Request, res: Response) => {
+  const user = req.user;
+  const result = await UserService.getUserProfileFromDB(user!);
+
+  sendResponse(res, {
+    success: true,
+    statusCode: StatusCodes.OK,
+    message: "Profile data retrieved successfully",
+    data: result,
+  });
+})
+  
+// retrieved all users
+const getAllUsers = catchAsync(async (req: Request, res: Response) => {
+  const result = await UserService.getAllUsers(req.query);
+
+  sendResponse(res, {
+    success: true,
+    statusCode: StatusCodes.OK,
+    message: "Users data retrieved successfully",
+    data: result,
+  });
+});
+
 export const UserController = { 
     createUser, 
     createAdmin, 
+    updateProfile,
+    updateUserRole,
+    deleteSingleUser,
+    toggleUserBlocking,
     getUserProfile, 
-    updateProfile
+    getAllUsers,
 };

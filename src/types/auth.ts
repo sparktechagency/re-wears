@@ -3,6 +3,13 @@ export type IVerifyEmail = {
     oneTimeCode: number;
 };
 
+export type ISignUpData = {
+  firstName: string;
+  lastName: string;
+  email: string;
+  password: string;
+};
+
 export type ILoginData = {
     email: string;
     password: string;

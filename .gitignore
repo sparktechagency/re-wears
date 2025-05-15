@@ -2,3 +2,5 @@ node_modules
 uploads
 /winston
 .env
+# editor
+.vscode

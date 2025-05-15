@@ -37,7 +37,9 @@ app.use(passport.session());
 app.use('/api/v1', router);
 
 app.get("/", (req: Request, res: Response)=>{
-    res.send("Hey Backend, How can I assist you ");
+    res.send(
+      `<h1 style="text-align: center; margin: 50px 0;">Re-wears server is running. Beep! Beep!</h1>`
+    );
 })
 
 //global error handle

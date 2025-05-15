@@ -30,21 +30,21 @@ router.post(
 );
 
 router.post(
-    '/verify-email',
-    async (req: Request, res: Response, next: NextFunction) => {
+  "/verify-otp",
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { email, oneTimeCode } = req.body;
 
-        try {
-            const { email, oneTimeCode } = req.body;
-
-            req.body = { email, oneTimeCode: Number(oneTimeCode)};
-            next();
-
-        } catch (error) {
-            return res.status(500).json({ message: "Failed to convert string to number" });
-        }
-    },
-    validateRequest(AuthValidation.createVerifyEmailZodSchema),
-    AuthController.verifyEmail
+      req.body = { email, oneTimeCode: Number(oneTimeCode) };
+      next();
+    } catch (error) {
+      return res
+        .status(500)
+        .json({ message: "Failed to convert string to number" });
+    }
+  },
+  validateRequest(AuthValidation.createVerifyEmailZodSchema),
+  AuthController.verifyEmail
 );
 
 router.post(
@@ -58,11 +58,6 @@ router.post(
     auth(USER_ROLES.ADMIN, USER_ROLES.USER),
     validateRequest(AuthValidation.createChangePasswordZodSchema),
     AuthController.changePassword
-);
-
-router.post(
-    '/resend-otp',
-    AuthController.resendVerificationEmail
 );
 
 router.post(

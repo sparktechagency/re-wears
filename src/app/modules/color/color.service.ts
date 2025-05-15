@@ -1,6 +1,6 @@
 import { StatusCodes } from "http-status-codes";
 import ApiError from "../../../errors/ApiErrors";
-import { ColorModel, IColor } from "./color.interface";
+import { IColor } from "./color.interface";
 import { Color } from "./color.model";
 import QueryBuilder from "../../builder/queryBuilder";
 
@@ -29,6 +29,7 @@ const getAllColors = async (query: Record<string, unknown>): Promise<IColor[]> =
   }
   return result;
 };
+
 const getSingleColor = async (id: string): Promise<IColor | null> => {
   const result = await Color.findById(id);
   if (!result) {
