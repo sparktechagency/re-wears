@@ -1,5 +1,5 @@
 import { model, Schema } from "mongoose";
-import { USER_ROLES } from "../../../enums/user";
+import { GENDER, USER_ROLES } from "../../../enums/user";
 import { IUser, UserModal } from "./user.interface";
 import bcrypt from "bcrypt";
 import ApiError from "../../../errors/ApiErrors";
@@ -7,85 +7,104 @@ import { StatusCodes } from "http-status-codes";
 import config from "../../../config";
 
 const userSchema = new Schema<IUser, UserModal>(
-    {
-        name: {
-            type: String,
-            required: false,
-        },
-        appId: {
-            type: String,
-            required: false,
-        },
-        role: {
-            type: String,
-            enum: Object.values(USER_ROLES),
-            required: true,
-        },
-        email: {
-            type: String,
-            required: false,
-            unique: true,
-            lowercase: true,
-        },
-        contact: {
-            type: String,
-            required: false,
-        },
-        password: {
-            type: String,
-            required: false,
-            select: 0,
-            minlength: 8,
-        },
-        location: {
-            type: String,
-            required: false,
-        },
-        profile: {
-            type: String,
-            default: 'https://res.cloudinary.com/dzo4husae/image/upload/v1733459922/zfyfbvwgfgshmahyvfyk.png',
-        },
-        verified: {
-            type: Boolean,
-            default: false,
-        },
-        authentication: {
-            type: {
-                isResetPassword: {
-                    type: Boolean,
-                    default: false,
-                },
-                oneTimeCode: {
-                    type: Number,
-                    default: null,
-                },
-                expireAt: {
-                    type: Date,
-                    default: null,
-                },
-            },
-            select: 0
-        },
-        accountInformation: {
-            status: {
-              type: Boolean,
-                default: false,
-            },
-            stripeAccountId: {
-                type: String,
-            },
-            externalAccountId: {
-                type: String,
-            },
-            currency: {
-                type: String,
-            }
-        }
+  {
+    firtName: {
+      type: String,
+      required: true,
     },
-    {
-        timestamps: true
-    }
-)
+    lastName: {
+      type: String,
+      required: true,
+    },
+    email: {
+      type: String,
+      required: true,
+      unique: true,
+      lowercase: true,
+    },
+    password: {
+      type: String,
+      required: true,
+      select: 0,
+      minlength: 8,
+    },
+    role: {
+      type: String,
+      enum: Object.values(USER_ROLES),
+      required: true,
+    },
+    image: {
+      type: String,
+      required: false,
+      default:
+        "https://res.cloudinary.com/dzo4husae/image/upload/v1733459922/zfyfbvwgfgshmahyvfyk.png",
+    },
+    location: {
+      type: String,
+      required: false,
+    },
+    gender: {
+      type: String,
+      enum: Object.values(GENDER),
+      required: false,
+    },
+    bod: {
+      type: Date,
+      required: false,
+    },
+    isVacation: {
+      type: Boolean,
+      default: false,
+    },
+    isVerified: {
+      type: Boolean,
+      default: false,
+    },
+    isBlocked: {
+      type: Boolean,
+      default: false,
+    },
+    isDeleted: {
+      type: Boolean,
+      default: false,
+    },
+    authentication: {
+      type: {
+        isResetPassword: {
+          type: Boolean,
+          default: false,
+        },
+        oneTimeCode: {
+          type: Number,
+          default: null,
+        },
+        expireAt: {
+          type: Date,
+          default: null,
+        },
+      },
+      select: 0,
+    },
+    accountInformation: {
+      status: {
+        type: Boolean,
+        default: false,
+      },
+      stripeAccountId: {
+        type: String,
+      },
+      externalAccountId: {
+        type: String,
+      },
+      currency: {
+        type: String,
+      },
+    },
+  },
+  {
+    timestamps: true,
+  }
+);
 
 
 //exist user check
