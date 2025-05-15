@@ -23,7 +23,7 @@ const createAdminToDB = async (payload: any): Promise<IUser> => {
   } else {
     await User.findByIdAndUpdate(
       { _id: createAdmin?._id },
-      { verified: true },
+      { isVerified: true },
       { new: true }
     );
   }
