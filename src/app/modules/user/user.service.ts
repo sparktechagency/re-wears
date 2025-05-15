@@ -85,6 +85,22 @@ const updateProfileToDB = async (
   return updateDoc;
 };
 
+// update user role
+const updateUserRole = async (id: string, payload: {role: USER_ROLES}) => {
+  const isExistUser: any = await User.isExistUserById(id);
+  if (!isExistUser) {
+    throw new ApiError(StatusCodes.BAD_REQUEST, "User doesn't exist!");
+  }
+
+  const result = await User.findByIdAndUpdate(
+    id,
+    payload,
+    { new: true }
+  );
+
+  return result;
+};
+
 // block/unblock user
 const toggleUserBlockingIntoDB = async (id: string) => {
   const isExistUser: any = await User.isExistUserById(id);
@@ -154,6 +170,7 @@ export const UserService = {
   createUserToDB,
   createAdminToDB,
   updateProfileToDB,
+  updateUserRole,
   toggleUserBlockingIntoDB,
   deleteUserFromDB,
   getUserProfileFromDB,

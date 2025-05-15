@@ -38,6 +38,8 @@ router.patch(
   UserController.updateProfile
 );
 
+router.patch("/:id", UserController.updateUserRole);
+
 router.patch("/block-user/:id", UserController.toggleUserBlocking);
 
 router.delete("/:id", UserController.deleteSingleUser);
