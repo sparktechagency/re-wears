@@ -1,8 +1,7 @@
-
 import { Types } from "mongoose";
 
 export type ISubCategory = {
-  name: "All" | "Clothing" | "Shoes" | "Bags" | "Accessories" | "Beauty";
+  name: string;
   icon: string;
   category: Types.ObjectId;
 };
