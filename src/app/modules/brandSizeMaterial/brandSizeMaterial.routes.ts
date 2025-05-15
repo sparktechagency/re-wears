@@ -7,7 +7,7 @@ const router = Router();
 
 
 
-router.post("/create", auth(USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMIN), brandSizeMaterialController.createBrandSizeMaterial);
+router.post("/list/create", auth(USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMIN), brandSizeMaterialController.createBrandSizeMaterial);
 
 router.get("/list/:type", auth(USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMIN, USER_ROLES.USER), brandSizeMaterialController.getAllBrandSizeMaterial);
 

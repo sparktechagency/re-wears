@@ -23,17 +23,18 @@ const createBrand = async (data: any) => {
 
 const getAllFromDB = async (type: string, query: Record<string, unknown>) => {
   validateType(type);
-  const searchFields = ["name"];
+
   const builder = new QueryBuilder(
-    BrandModel.find({ type: query.type }),
+    BrandModel.find({ type }), 
     query
   );
+
   const result = await builder
-    .search(searchFields)
     .filter()
     .sort()
     .paginate()
     .fields().modelQuery;
+
   return result;
 };
 
