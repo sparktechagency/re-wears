@@ -27,5 +27,4 @@ router.delete(
   childSubCategoryController.deleteChildSubCategory
 );
 
-
 export const childSubCategoryRoutes = router;
