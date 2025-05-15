@@ -29,19 +29,6 @@ const createAdmin = catchAsync( async (req: Request, res: Response, next: NextFu
     });
 });
 
-// retrieved user profile
-const getUserProfile = catchAsync(async (req: Request, res: Response) => {
-  const user = req.user;
-  const result = await UserService.getUserProfileFromDB(user!);
-
-  sendResponse(res, {
-    success: true,
-    statusCode: StatusCodes.OK,
-    message: "Profile data retrieved successfully",
-    data: result,
-  });
-});
-
 //update profile
 const updateProfile = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -67,9 +54,35 @@ const updateProfile = catchAsync(
   }
 );
 
+// retrieved user profile
+const getUserProfile = catchAsync(async (req: Request, res: Response) => {
+  const user = req.user;
+  const result = await UserService.getUserProfileFromDB(user!);
+
+  sendResponse(res, {
+    success: true,
+    statusCode: StatusCodes.OK,
+    message: "Profile data retrieved successfully",
+    data: result,
+  });
+})
+  
+// retrieved all users
+const getAllUsers = catchAsync(async (req: Request, res: Response) => {
+  const result = await UserService.getAllUsers(req.query);
+
+  sendResponse(res, {
+    success: true,
+    statusCode: StatusCodes.OK,
+    message: "Users data retrieved successfully",
+    data: result,
+  });
+});
+
 export const UserController = { 
     createUser, 
     createAdmin, 
     getUserProfile, 
+    getAllUsers,
     updateProfile
 };

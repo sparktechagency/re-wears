@@ -8,6 +8,7 @@ import generateOTP from "../../../util/generateOTP";
 import { emailTemplate } from "../../../shared/emailTemplate";
 import { emailHelper } from "../../../helpers/emailHelper";
 import unlinkFile from "../../../shared/unlinkFile";
+import QueryBuilder from "../../builder/queryBuilder";
 
 const createAdminToDB = async (payload: any): Promise<IUser> => {
   // check admin is exist or not;
@@ -84,6 +85,22 @@ const updateProfileToDB = async (
   return updateDoc;
 };
 
+// delete user
+const deleteUserFromDB = async (id: string) => {
+  const isExistUser: any = await User.isExistUserById(id);
+  if (!isExistUser) {
+    throw new ApiError(StatusCodes.BAD_REQUEST, "User doesn't exist!");
+  }
+
+  const result = await User.findByIdAndUpdate(
+    id,
+    { isDeleted: true },
+    { new: true }
+  );
+
+  return result;
+};
+
 // get profile data
 const getUserProfileFromDB = async (
   user: JwtPayload
@@ -97,22 +114,31 @@ const getUserProfileFromDB = async (
 };
 
 // get all users data
-const getAllUsersFromDB = async (
-  user: JwtPayload
-): Promise<Partial<IUser>> => {
-  const { id } = user;
-  const isExistUser: any = await User.isExistUserById(id);
-  if (!isExistUser) {
-    throw new ApiError(StatusCodes.BAD_REQUEST, "User doesn't exist!");
+const getAllUsers = async (
+  query: Record<string, unknown>
+): Promise<IUser[]> => {
+  const searchableFields = ["name", "code"];
+
+  const userQuery = new QueryBuilder<IUser>(User.find(), query)
+    .search(searchableFields)
+    .filter()
+    .sort()
+    .paginate()
+    .fields();
+
+  const result = await userQuery.modelQuery;
+
+  if (!result) {
+    throw new ApiError(StatusCodes.BAD_REQUEST, "Failed to get users");
   }
-  return isExistUser;
+  return result;
 };
 
-
-
 export const UserService = {
-    createUserToDB,
-    getUserProfileFromDB,
-    updateProfileToDB,
-    createAdminToDB
+  createUserToDB,
+  createAdminToDB,
+  updateProfileToDB,
+  deleteUserFromDB,
+  getUserProfileFromDB,
+  getAllUsers,
 };

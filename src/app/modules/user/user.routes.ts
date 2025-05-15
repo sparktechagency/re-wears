@@ -8,6 +8,12 @@ import fileUploadHandler from '../../middlewares/fileUploaderHandler';
 const router = express.Router();
 
 router.get(
+  "/",
+  auth(USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMIN),
+  UserController.getAllUsers
+);
+
+router.get(
   "/profile",
   auth(USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMIN, USER_ROLES.USER),
   UserController.getUserProfile
