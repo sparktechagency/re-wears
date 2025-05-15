@@ -5,7 +5,6 @@ const subCategorySchema = new Schema<ISubCategory>(
   {
     name: {
       type: String,
-      enum: ["All", "Clothing", "Shoes", "Bags", "Accessories", "Beauty"],
       required: true,
       unique: true,
     },
@@ -23,4 +22,7 @@ const subCategorySchema = new Schema<ISubCategory>(
     timestamps: true,
   }
 );
-export const subCategoryModel = model<ISubCategory>("subCategory", subCategorySchema);
+export const subCategoryModel = model<ISubCategory>(
+  "subCategory",
+  subCategorySchema
+);
