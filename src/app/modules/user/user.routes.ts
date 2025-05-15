@@ -20,14 +20,15 @@ router.post(
 );
 
 router
-    .route('/')
-    .post(
-        UserController.createUser
-    )
-    .patch(
-        auth(USER_ROLES.ADMIN, USER_ROLES.USER),
-        fileUploadHandler(),
-        UserController.updateProfile
-    );
+  .route("/create-user")
+  .post(
+    validateRequest(UserValidation.createUserZodSchema),
+    UserController.createUser
+  )
+  .patch(
+    auth(USER_ROLES.ADMIN, USER_ROLES.USER),
+    fileUploadHandler(),
+    UserController.updateProfile
+  );
 
 export const UserRoutes = router;

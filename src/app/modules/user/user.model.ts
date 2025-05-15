@@ -8,7 +8,7 @@ import config from "../../../config";
 
 const userSchema = new Schema<IUser, UserModal>(
   {
-    firtName: {
+    firstName: {
       type: String,
       required: true,
     },
