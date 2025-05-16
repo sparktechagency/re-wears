@@ -7,8 +7,13 @@ const router = express.Router();
 
 router.post(
   "/create",
-  auth(USER_ROLES.USER),
+  auth(USER_ROLES.USER, USER_ROLES.ADMIN, USER_ROLES.SUPER_ADMIN),
   MakeAnOfferController.createOffer
+);
+router.get(
+  "/",
+  auth(USER_ROLES.USER, USER_ROLES.ADMIN, USER_ROLES.SUPER_ADMIN),
+  MakeAnOfferController.getAllOffer
 );
 
 export const MakeAnOfferRoutes = router;
