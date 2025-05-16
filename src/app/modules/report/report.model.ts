@@ -1,6 +1,6 @@
 import { model, Schema } from "mongoose";
 import { IReport, ReportModel } from "./report.interface";
-import ApiError from "../../../errors/ApiError";
+import ApiError from "../../../errors/ApiErrors";
 import { StatusCodes } from "http-status-codes";
 import { Reservation } from "../reservation/reservation.model";
 

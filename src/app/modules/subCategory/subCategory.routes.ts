@@ -69,3 +69,6 @@ router.delete(
   auth(USER_ROLES.SUPER_ADMIN),
   SubCategoryController.deleteSubCategory
 );
+
+
+export const SubCategoryRoutes = router;

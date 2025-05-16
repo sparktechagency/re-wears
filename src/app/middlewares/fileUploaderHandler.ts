@@ -30,6 +30,9 @@ const fileUploadHandler = () => {
         case "icon":
           uploadDir = path.join(baseUploadDir, "icon");
           break;
+        case "productImage":
+          uploadDir = path.join(baseUploadDir, "productImage");
+          break;
         default:
           throw new ApiError(StatusCodes.BAD_REQUEST, "File is not supported");
       }
@@ -54,7 +57,11 @@ const fileUploadHandler = () => {
   //file filter
   const filterFilter = (req: Request, file: any, cb: FileFilterCallback) => {
     // console.log("file handler",file)
-    if (file.fieldname === "image" || file.fieldname === "icon") {
+    if (
+      file.fieldname === "image" ||
+      file.fieldname === "icon" ||
+      file.fieldname === "productImage"
+    ) {
       if (
         file.mimetype === "image/jpeg" ||
         file.mimetype === "image/png" ||
@@ -77,6 +84,7 @@ const fileUploadHandler = () => {
   const upload = multer({ storage: storage, fileFilter: filterFilter }).fields([
     { name: "image", maxCount: 3 },
     { name: "icon", maxCount: 1 },
+    { name: "productImage", maxCount: 5 },
   ]);
   return upload;
 };
