@@ -19,4 +19,15 @@ const createOrUpdateCms = async (type: string, payload: Partial<ICms>) => {
   return result;
 };
 
-export const CmsServices = { createOrUpdateCms };
+// get cms
+const getCms = async (type: string) => {
+  const result = await Cms.findOne({ type });
+
+  // check if cms exists
+  if (!result) {
+    throw new Error(`Cms with type ${type} not found`);
+  }
+  return result;
+}
+
+export const CmsServices = { createOrUpdateCms, getCms };

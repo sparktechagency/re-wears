@@ -11,4 +11,6 @@ router.put(
   CmsController.createOrUpdateCms
 );
 
+router.get("/:type", CmsController.getCms);
+
 export const CmsRoutes = router;
