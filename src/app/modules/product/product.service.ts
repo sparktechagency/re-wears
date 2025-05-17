@@ -15,10 +15,22 @@ const createProduct = async (product: IProduct): Promise<IProduct> => {
 const getAllProducts = async (
   query: Record<string, any>
 ): Promise<{ data: IProduct[]; meta: any }> => {
-  const queryBuilder = new QueryBuilder<IProduct>(Product.find(), query);
+  const { minPrice, maxPrice, ...restQuery } = query;
+  const priceFilter: any = {};
+  if (minPrice) priceFilter.$gte = Number(minPrice);
+  if (maxPrice) priceFilter.$lte = Number(maxPrice);
 
+  const filter: any = { status: { $nin: ["Draft", "Hidden"] } };
+  if (Object.keys(priceFilter).length > 0) {
+    filter.price = priceFilter;
+  }
+
+  const queryBuilder = new QueryBuilder<IProduct>(
+    Product.find(filter),
+    restQuery
+  );
   queryBuilder
-    .search(["name", "description"]) // Searchable fields
+    .search(["name", "description"])
     .filter()
     .sort()
     .paginate()
