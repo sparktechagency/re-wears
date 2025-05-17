@@ -8,9 +8,15 @@ import fileUploadHandler from '../../middlewares/fileUploaderHandler';
 const router = express.Router();
 
 router.get(
-    '/profile',
-    auth(USER_ROLES.ADMIN, USER_ROLES.USER),
-    UserController.getUserProfile
+  "/",
+  auth(USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMIN),
+  UserController.getAllUsers
+);
+
+router.get(
+  "/profile",
+  auth(USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMIN, USER_ROLES.USER),
+  UserController.getUserProfile
 );
   
 router.post(
@@ -19,15 +25,23 @@ router.post(
     UserController.createAdmin
 );
 
-router
-    .route('/')
-    .post(
-        UserController.createUser
-    )
-    .patch(
-        auth(USER_ROLES.ADMIN, USER_ROLES.USER),
-        fileUploadHandler(),
-        UserController.updateProfile
-    );
+router.post(
+  "/create-user",
+  validateRequest(UserValidation.createUserZodSchema),
+  UserController.createUser
+);
+
+router.patch(
+  "/update-profile",
+  auth(USER_ROLES.ADMIN, USER_ROLES.USER),
+  fileUploadHandler(),
+  UserController.updateProfile
+);
+
+router.patch("/:id", UserController.updateUserRole);
+
+router.patch("/block-user/:id", UserController.toggleUserBlocking);
+
+router.delete("/:id", UserController.deleteSingleUser);
 
 export const UserRoutes = router;
