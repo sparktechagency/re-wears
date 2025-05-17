@@ -10,6 +10,7 @@ import { WishlistRoutes } from "../modules/wishlist/wishlist.route";
 import { MakeAnOfferRoutes } from "../modules/makeanoffer/makeanoffer.route";
 import { brandSizeMaterialRoutes } from "../modules/brandSizeMaterial/brandSizeMaterial.routes";
 import { SupportRoutes } from "../modules/support/support.route";
+import { CmsRoutes } from "../modules/cms/cms.route";
 const router = express.Router();
 
 const apiRoutes = [
@@ -24,6 +25,7 @@ const apiRoutes = [
   { path: "/wishlist", route: WishlistRoutes },
   { path: "/offer", route: MakeAnOfferRoutes },
   { path: "/supports", route: SupportRoutes },
+  { path: "/cms", route: CmsRoutes },
 ];
 
 apiRoutes.forEach((route) => router.use(route.path, route.route));
