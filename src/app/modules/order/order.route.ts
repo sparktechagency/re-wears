@@ -1,18 +1,19 @@
 import express from "express";
+import { OrderController } from "./order.controller";
 import auth from "../../middlewares/auth";
-import { ChatController } from "./chat.controller";
 import { USER_ROLES } from "../../../enums/user";
+
 const router = express.Router();
 
 router.post(
-  "/:id",
+  "/create",
   auth(USER_ROLES.USER, USER_ROLES.ADMIN, USER_ROLES.SUPER_ADMIN),
-  ChatController.createChat
+  OrderController.createOrder
 );
 router.get(
   "/",
   auth(USER_ROLES.USER, USER_ROLES.ADMIN, USER_ROLES.SUPER_ADMIN),
-  ChatController.getChat
+  OrderController.getAllOrder
 );
 
-export const ChatRoutes = router;
+export const OrderRoutes = router;

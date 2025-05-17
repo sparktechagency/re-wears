@@ -9,6 +9,9 @@ import { childSubCategoryRoutes } from "../modules/childSubCategory/childSubCate
 import { WishlistRoutes } from "../modules/wishlist/wishlist.route";
 import { MakeAnOfferRoutes } from "../modules/makeanoffer/makeanoffer.route";
 import { brandSizeMaterialRoutes } from "../modules/brandSizeMaterial/brandSizeMaterial.routes";
+import { ChatRoutes } from "../modules/chat/chat.routes";
+import { MessageRoutes } from "../modules/message/message.routes";
+import { OrderRoutes } from "../modules/order/order.route";
 const router = express.Router();
 
 const apiRoutes = [
@@ -22,6 +25,10 @@ const apiRoutes = [
   { path: "/child-sub-category", route: childSubCategoryRoutes },
   { path: "/wishlist", route: WishlistRoutes },
   { path: "/offer", route: MakeAnOfferRoutes },
+  // * for create room
+  { path: "/room", route: ChatRoutes },
+  { path: "/chat", route: MessageRoutes },
+  { path: "/order", route: OrderRoutes },
 ];
 
 apiRoutes.forEach((route) => router.use(route.path, route.route));
