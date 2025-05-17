@@ -15,6 +15,18 @@ const createSupport = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+// update support status
+const updateSupport = catchAsync(async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const result = await SupportServices.updateSupportIntoDB(id, req.body);
+  sendResponse(res, {
+    statusCode: StatusCodes.OK,
+    success: true,
+    message: "Support Updated Successfully",
+    data: result,
+  });
+})
+
 const getAllSupport = catchAsync(async (req: Request, res: Response) => {
   const result = await SupportServices.getAllSupportFromDB(req.query);
   sendResponse(res, {
@@ -25,4 +37,8 @@ const getAllSupport = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
-export const SupportController = { createSupport, getAllSupport };
+export const SupportController = {
+  createSupport,
+  updateSupport,
+  getAllSupport,
+};

@@ -9,6 +9,7 @@ import { childSubCategoryRoutes } from "../modules/childSubCategory/childSubCate
 import { WishlistRoutes } from "../modules/wishlist/wishlist.route";
 import { MakeAnOfferRoutes } from "../modules/makeanoffer/makeanoffer.route";
 import { brandSizeMaterialRoutes } from "../modules/brandSizeMaterial/brandSizeMaterial.routes";
+import { SupportRoutes } from "../modules/support/support.route";
 const router = express.Router();
 
 const apiRoutes = [
@@ -22,6 +23,7 @@ const apiRoutes = [
   { path: "/child-sub-category", route: childSubCategoryRoutes },
   { path: "/wishlist", route: WishlistRoutes },
   { path: "/offer", route: MakeAnOfferRoutes },
+  { path: "/supports", route: SupportRoutes },
 ];
 
 apiRoutes.forEach((route) => router.use(route.path, route.route));

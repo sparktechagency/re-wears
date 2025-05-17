@@ -11,6 +11,12 @@ router.post(
   SupportController.createSupport
 );
 
+router.patch(
+  "/:id",
+  validateRequest(SupportValidations.updateSchema),
+  SupportController.updateSupport
+);
+
 router.get("/", SupportController.getAllSupport);
 
 export const SupportRoutes = router;

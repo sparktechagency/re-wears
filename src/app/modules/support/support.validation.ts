@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { SupportPriority } from "./support.constants";
+import { SupportPriority, SupportStatus } from "./support.constants";
 
 const createSchema = z.object({
   body: z.object({
@@ -27,4 +27,12 @@ const createSchema = z.object({
   }),
 });
 
-export const SupportValidations = { createSchema };
+const updateSchema = z.object({
+  body: z.object({
+    status: z.enum([...Object.values(SupportStatus)] as [string, ...string[]], {
+      required_error: "Status is required",
+    }),
+  }),
+});
+
+export const SupportValidations = { createSchema, updateSchema };

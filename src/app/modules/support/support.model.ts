@@ -12,13 +12,13 @@ const supportSchema = new Schema<ISupport, SupportModel>({
     type: String,
     enum: Object.values(SupportPriority),
     required: true,
-    default: SupportPriority.Medium,
+    default: SupportPriority.MEDIUM,
   },
   status: {
     type: String,
     enum: Object.values(SupportStatus),
     required: true,
-    default: SupportStatus.Open,
+    default: SupportStatus.OPEN,
   },
 });
 

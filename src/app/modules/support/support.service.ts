@@ -33,22 +33,7 @@ const updateSupportIntoDB = async (id: string, payload: Partial<ISupport>) => {
       "Failed to update support ticket"
     );
   }
-};
 
-// delete support
-const deleteSupportIntoDB = async (id: string) => {
-  const existingSupport = await Support.findById(id);
-  if (!existingSupport) {
-    throw new ApiError(StatusCodes.BAD_REQUEST, "Support ticket not found");
-  }
-
-  const result = await Support.findByIdAndDelete(id);
-  if (!result) {
-    throw new ApiError(
-      StatusCodes.BAD_REQUEST,
-      "Failed to delete support ticket"
-    );
-  }
   return result;
 };
 
@@ -78,5 +63,6 @@ const getAllSupportFromDB = async (query: Record<string, unknown>) => {
 
 export const SupportServices = {
   createSupportIntoDB,
+  updateSupportIntoDB,
   getAllSupportFromDB,
 };
