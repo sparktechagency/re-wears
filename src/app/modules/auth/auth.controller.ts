@@ -55,63 +55,67 @@ const resetPassword = catchAsync(async (req: Request, res: Response) => {
 });
 
 const changePassword = catchAsync(async (req: Request, res: Response) => {
-    const user = req.user;
-    const { ...passwordData } = req.body;
-    await AuthService.changePasswordToDB(user, passwordData);
+  const user = req.user;
+  const { ...passwordData } = req.body;
+  await AuthService.changePasswordToDB(user!, passwordData);
 
-    sendResponse(res, {
-        success: true,
-        statusCode: StatusCodes.OK,
-        message: 'Password changed successfully',
-    });
+  sendResponse(res, {
+    success: true,
+    statusCode: StatusCodes.OK,
+    message: "Password changed successfully",
+  });
 });
-
 
 const newAccessToken = catchAsync(async (req: Request, res: Response) => {
-    const { token } = req.body;
-    const result = await AuthService.newAccessTokenToUser(token);
+  const { token } = req.body;
+  const result = await AuthService.newAccessTokenToUser(token);
 
-    sendResponse(res, {
-        success: true,
-        statusCode: StatusCodes.OK,
-        message: 'Generate Access Token successfully',
-        data: result
-    });
+  sendResponse(res, {
+    success: true,
+    statusCode: StatusCodes.OK,
+    message: "Generate Access Token successfully",
+    data: result,
+  });
 });
 
-const resendVerificationEmail = catchAsync(async (req: Request, res: Response) => {
+const resendVerificationEmail = catchAsync(
+  async (req: Request, res: Response) => {
     const { email } = req.body;
     const result = await AuthService.resendVerificationEmailToDB(email);
 
     sendResponse(res, {
-        success: true,
-        statusCode: StatusCodes.OK,
-        message: 'Generate OTP and send successfully',
-        data: result
+      success: true,
+      statusCode: StatusCodes.OK,
+      message: "Generate OTP and send successfully",
+      data: result,
     });
-});
+  }
+);
 
 const socialLogin = catchAsync(async (req: Request, res: Response) => {
-    const result = await AuthService.socialLoginFromDB(req.body);
+  const result = await AuthService.socialLoginFromDB(req.body);
 
-    sendResponse(res, {
-        success: true,
-        statusCode: StatusCodes.OK,
-        message: 'Logged in Successfully',
-        data: result
-    });
+  sendResponse(res, {
+    success: true,
+    statusCode: StatusCodes.OK,
+    message: "Logged in Successfully",
+    data: result,
+  });
 });
 
 // delete user
 const deleteUser = catchAsync(async (req: Request, res: Response) => {
-    const result = await AuthService.deleteUserFromDB(req.user, req.body.password);
+  const result = await AuthService.deleteUserFromDB(
+    req.user!,
+    req.body.password
+  );
 
-    sendResponse(res, {
-        success: true,
-        statusCode: StatusCodes.OK,
-        message: 'Account Deleted successfully',
-        data: result
-    });
+  sendResponse(res, {
+    success: true,
+    statusCode: StatusCodes.OK,
+    message: "Account Deleted successfully",
+    data: result,
+  });
 });
 
 export const AuthController = {
