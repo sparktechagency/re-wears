@@ -24,7 +24,20 @@ const getAllOrder = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+// Get top sellers and buyers based on order count
+const getTopSellersAndBuyers = catchAsync(
+  async (req: Request, res: Response) => {
+    const result = await OrderServices.getTopSellersAndBuyers(req.query);
+    sendResponse(res, {
+      statusCode: 200,
+      success: true,
+      message: "Sellers and buyers retrieved successfully",
+      data: result,
+    });
+  })
+
 export const OrderController = {
   createOrder,
   getAllOrder,
+  getTopSellersAndBuyers,
 };

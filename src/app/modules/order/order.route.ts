@@ -16,4 +16,11 @@ router.get(
   OrderController.getAllOrder
 );
 
+// Get top sellers and buyers based on order count
+router.get(
+  "/users",
+  auth(USER_ROLES.USER, USER_ROLES.ADMIN, USER_ROLES.SUPER_ADMIN),
+  OrderController.getTopSellersAndBuyers
+);
+
 export const OrderRoutes = router;

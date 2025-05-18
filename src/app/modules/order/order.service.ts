@@ -38,7 +38,227 @@ const getAllOrderFromDB = async (query: Record<string, any>) => {
   return { result, pagination };
 };
 
+
+// Get top sellers and buyers based on order count with search and pagination
+const getTopSellersAndBuyers = async (query: Record<string, any>) => {
+  // Extract query parameters with defaults
+  const { 
+    type = 'both', 
+    searchTerm,
+    page = 1,
+    limit = 5
+  } = query;
+  
+  // Calculate pagination values
+  const pageNumber = Number(page);
+  const limitNumber = Number(limit);
+  const skip = (pageNumber - 1) * limitNumber;
+  
+  // CASE 1: Handle specific type request (either sellers or buyers)
+  if (type === "sellers" || type === "buyers") {
+    // Determine which field to use based on type
+    const field = type === "sellers" ? "seller" : "buyer";
+    const userTypeValue = type === "sellers" ? "seller" : "buyer";
+    
+    // Build the aggregation pipeline
+    const pipeline: any[] = [
+      // Step 1: Group by seller/buyer and count orders
+      {
+        $group: {
+          _id: `$${field}`,
+          totalOrders: { $sum: 1 }
+        }
+      },
+      
+      // Step 2: Add userType field in a separate project stage
+      {
+        $project: {
+          _id: 1,
+          totalOrders: 1,
+          userType: { $literal: userTypeValue }
+        }
+      },
+      
+      // Step 3: Join with users collection to get user details
+      {
+        $lookup: {
+          from: "users",
+          localField: "_id",
+          foreignField: "_id",
+          as: "userDetails"
+        }
+      },
+      {
+        $unwind: {
+          path: "$userDetails",
+          preserveNullAndEmptyArrays: true
+        }
+      }
+    ];
+    
+    // Step 4: Add search filter if search term is provided
+    if (searchTerm) {
+      pipeline.push({
+        $match: {
+          $or: [
+            { "userDetails.name": { $regex: searchTerm, $options: "i" } },
+            { "userDetails.email": { $regex: searchTerm, $options: "i" } }
+          ]
+        }
+      });
+    }
+    
+    // Step 5: Use $facet to get both data and count in a single query
+    pipeline.push({
+      $facet: {
+        // Get total count for pagination metadata
+        metadata: [{ $count: "total" }],
+        // Get paginated and sorted data
+        data: [
+          { $sort: { totalOrders: -1 } },
+          { $skip: skip },
+          { $limit: limitNumber },
+          {
+            $project: {
+              _id: 1,
+              totalOrders: 1,
+              userType: 1,
+              name: "$userDetails.name",
+              email: "$userDetails.email",
+              image: "$userDetails.image",
+              role: "$userDetails.role"
+            }
+          }
+        ]
+      }
+    });
+    
+    // Execute the aggregation
+    const [result] = await Order.aggregate(pipeline);
+    
+    // Format and return the response
+    return {
+      data: result.data || [],
+      meta: {
+        page: pageNumber,
+        limit: limitNumber,
+        total: result.metadata[0]?.total || 0
+      }
+    };
+  } 
+  // CASE 2: Handle combined results (both sellers and buyers)
+  else {
+    // Build a pipeline that combines both sellers and buyers
+    const pipeline: any[] = [
+      // Step 1: First get all sellers with their order counts
+      {
+        $group: {
+          _id: "$seller",
+          totalOrders: { $sum: 1 }
+        }
+      },
+      // Add userType in a separate project stage
+      {
+        $project: {
+          _id: 1,
+          totalOrders: 1,
+          userType: { $literal: "seller" }
+        }
+      },
+      
+      // Step 2: Union with buyers data
+      {
+        $unionWith: {
+          coll: "orders",
+          pipeline: [
+            {
+              $group: {
+                _id: "$buyer",
+                totalOrders: { $sum: 1 }
+              }
+            },
+            {
+              $project: {
+                _id: 1,
+                totalOrders: 1,
+                userType: { $literal: "buyer" }
+              }
+            }
+          ]
+        }
+      },
+      
+      // Step 3: Join with users collection to get user details
+      {
+        $lookup: {
+          from: "users",
+          localField: "_id",
+          foreignField: "_id",
+          as: "userDetails"
+        }
+      },
+      {
+        $unwind: {
+          path: "$userDetails",
+          preserveNullAndEmptyArrays: true
+        }
+      }
+    ];
+    
+    // Step 4: Add search filter if search term is provided
+    if (searchTerm) {
+      pipeline.push({
+        $match: {
+          $or: [
+            { "userDetails.name": { $regex: searchTerm, $options: "i" } },
+            { "userDetails.email": { $regex: searchTerm, $options: "i" } }
+          ]
+        }
+      });
+    }
+    
+    // Step 5: Use $facet to get both data and count
+    pipeline.push({
+      $facet: {
+        metadata: [{ $count: "total" }],
+        data: [
+          // Sort combined results by order count
+          { $sort: { totalOrders: -1 } },
+          // Apply pagination
+          { $skip: skip },
+          { $limit: limitNumber },
+          // Project only needed fields
+          {
+            $project: {
+              _id: 1,
+              totalOrders: 1,
+              userType: 1,
+              name: "$userDetails.name",
+              email: "$userDetails.email",
+              image: "$userDetails.image",
+              role: "$userDetails.role"
+            }
+          }
+        ]
+      }
+    });
+    
+    // Execute the aggregation
+    const [result] = await Order.aggregate(pipeline);
+    
+    // Format and return the response
+    return {
+      data: result.data || [],
+      meta: {
+        page: pageNumber,
+        limit: limitNumber,
+        total: result.metadata[0]?.total || 0
+      }
+    };
+  }
+};
 export const OrderServices = {
   createOrderIntoDB,
   getAllOrderFromDB,
+  getTopSellersAndBuyers,
 };
