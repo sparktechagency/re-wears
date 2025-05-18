@@ -10,7 +10,7 @@ const superUser = {
   role: USER_ROLES.SUPER_ADMIN,
   email: config.admin.email,
   password: config.admin.password,
-  verified: true,
+  isVerified: true,
 };
 
 const seedSuperAdmin = async () => {
