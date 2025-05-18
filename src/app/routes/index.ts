@@ -15,7 +15,6 @@ import { ChatRoutes } from "../modules/chat/chat.routes";
 import { MessageRoutes } from "../modules/message/message.routes";
 import { OrderRoutes } from "../modules/order/order.route";
 import { ReportRoutes } from "../modules/report/report.route";
-import { NotificationRoutes } from "../modules/notification/notification.routes";
 const router = express.Router();
 
 const apiRoutes = [

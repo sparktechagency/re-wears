@@ -23,6 +23,6 @@ const subCategorySchema = new Schema<ISubCategory>(
   }
 );
 export const subCategoryModel = model<ISubCategory>(
-  "subCategory",
+  "SubCategory",
   subCategorySchema
 );

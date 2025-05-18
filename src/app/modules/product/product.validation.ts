@@ -2,7 +2,6 @@ import { z } from "zod";
 
 const createProductValidation = {
   body: z.object({
-    user: z.string({ required_error: "user is required" }),
     name: z.string({ required_error: "name is required" }),
     description: z.string({ required_error: "description is required" }),
     images: z.array(z.string({ required_error: "images is required" })),
@@ -12,7 +11,16 @@ const createProductValidation = {
     brand: z.string({ required_error: "brand is required" }),
     size: z.string({ required_error: "size is required" }),
     material: z.string({ required_error: "material is required" }),
-    category: z.string({ required_error: "category is required" }),
+    category: z.object(
+      {
+        category: z.string({ required_error: "category is required" }),
+        subCategory: z.string({ required_error: "subCategory is required" }),
+        childSubCategory: z.string({
+          required_error: "childSubCategory is required",
+        }),
+      },
+      { required_error: "category object is required" }
+    ),
     colors: z.array(z.string({ required_error: "colors is required" })),
     price: z.number({ required_error: "price is required" }),
     status: z.enum(["Active", "Reserved", "Sold", "Hidden", "Draft"], {

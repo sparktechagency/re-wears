@@ -4,7 +4,7 @@ import sendResponse from "../../../shared/sendResponse";
 import { productService } from "./product.service";
 
 const createProduct = catchAsync(async (req: Request, res: Response) => {
-  const result = await productService.createProduct(req.body);
+  const result = await productService.createProduct(req.body, req.user);
   sendResponse(res, {
     statusCode: 200,
     success: true,

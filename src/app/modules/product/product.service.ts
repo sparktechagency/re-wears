@@ -4,8 +4,23 @@ import { IProduct } from "./product.interface";
 import { Product } from "./product.model";
 import QueryBuilder from "../../builder/queryBuilder";
 
-const createProduct = async (product: IProduct): Promise<IProduct> => {
-  const createdProduct = await Product.create(product);
+const createProduct = async (
+  payload: IProduct,
+  user: any
+): Promise<IProduct> => {
+  // parse the categoy string to an object
+  if (typeof payload.category === "string") {
+    try {
+      payload.category = JSON.parse(payload.category);
+    } catch (e) {
+      throw new ApiError(StatusCodes.BAD_REQUEST, "Invalid category format");
+    }
+  }
+
+  // inject the user id into the payload
+  payload.user = user.id;
+
+  const createdProduct = await Product.create(payload);
   if (!createdProduct) {
     throw new ApiError(StatusCodes.BAD_REQUEST, "Failed to create product");
   }
