@@ -11,6 +11,9 @@ import { MakeAnOfferRoutes } from "../modules/makeanoffer/makeanoffer.route";
 import { brandSizeMaterialRoutes } from "../modules/brandSizeMaterial/brandSizeMaterial.routes";
 import { SupportRoutes } from "../modules/support/support.route";
 import { CmsRoutes } from "../modules/cms/cms.route";
+import { ChatRoutes } from "../modules/chat/chat.routes";
+import { MessageRoutes } from "../modules/message/message.routes";
+import { OrderRoutes } from "../modules/order/order.route";
 const router = express.Router();
 
 const apiRoutes = [
@@ -26,6 +29,10 @@ const apiRoutes = [
   { path: "/offer", route: MakeAnOfferRoutes },
   { path: "/supports", route: SupportRoutes },
   { path: "/cms", route: CmsRoutes },
+  // * for create room
+  { path: "/room", route: ChatRoutes },
+  { path: "/chat", route: MessageRoutes },
+  { path: "/order", route: OrderRoutes },
 ];
 
 apiRoutes.forEach((route) => router.use(route.path, route.route));
