@@ -25,7 +25,7 @@ router.post(
       res.status(500).json({ message: "Failed to upload Image" });
     }
   },
-  auth(USER_ROLES.SUPER_ADMIN),
+  auth(USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMIN),
   SubCategoryController.createSubCategory
 );
 
