@@ -1,6 +1,6 @@
 import { USER_ROLES } from "../../../enums/user";
 import { IUser } from "./user.interface";
-import { JwtPayload } from 'jsonwebtoken';
+import { JwtPayload } from "jsonwebtoken";
 import { User } from "./user.model";
 import { StatusCodes } from "http-status-codes";
 import ApiError from "../../../errors/ApiErrors";
@@ -86,17 +86,13 @@ const updateProfileToDB = async (
 };
 
 // update user role
-const updateUserRole = async (id: string, payload: {role: USER_ROLES}) => {
+const updateUserRole = async (id: string, payload: { role: USER_ROLES }) => {
   const isExistUser: any = await User.isExistUserById(id);
   if (!isExistUser) {
     throw new ApiError(StatusCodes.BAD_REQUEST, "User doesn't exist!");
   }
 
-  const result = await User.findByIdAndUpdate(
-    id,
-    payload,
-    { new: true }
-  );
+  const result = await User.findByIdAndUpdate(id, payload, { new: true });
 
   return result;
 };
