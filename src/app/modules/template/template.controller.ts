@@ -38,4 +38,27 @@ const deleteTemplate = catchAsync(async (req: Request, res: Response) => {
   });
 })
 
-export const TemplateController = { createTemplate, updateTemplate, deleteTemplate };
+// get single template
+const getSingleTemplate = catchAsync(async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const result = await TemplateServices.getSingleTemplate(id);
+  res.send({
+    success: true,
+    statusCode: StatusCodes.OK,
+    message: "Template fetched successfully",
+    data: result,
+  });
+})
+
+// get all template
+const getAllTemplate = catchAsync(async (req: Request, res: Response) => {
+  const result = await TemplateServices.getAllTemplates(req.query);
+  res.send({
+    success: true,
+    statusCode: StatusCodes.OK,
+    message: "Template fetched successfully",
+    data: result,
+  });
+})
+
+export const TemplateController = { createTemplate, updateTemplate, deleteTemplate, getSingleTemplate, getAllTemplate };

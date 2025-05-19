@@ -23,4 +23,12 @@ router.delete(
   TemplateController.deleteTemplate
 );
 
+router.get("/:id", TemplateController.getSingleTemplate);
+
+router.get(
+  "/",
+  auth(USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMIN),
+  TemplateController.getAllTemplate
+);
+
 export const TemplateRoutes = router;

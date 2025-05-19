@@ -1,3 +1,4 @@
+import QueryBuilder from "../../builder/queryBuilder";
 import generateSequentialId from "../../utils/idGenerator";
 import { TemplateModel } from "./template.interface";
 import { Template } from "./template.model";
@@ -47,6 +48,44 @@ const deleteTemplate = async (id: string) => {
     throw new Error("Failed to delete template");
   }
   return result;
-}
+};
 
-export const TemplateServices = { createTemplate, updateTemplate, deleteTemplate };
+// get single template
+const getSingleTemplate = async (id: string) => {
+  const result = await Template.findById(id);
+  if (!result) {
+    throw new Error("Template not found");
+  }
+  return result;
+};
+
+// get all templates
+const getAllTemplates = async (query: Record<string, unknown>) => {
+  const templateQuery = new QueryBuilder(Template.find({}), query)
+    .search(["name", "category", "message", "id"])
+    .filter()
+    .sort()
+    .paginate()
+    .fields();
+
+  const result = await templateQuery.modelQuery;
+  const total = await Template.countDocuments(
+    templateQuery.modelQuery.getFilter()
+  );
+
+  return {
+    meta: {
+      page: query.page ? Number(query.page) : 1,
+      limit: query.limit ? Number(query.limit) : 10,
+      total,
+    },
+    data: result,
+  };
+};
+export const TemplateServices = {
+  createTemplate,
+  updateTemplate,
+  deleteTemplate,
+  getSingleTemplate,
+  getAllTemplates,
+};
