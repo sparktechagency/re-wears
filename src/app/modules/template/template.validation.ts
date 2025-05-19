@@ -8,4 +8,12 @@ const createSchema = z.object({
   }),
 });
 
-export const TemplateValidations = { createSchema };
+const updateSchema = z.object({
+  body: z.object({
+    name: z.string().optional(),
+    category: z.string().optional(),
+    message: z.string().optional(),
+  }),
+});
+
+export const TemplateValidations = { createSchema, updateSchema };

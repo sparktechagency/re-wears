@@ -11,4 +11,10 @@ router.post(
   TemplateController.createTemplate
 );
 
+router.patch(
+  "/:id",
+  auth(USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMIN),
+  TemplateController.updateTemplate
+);
+
 export const TemplateRoutes = router;

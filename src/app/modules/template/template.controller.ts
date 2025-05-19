@@ -3,6 +3,7 @@ import { TemplateServices } from "./template.service";
 import catchAsync from "../../../shared/catchAsync";
 import { StatusCodes } from "http-status-codes";
 
+// create template
 const createTemplate = catchAsync(async (req: Request, res: Response) => {
   const result = await TemplateServices.createTemplate(req.body);
   res.send({
@@ -13,4 +14,16 @@ const createTemplate = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
-export const TemplateController = { createTemplate };
+// update template
+const updateTemplate = catchAsync(async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const result = await TemplateServices.updateTemplate(id, req.body);
+  res.send({
+    success: true,
+    statusCode: StatusCodes.OK,
+    message: "Template updated successfully",
+    data: result,
+  });
+});
+
+export const TemplateController = { createTemplate, updateTemplate };
