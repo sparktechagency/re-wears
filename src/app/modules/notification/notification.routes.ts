@@ -21,4 +21,10 @@ router.patch('/admin',
     NotificationController.adminReadNotification
 );
 
+router.post(
+  "/create-admin-notification",
+  auth(USER_ROLES.ADMIN, USER_ROLES.SUPER_ADMIN),
+  NotificationController.createAdminNotification
+);
+
 export const NotificationRoutes = router;

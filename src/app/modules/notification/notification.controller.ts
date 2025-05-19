@@ -51,9 +51,21 @@ const adminReadNotification = catchAsync( async (req: Request, res: Response) =>
     });
 });
 
+// create admin notification
+const createAdminNotification = catchAsync( async (req: Request, res: Response) => {
+    const result = await NotificationService.createAdminNotification(req.body);
+    sendResponse(res, {
+        statusCode: StatusCodes.OK,
+        success: true,
+        message: 'Notification Created Successfully',
+        data: result
+    });
+})
+
 export const NotificationController = {
     adminNotificationFromDB,
     getNotificationFromDB,
     readNotification,
-    adminReadNotification
+    adminReadNotification,
+    createAdminNotification
 };
