@@ -17,4 +17,10 @@ router.patch(
   TemplateController.updateTemplate
 );
 
+router.delete(
+  "/:id",
+  auth(USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMIN),
+  TemplateController.deleteTemplate
+);
+
 export const TemplateRoutes = router;

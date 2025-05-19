@@ -35,4 +35,18 @@ const updateTemplate = async (id: string, payload: Partial<TemplateModel>) => {
   return result;
 };
 
-export const TemplateServices = { createTemplate, updateTemplate };
+// delete template
+const deleteTemplate = async (id: string) => {
+  const isExist = await Template.findById(id);
+  if (!isExist) {
+    throw new Error("Template not found");
+  }
+
+  const result = await Template.findByIdAndDelete(id);
+  if (!result) {
+    throw new Error("Failed to delete template");
+  }
+  return result;
+}
+
+export const TemplateServices = { createTemplate, updateTemplate, deleteTemplate };

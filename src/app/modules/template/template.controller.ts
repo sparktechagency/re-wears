@@ -26,4 +26,16 @@ const updateTemplate = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
-export const TemplateController = { createTemplate, updateTemplate };
+// delete template
+const deleteTemplate = catchAsync(async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const result = await TemplateServices.deleteTemplate(id);
+  res.send({
+    success: true,
+    statusCode: StatusCodes.OK,
+    message: "Template deleted successfully",
+    data: result,
+  });
+})
+
+export const TemplateController = { createTemplate, updateTemplate, deleteTemplate };
