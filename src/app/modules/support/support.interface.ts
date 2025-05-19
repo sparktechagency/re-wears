@@ -9,6 +9,8 @@ export type ISupport = {
   message?: string;
   priority: SupportPriority;
   status: SupportStatus;
+  createdAt?: Date;
+  updatedAt?: Date;
 };
 
 export type SupportModel = Model<ISupport>;

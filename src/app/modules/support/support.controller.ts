@@ -37,8 +37,21 @@ const getAllSupport = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+// get support overview
+const getSupportOverview = catchAsync(
+  async (req: Request, res: Response) => {
+    const result = await SupportServices.getSupportOverviewFromDB();
+    sendResponse(res, {
+      statusCode: StatusCodes.OK,
+      success: true,
+      message: "Support overview fetched successfully",
+      data: result,
+    });
+  })
+
 export const SupportController = {
   createSupport,
   updateSupport,
   getAllSupport,
+  getSupportOverview,
 };
