@@ -4,12 +4,12 @@ import { IChildSubCategory } from "./childSubCategory.interface";
 const childSubCategory = new Schema<IChildSubCategory>(
   {
     name: {
-      type: [String],
+      type: String,
       required: true,
     },
-    subcategory: {
+    subCategory: {
       type: Schema.Types.ObjectId,
-      ref: "subCategory",
+      ref: "SubCategory",
       required: true,
     },
   },
@@ -18,6 +18,6 @@ const childSubCategory = new Schema<IChildSubCategory>(
   }
 );
 export const childSubCategoryModel = model<IChildSubCategory>(
-  "childSubCategory",
+  "ChildSubCategory",
   childSubCategory
 );

@@ -9,6 +9,7 @@ const router = Router();
 
 router.post(
   "/create",
+  auth(USER_ROLES.USER),
   fileUploadHandler(),
   async (req, res, next) => {
     try {

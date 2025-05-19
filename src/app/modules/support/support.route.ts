@@ -19,4 +19,6 @@ router.patch(
 
 router.get("/", SupportController.getAllSupport);
 
+router.get("/overview", SupportController.getSupportOverview);
+
 export const SupportRoutes = router;

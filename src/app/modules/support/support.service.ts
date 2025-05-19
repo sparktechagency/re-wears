@@ -3,6 +3,7 @@ import ApiError from "../../../errors/ApiErrors";
 import { ISupport } from "./support.interface";
 import { Support } from "./support.model";
 import QueryBuilder from "../../builder/queryBuilder";
+import { SupportStatus } from "./support.constants";
 
 // create support
 const createSupportIntoDB = async (payload: ISupport) => {
@@ -61,8 +62,95 @@ const getAllSupportFromDB = async (query: Record<string, unknown>) => {
   };
 };
 
+// get support overview
+const getSupportOverviewFromDB = async () => {
+  // Get total tickets count
+  const totalTickets = await Support.countDocuments({});
+
+  // Get tickets by status
+  const openTickets = await Support.countDocuments({
+    status: SupportStatus.OPEN,
+  });
+
+  const pendingTickets = await Support.countDocuments({
+    status: SupportStatus.PENDING,
+  });
+
+  const resolvedTickets = await Support.countDocuments({
+    status: SupportStatus.RESOLVED,
+  });
+
+  // Calculate resolution rate (percentage of resolved tickets)
+  const resolutionRate =
+    totalTickets > 0 ? Math.round((resolvedTickets / totalTickets) * 100) : 0;
+
+  // Calculate average resolution time for resolved tickets
+  let avgResolutionTime = 0;
+
+  const resolvedTicketsWithTimestamps = await Support.find({
+    status: SupportStatus.RESOLVED,
+  });
+
+  if (resolvedTicketsWithTimestamps.length > 0) {
+    const totalResolutionTime = resolvedTicketsWithTimestamps.reduce(
+      (sum, ticket: ISupport) => {
+        // Calculate time difference between creation and last update (resolution)
+        const creationTime = new Date(ticket.createdAt || 0).getTime();
+        const resolutionTime = new Date(ticket.updatedAt || 0).getTime();
+        return sum + (resolutionTime - creationTime);
+      },
+      0
+    );
+    // Average resolution time in hours
+    avgResolutionTime = Math.round(
+      totalResolutionTime /
+        resolvedTicketsWithTimestamps.length /
+        (1000 * 60 * 60)
+    );
+  }
+
+  // Calculate average response time (time to move from OPEN to PENDING)
+  // This assumes that when a ticket moves to PENDING, it has received a first response
+  let avgResponseTime = 0;
+
+  // We need to add a query to find tickets that have moved from OPEN to another status
+  // Since we don't have a field tracking when status changed, we can use updatedAt as an approximation
+  // for tickets that are not in OPEN status
+  const respondedTickets = await Support.find({
+    status: { $ne: SupportStatus.OPEN },
+  });
+
+  if (respondedTickets.length > 0) {
+    const totalResponseTime = respondedTickets.reduce((sum, ticket) => {
+      const creationTime = new Date(ticket.createdAt || 0).getTime();
+      const responseTime = new Date(ticket.updatedAt || 0).getTime();
+      return sum + (responseTime - creationTime);
+    }, 0);
+
+    // Average response time in hours
+    avgResponseTime = Math.round(
+      totalResponseTime / respondedTickets.length / (1000 * 60 * 60)
+    );
+  }
+
+  return {
+    totalTickets,
+    byStatus: {
+      open: openTickets,
+      pending: pendingTickets,
+      resolved: resolvedTickets,
+    },
+    metrics: {
+      resolutionRate,
+      avgResolutionTime,
+      avgResponseTime,
+    },
+  };
+};
+
 export const SupportServices = {
   createSupportIntoDB,
   updateSupportIntoDB,
   getAllSupportFromDB,
+  getSupportOverviewFromDB,
 };

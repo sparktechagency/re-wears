@@ -11,8 +11,8 @@ export const deleteUnverifiedAccount = () => {
 
             // Delete unverified accounts older than the grace period
             const result = await User.deleteMany({
-                verified: false,
-                createdAt: { $lt: cutoffDate }, // Only delete accounts created before the cutoff date
+              isVerified: false,
+              createdAt: { $lt: cutoffDate }, // Only delete accounts created before the cutoff date
             });
 
             logger.info(`Deleted ${result.deletedCount} unverified accounts.`);

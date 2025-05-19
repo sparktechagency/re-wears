@@ -49,9 +49,23 @@ const adminReadNotificationToDB = async (): Promise<INotification | null> => {
     return result;
 };
 
+
+// ------------------ ADMIN NOTIFICATIONS ------------------
+
+// create admin notification
+const createAdminNotification = async (payload: any): Promise<INotification | null> => {
+    const result = await Notification.create(payload);
+    if(!result) {
+        throw new Error('Failed to create notification');
+    }
+    return result;
+};
+
+
 export const NotificationService = {
     adminNotificationFromDB,
     getNotificationFromDB,
     readNotificationToDB,
-    adminReadNotificationToDB
+    adminReadNotificationToDB,
+    createAdminNotification,
 };

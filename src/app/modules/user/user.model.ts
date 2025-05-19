@@ -100,6 +100,10 @@ const userSchema = new Schema<IUser, UserModal>(
         type: String,
       },
     },
+    appId: {
+      type: String,
+      required: false,
+    },
   },
   {
     timestamps: true,

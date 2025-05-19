@@ -41,73 +41,67 @@ const getAllOrderFromDB = async (query: Record<string, any>) => {
 
 // Get top sellers and buyers based on order count with search and pagination
 const getTopSellersAndBuyers = async (query: Record<string, any>) => {
-  // Extract query parameters with defaults
-  const { 
-    type = 'both', 
-    searchTerm,
-    page = 1,
-    limit = 5
-  } = query;
-  
+  // Extract query parameters with defaults - change 'type' to 'userType'
+  const { userType = "both", searchTerm, page = 1, limit = 5 } = query;
+
   // Calculate pagination values
   const pageNumber = Number(page);
   const limitNumber = Number(limit);
   const skip = (pageNumber - 1) * limitNumber;
-  
-  // CASE 1: Handle specific type request (either sellers or buyers)
-  if (type === "sellers" || type === "buyers") {
-    // Determine which field to use based on type
-    const field = type === "sellers" ? "seller" : "buyer";
-    const userTypeValue = type === "sellers" ? "seller" : "buyer";
-    
+
+  // CASE 1: Handle specific type request - change 'sellers'/'buyers' to 'seller'/'buyer'
+  if (userType === "seller" || userType === "buyer") {
+    // Determine which field to use based on userType
+    const field = userType === "seller" ? "seller" : "buyer";
+
     // Build the aggregation pipeline
     const pipeline: any[] = [
       // Step 1: Group by seller/buyer and count orders
       {
         $group: {
           _id: `$${field}`,
-          totalOrders: { $sum: 1 }
-        }
+          totalOrders: { $sum: 1 },
+        },
       },
-      
+
       // Step 2: Add userType field in a separate project stage
       {
         $project: {
           _id: 1,
           totalOrders: 1,
-          userType: { $literal: userTypeValue }
-        }
+          userType: { $literal: userType },
+        },
       },
-      
+
       // Step 3: Join with users collection to get user details
       {
         $lookup: {
           from: "users",
           localField: "_id",
           foreignField: "_id",
-          as: "userDetails"
-        }
+          as: "userDetails",
+        },
       },
       {
         $unwind: {
           path: "$userDetails",
-          preserveNullAndEmptyArrays: true
-        }
-      }
+          preserveNullAndEmptyArrays: true,
+        },
+      },
     ];
-    
+
     // Step 4: Add search filter if search term is provided
     if (searchTerm) {
       pipeline.push({
         $match: {
           $or: [
             { "userDetails.name": { $regex: searchTerm, $options: "i" } },
-            { "userDetails.email": { $regex: searchTerm, $options: "i" } }
-          ]
-        }
+            { "userDetails.email": { $regex: searchTerm, $options: "i" } },
+          ],
+        },
       });
     }
-    
+
     // Step 5: Use $facet to get both data and count in a single query
     pipeline.push({
       $facet: {
@@ -126,26 +120,26 @@ const getTopSellersAndBuyers = async (query: Record<string, any>) => {
               name: "$userDetails.name",
               email: "$userDetails.email",
               image: "$userDetails.image",
-              role: "$userDetails.role"
-            }
-          }
-        ]
-      }
+              role: "$userDetails.role",
+            },
+          },
+        ],
+      },
     });
-    
+
     // Execute the aggregation
     const [result] = await Order.aggregate(pipeline);
-    
+
     // Format and return the response
     return {
       data: result.data || [],
       meta: {
         page: pageNumber,
         limit: limitNumber,
-        total: result.metadata[0]?.total || 0
-      }
+        total: result.metadata[0]?.total || 0,
+      },
     };
-  } 
+  }
   // CASE 2: Handle combined results (both sellers and buyers)
   else {
     // Build a pipeline that combines both sellers and buyers
@@ -154,18 +148,18 @@ const getTopSellersAndBuyers = async (query: Record<string, any>) => {
       {
         $group: {
           _id: "$seller",
-          totalOrders: { $sum: 1 }
-        }
+          totalOrders: { $sum: 1 },
+        },
       },
       // Add userType in a separate project stage
       {
         $project: {
           _id: 1,
           totalOrders: 1,
-          userType: { $literal: "seller" }
-        }
+          userType: { $literal: "seller" },
+        },
       },
-      
+
       // Step 2: Union with buyers data
       {
         $unionWith: {
@@ -174,49 +168,49 @@ const getTopSellersAndBuyers = async (query: Record<string, any>) => {
             {
               $group: {
                 _id: "$buyer",
-                totalOrders: { $sum: 1 }
-              }
+                totalOrders: { $sum: 1 },
+              },
             },
             {
               $project: {
                 _id: 1,
                 totalOrders: 1,
-                userType: { $literal: "buyer" }
-              }
-            }
-          ]
-        }
+                userType: { $literal: "buyer" },
+              },
+            },
+          ],
+        },
       },
-      
+
       // Step 3: Join with users collection to get user details
       {
         $lookup: {
           from: "users",
           localField: "_id",
           foreignField: "_id",
-          as: "userDetails"
-        }
+          as: "userDetails",
+        },
       },
       {
         $unwind: {
           path: "$userDetails",
-          preserveNullAndEmptyArrays: true
-        }
-      }
+          preserveNullAndEmptyArrays: true,
+        },
+      },
     ];
-    
+
     // Step 4: Add search filter if search term is provided
     if (searchTerm) {
       pipeline.push({
         $match: {
           $or: [
             { "userDetails.name": { $regex: searchTerm, $options: "i" } },
-            { "userDetails.email": { $regex: searchTerm, $options: "i" } }
-          ]
-        }
+            { "userDetails.email": { $regex: searchTerm, $options: "i" } },
+          ],
+        },
       });
     }
-    
+
     // Step 5: Use $facet to get both data and count
     pipeline.push({
       $facet: {
@@ -236,24 +230,24 @@ const getTopSellersAndBuyers = async (query: Record<string, any>) => {
               name: "$userDetails.name",
               email: "$userDetails.email",
               image: "$userDetails.image",
-              role: "$userDetails.role"
-            }
-          }
-        ]
-      }
+              role: "$userDetails.role",
+            },
+          },
+        ],
+      },
     });
-    
+
     // Execute the aggregation
     const [result] = await Order.aggregate(pipeline);
-    
+
     // Format and return the response
     return {
       data: result.data || [],
       meta: {
         page: pageNumber,
         limit: limitNumber,
-        total: result.metadata[0]?.total || 0
-      }
+        total: result.metadata[0]?.total || 0,
+      },
     };
   }
 };
