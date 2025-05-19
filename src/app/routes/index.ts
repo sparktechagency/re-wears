@@ -15,6 +15,7 @@ import { ChatRoutes } from "../modules/chat/chat.routes";
 import { MessageRoutes } from "../modules/message/message.routes";
 import { OrderRoutes } from "../modules/order/order.route";
 import { ReportRoutes } from "../modules/report/report.route";
+import { TemplateRoutes } from "../modules/template/template.route";
 const router = express.Router();
 
 const apiRoutes = [
@@ -31,6 +32,7 @@ const apiRoutes = [
   { path: "/supports", route: SupportRoutes },
   { path: "/reports", route: ReportRoutes },
   { path: "/cms", route: CmsRoutes },
+  { path: "/templates", route: TemplateRoutes },
   // * for create room
   { path: "/room", route: ChatRoutes },
   { path: "/chat", route: MessageRoutes },
