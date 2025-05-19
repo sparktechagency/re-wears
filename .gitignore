@@ -4,3 +4,5 @@ uploads
 .env
 # editor
 .vscode
+dist
+.qodo

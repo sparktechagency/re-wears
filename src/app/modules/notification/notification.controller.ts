@@ -6,7 +6,7 @@ import { NotificationService } from './notification.service';
 
 const getNotificationFromDB = catchAsync( async (req: Request, res: Response) => {
     const user = req.user;
-    const result = await NotificationService.getNotificationFromDB(user);
+    const result = await NotificationService.getNotificationFromDB(user!);
 
     sendResponse(res, {
         statusCode: StatusCodes.OK,
@@ -30,7 +30,7 @@ const adminNotificationFromDB = catchAsync( async (req: Request, res: Response) 
 
 const readNotification = catchAsync(async (req: Request, res: Response) => {
     const user = req.user;
-    const result = await NotificationService.readNotificationToDB(user);
+    const result = await NotificationService.readNotificationToDB(user!);
 
     sendResponse(res, {
         statusCode: StatusCodes.OK,

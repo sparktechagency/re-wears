@@ -2,7 +2,6 @@ import { StatusCodes } from "http-status-codes";
 import ApiError from "../../../errors/ApiErrors";
 import { BrandModel } from "./brandSizeMaterial.model";
 import QueryBuilder from "../../builder/queryBuilder";
-import { IBrand } from "./brandSizeMaterial.interface";
 
 const allowedTypes = ["brand", "size", "material"];
 

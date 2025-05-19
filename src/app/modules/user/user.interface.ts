@@ -16,6 +16,7 @@ interface IAuthenticationProps {
 
 export type IUser = {
   _id: string;
+  id?: string;
   firstName: string;
   lastName: string;
   email: string;
@@ -31,6 +32,9 @@ export type IUser = {
   isDeleted: boolean;
   authentication?: IAuthenticationProps;
   accountInformation?: IStripeAccountInfo;
+  appId?: string;
+  createdAt?: Date;
+  updatedAt?: Date;
 };
 
 export type UserModal = {

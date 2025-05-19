@@ -2,7 +2,6 @@ import { Request, Response } from "express";
 import catchAsync from "../../../shared/catchAsync";
 import sendResponse from "../../../shared/sendResponse";
 import { brandSizeMaterialService } from "./brandSizeMaterial.service";
-import { IBrand } from "./brandSizeMaterial.interface";
 
 const createBrandSizeMaterial = catchAsync(
   async (req: Request, res: Response) => {
