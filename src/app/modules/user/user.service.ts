@@ -9,6 +9,7 @@ import { emailTemplate } from "../../../shared/emailTemplate";
 import { emailHelper } from "../../../helpers/emailHelper";
 import unlinkFile from "../../../shared/unlinkFile";
 import QueryBuilder from "../../builder/queryBuilder";
+import generateSequentialId from "../../utils/idGenerator";
 
 const createAdminToDB = async (payload: any): Promise<IUser> => {
   // check admin is exist or not;
@@ -16,6 +17,9 @@ const createAdminToDB = async (payload: any): Promise<IUser> => {
   if (isExistAdmin) {
     throw new ApiError(StatusCodes.CONFLICT, "This Email already exist");
   }
+  // generate siquence id
+  const id = await generateSequentialId(User, "id");
+  payload.id = id;
 
   // create admin to db
   const createAdmin = await User.create(payload);
@@ -33,6 +37,10 @@ const createAdminToDB = async (payload: any): Promise<IUser> => {
 };
 
 const createUserToDB = async (payload: Partial<IUser>): Promise<IUser> => {
+  // generate sequence id
+  const id = await generateSequentialId(User, "id");
+  payload.id = id;
+
   const createUser = await User.create(payload);
   if (!createUser) {
     throw new ApiError(StatusCodes.BAD_REQUEST, "Failed to create user");
