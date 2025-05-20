@@ -157,9 +157,12 @@ const getUserProfileFromDB = async (
 const getAllUsers = async (
   query: Record<string, unknown>
 ): Promise<IUser[]> => {
-  const searchableFields = ["name", "code"];
+  const searchableFields = ["id", "firstName", "lastName", "email", "code"];
 
-  const userQuery = new QueryBuilder<IUser>(User.find(), query)
+  const userQuery = new QueryBuilder<IUser>(
+    User.find({ isDeleted: false }),
+    query
+  )
     .search(searchableFields)
     .filter()
     .sort()

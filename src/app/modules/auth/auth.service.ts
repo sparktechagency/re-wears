@@ -26,6 +26,22 @@ const loginUserFromDB = async (payload: ILoginData) => {
     throw new ApiError(StatusCodes.BAD_REQUEST, "User doesn't exist!");
   }
 
+  // check user delete status
+  if (isExistUser.isDeleted) {
+    throw new ApiError(
+      StatusCodes.BAD_REQUEST,
+      "Your account is deleted! Please contact admin"
+    );
+  }
+
+  // check user block status
+  if (isExistUser.isBlocked) {
+    throw new ApiError(
+      StatusCodes.BAD_REQUEST,
+      "Your account is blocked! Please contact admin"
+    );
+  }
+
   //check verified and status
   if (!isExistUser.isVerified) {
     throw new ApiError(
