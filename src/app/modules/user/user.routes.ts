@@ -40,8 +40,16 @@ router.patch(
 
 router.patch("/:id", UserController.updateUserRole);
 
-router.patch("/block-user/:id", UserController.toggleUserBlocking);
+router.patch(
+  "/block-user/:id",
+  auth(USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMIN),
+  UserController.toggleUserBlocking
+);
 
-router.delete("/:id", UserController.deleteSingleUser);
+router.delete(
+  "/:id",
+  auth(USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMIN),
+  UserController.deleteSingleUser
+);
 
 export const UserRoutes = router;
