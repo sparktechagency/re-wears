@@ -160,7 +160,7 @@ const getAllUsers = async (
   const searchableFields = ["id", "firstName", "lastName", "email", "code"];
 
   const userQuery = new QueryBuilder<IUser>(
-    User.find({ isDeleted: false }),
+    User.find({ isDeleted: false, role: { $ne: USER_ROLES.SUPER_ADMIN } }),
     query
   )
     .search(searchableFields)
