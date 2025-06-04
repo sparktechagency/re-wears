@@ -25,7 +25,7 @@ export type IUser = {
   image: string;
   location: string;
   gender: GENDER;
-  bod: Date;
+  dob: Date;
   isVacation: boolean;
   isVerified: boolean;
   isBlocked: boolean;

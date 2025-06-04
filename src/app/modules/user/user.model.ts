@@ -8,6 +8,10 @@ import config from "../../../config";
 
 const userSchema = new Schema<IUser, UserModal>(
   {
+    id: {
+      type: String,
+      required: true,
+    },
     firstName: {
       type: String,
       required: true,
@@ -48,7 +52,7 @@ const userSchema = new Schema<IUser, UserModal>(
       enum: Object.values(GENDER),
       required: false,
     },
-    bod: {
+    dob: {
       type: Date,
       required: false,
     },
