@@ -70,5 +70,4 @@ router.delete(
   SubCategoryController.deleteSubCategory
 );
 
-
 export const SubCategoryRoutes = router;

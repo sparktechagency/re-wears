@@ -62,7 +62,7 @@ const getAllProducts = async (
         "category.childSubCategory",
       ],
       {
-        user: "name email",
+        user: "firstName lastName email image",
         brand: "name",
         size: "name",
         material: "name",
@@ -90,8 +90,18 @@ const getSingleProductIntoDB = async (id: string) => {
   return result;
 };
 
+const updateProductFromDB = async (id: string, payload: IProduct) => {
+  const result = await Product.findByIdAndUpdate(id, payload, { new: true });
+
+  if (!result) {
+    throw new ApiError(StatusCodes.NOT_FOUND, "Product not found");
+  }
+  return result;
+};
+
 export const productService = {
   createProduct,
   getAllProducts,
   getSingleProductIntoDB,
+  updateProductFromDB,
 };

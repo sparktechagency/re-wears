@@ -9,7 +9,7 @@ const router = express.Router();
 router.post(
   "/create",
   // auth(USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMIN),
-  validateRequest(CategoryValidation.createCategoryZodSchema),
+  // validateRequest(CategoryValidation.createCategoryZodSchema),
   CategoryController.createCategory
 );
 
