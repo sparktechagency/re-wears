@@ -65,7 +65,7 @@ const getAllProductBaseOnCategory = async () => {
             {
                 _id: null,
                 name: "All",
-                icon: null,
+                icon: "https://res.cloudinary.com/dabd4udau/image/upload/v1749981750/kbfvbcfsahe1fojw9hqw.svg",
                 childSubCategories: allChildSubs
             },
             ...category.subCategories

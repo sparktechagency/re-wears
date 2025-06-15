@@ -3,6 +3,7 @@ import ApiError from "../../../errors/ApiErrors";
 import { IProduct } from "./product.interface";
 import { Product } from "./product.model";
 import QueryBuilder from "../../builder/queryBuilder";
+import { Wishlist } from "../wishlist/wishlist.model";
 
 const createProduct = async (
   payload: IProduct,
@@ -29,7 +30,7 @@ const createProduct = async (
 
 const getAllProducts = async (
   query: Record<string, any>
-): Promise<{ data: IProduct[]; meta: any }> => {
+): Promise<{ data: any[]; meta: any }> => {
   const { minPrice, maxPrice, ...restQuery } = query;
   const priceFilter: any = {};
   if (minPrice) priceFilter.$gte = Number(minPrice);
@@ -44,6 +45,7 @@ const getAllProducts = async (
     Product.find(filter),
     restQuery
   );
+
   queryBuilder
     .search(["name", "description"])
     .filter()
@@ -76,18 +78,43 @@ const getAllProducts = async (
   const products = await queryBuilder.modelQuery;
   const pagination = await queryBuilder.getPaginationInfo();
 
+  // Collect product IDs
+  const productIds = products.map((p) => p._id);
+
+  // Get wishlist counts grouped by product
+  const wishlistCounts = await Wishlist.aggregate([
+    { $match: { product: { $in: productIds } } },
+    { $group: { _id: "$product", count: { $sum: 1 } } },
+  ]);
+
+  // Convert to map for faster lookup
+  const wishlistMap = wishlistCounts.reduce((acc, item) => {
+    acc[item._id.toString()] = item.count;
+    return acc;
+  }, {} as Record<string, number>);
+
+  // Attach wishlist count to each product
+  const dataWithWishlist = products.map((p) => {
+    return {
+      ...p.toObject(),
+      wishlistCount: wishlistMap[p._id.toString()] || 0,
+    };
+  });
+
   return {
-    data: products,
+    data: dataWithWishlist,
     meta: pagination,
   };
 };
 
+
 const getSingleProductIntoDB = async (id: string) => {
-  const result = await Product.findById(id);
+  const result = await Product.findById(id).populate("brand").populate("size").populate("material").populate("colors").populate("user");
+  const favCount = await Wishlist.countDocuments({ product: id });
   if (!result) {
     throw new ApiError(StatusCodes.NOT_FOUND, "Product not found");
   }
-  return result;
+  return { result, favCount };
 };
 
 const updateProductFromDB = async (id: string, payload: IProduct) => {
