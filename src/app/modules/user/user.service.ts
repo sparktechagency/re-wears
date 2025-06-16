@@ -81,6 +81,15 @@ const updateProfileToDB = async (
   if (!isExistUser) {
     throw new ApiError(StatusCodes.BAD_REQUEST, "User doesn't exist!");
   }
+  if (payload.userName) {
+    const existingUser = await User.findOne({
+      userName: payload.userName,
+      _id: { $ne: id }
+    });
+    if (existingUser) {
+      throw new ApiError(StatusCodes.BAD_REQUEST, "Username already taken!");
+    }
+  }
 
   //unlink file here
   if (payload.image) {
@@ -173,7 +182,7 @@ const getAllUsers = async (
   return result;
 };
 
-
+// TODO: need to return user follower how much user he follwing | user-name | follower | following | rating | reviews 
 const getSingleUserFromDB = async (id: JwtPayload) => {
   const result = await User.findById(id)
   if (!result) {
