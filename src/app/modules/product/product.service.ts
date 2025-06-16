@@ -79,7 +79,7 @@ const getAllProducts = async (
   const pagination = await queryBuilder.getPaginationInfo();
 
   // Collect product IDs
-  const productIds = products.map((p) => p._id);
+  const productIds = products?.map((p) => p?._id);
 
   // Get wishlist counts grouped by product
   const wishlistCounts = await Wishlist.aggregate([
@@ -94,10 +94,10 @@ const getAllProducts = async (
   }, {} as Record<string, number>);
 
   // Attach wishlist count to each product
-  const dataWithWishlist = products.map((p) => {
+  const dataWithWishlist = products?.map((p) => {
     return {
-      ...p.toObject(),
-      wishlistCount: wishlistMap[p._id.toString()] || 0,
+      ...p?.toObject(),
+      wishlistCount: wishlistMap[p?._id.toString()] || 0,
     };
   });
 

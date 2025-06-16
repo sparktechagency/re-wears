@@ -5,28 +5,28 @@ import catchAsync from '../../../shared/catchAsync';
 import sendResponse from '../../../shared/sendResponse';
 
 // register user
-const createUser = catchAsync( async (req: Request, res: Response, next: NextFunction) => {
-    const { ...userData } = req.body;
-    const result = await UserService.createUserToDB(userData);
+const createUser = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+  const { ...userData } = req.body;
+  const result = await UserService.createUserToDB(userData);
 
-    sendResponse(res, {
-        success: true,
-        statusCode: StatusCodes.OK,
-        message: 'Your account has been successfully created. Verify Your Email By OTP. Check your email',
-    })
+  sendResponse(res, {
+    success: true,
+    statusCode: StatusCodes.OK,
+    message: 'Your account has been successfully created. Verify Your Email By OTP. Check your email',
+  })
 });
 
 // register admin
-const createAdmin = catchAsync( async (req: Request, res: Response, next: NextFunction) => {
-    const { ...userData } = req.body;
-    const result = await UserService.createAdminToDB(userData);
+const createAdmin = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+  const { ...userData } = req.body;
+  const result = await UserService.createAdminToDB(userData);
 
-    sendResponse(res, {
-        success: true,
-        statusCode: StatusCodes.OK,
-        message: 'Admin created successfully',
-        data: result
-    });
+  sendResponse(res, {
+    success: true,
+    statusCode: StatusCodes.OK,
+    message: 'Admin created successfully',
+    data: result
+  });
 });
 
 //update profile
@@ -102,7 +102,7 @@ const getUserProfile = catchAsync(async (req: Request, res: Response) => {
     data: result,
   });
 })
-  
+
 // retrieved all users
 const getAllUsers = catchAsync(async (req: Request, res: Response) => {
   const result = await UserService.getAllUsers(req.query);
@@ -115,13 +115,26 @@ const getAllUsers = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
-export const UserController = { 
-    createUser, 
-    createAdmin, 
-    updateProfile,
-    updateUserRole,
-    deleteSingleUser,
-    toggleUserBlocking,
-    getUserProfile, 
-    getAllUsers,
+
+const getSingleUser = catchAsync(async (req: Request, res: Response) => {
+  const id = req.params
+  const result = await UserService.getSingleUserFromDB(id)
+  sendResponse(res, {
+    success: true,
+    statusCode: StatusCodes.OK,
+    message: "User data retrieved successfully",
+    data: result,
+  });
+})
+
+export const UserController = {
+  createUser,
+  createAdmin,
+  updateProfile,
+  updateUserRole,
+  deleteSingleUser,
+  toggleUserBlocking,
+  getUserProfile,
+  getAllUsers,
+  getSingleUser
 };

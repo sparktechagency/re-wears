@@ -22,7 +22,7 @@ const productSchema = new Schema<IProduct>(
     },
     condition: {
       type: String,
-      enum: ["LikelyNew", "VeryGood", "Good", "Fair"],
+      enum: ["Like New", "Very Good", "Good", "Fair"],
       required: true,
     },
     brand: {
@@ -38,7 +38,6 @@ const productSchema = new Schema<IProduct>(
     material: {
       type: Schema.Types.ObjectId,
       ref: "Brand",
-      required: true,
     },
     category: {
       category: {
@@ -70,6 +69,7 @@ const productSchema = new Schema<IProduct>(
       type: String,
       enum: ["Active", "Reserved", "Sold", "Hidden", "Draft"],
       required: true,
+      default: "Active"
     },
     isBlocked: {
       type: Boolean,

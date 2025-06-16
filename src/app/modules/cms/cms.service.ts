@@ -22,7 +22,6 @@ const createOrUpdateCms = async (type: string, payload: Partial<ICms>) => {
 // get cms
 const getCms = async (type: string) => {
   const result = await Cms.findOne({ type });
-
   // check if cms exists
   if (!result) {
     throw new Error(`Cms with type ${type} not found`);

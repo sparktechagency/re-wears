@@ -173,6 +173,16 @@ const getAllUsers = async (
   return result;
 };
 
+
+const getSingleUserFromDB = async (id: JwtPayload) => {
+  const result = await User.findById(id)
+  if (!result) {
+    throw new ApiError(StatusCodes.BAD_REQUEST, "No user found")
+  }
+  return result
+}
+
+
 export const UserService = {
   createUserToDB,
   createAdminToDB,
@@ -182,4 +192,5 @@ export const UserService = {
   deleteUserFromDB,
   getUserProfileFromDB,
   getAllUsers,
+  getSingleUserFromDB
 };

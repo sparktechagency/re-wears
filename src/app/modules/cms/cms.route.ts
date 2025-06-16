@@ -14,6 +14,6 @@ router.put(
   CmsController.createOrUpdateCms
 );
 // get all cms
-router.get("/:type", auth(USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMIN), CmsController.getCms);
+router.get("/:type", CmsController.getCms);
 
 export const CmsRoutes = router;
