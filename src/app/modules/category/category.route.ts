@@ -8,29 +8,29 @@ const router = express.Router();
 
 router.post(
   "/create",
-  auth(USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMIN),
-  validateRequest(CategoryValidation.createCategoryZodSchema),
+  // auth(USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMIN),
+  // validateRequest(CategoryValidation.createCategoryZodSchema),
   CategoryController.createCategory
 );
 
 router.get(
   "/",
-  auth(USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMIN, USER_ROLES.USER),
+  // auth(USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMIN, USER_ROLES.USER),
   CategoryController.getCategories
 );
 
 router
   .route("/:id")
   .get(
-    auth(USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMIN, USER_ROLES.USER),
+    // auth(USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMIN, USER_ROLES.USER),
     CategoryController.getSingleCategory
   )
   .patch(
-    auth(USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMIN),
+    // auth(USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMIN),
     CategoryController.updateCategory
   )
   .delete(
-    auth(USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMIN),
+    // auth(USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMIN),
     CategoryController.deleteCategory
   );
 

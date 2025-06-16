@@ -48,21 +48,50 @@ router.post(
   productController.createProduct
 );
 
-
-
-
-
-// 
+//
 router.get(
   "/:id",
   auth(USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMIN, USER_ROLES.USER),
   productController.getSingleProduct
 );
 
-// 
+//
 router.get(
   "/",
-  auth(USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMIN, USER_ROLES.USER),
+  // auth(USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMIN, USER_ROLES.USER),
   productController.getAllProducts
 );
+
+router.patch(
+  "/:id",
+  auth(USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMIN, USER_ROLES.USER),
+  fileUploadHandler(),
+  async (req, res, next) => {
+    const productImage = getMultipleFilesPath(req.files, "productImage");
+    const parseIfStringArray = (value: any) => {
+      if (typeof value === "string") {
+        try {
+          return JSON.parse(value);
+        } catch {
+          return value;
+        }
+      }
+      return value;
+    };
+
+    const payload = {
+      ...req.body,
+      colors: parseIfStringArray(req.body.colors),
+      sizes: parseIfStringArray(req.body.sizes),
+      brands: parseIfStringArray(req.body.brands),
+      materials: parseIfStringArray(req.body.materials),
+    };
+
+    req.body = productImage ? { ...payload, productImage } : payload;
+
+    next();
+  },
+  productController.updateProduct
+);
+
 export const productRoutes = router;

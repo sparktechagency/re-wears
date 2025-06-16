@@ -1,7 +1,7 @@
 import { model, Schema } from "mongoose";
 import { ICategory, CategoryModel } from "./category.interface";
 
-const serviceSchema = new Schema<ICategory, CategoryModel>(
+const categorySchema = new Schema<ICategory, CategoryModel>(
   {
     name: {
       type: String,
@@ -15,5 +15,5 @@ const serviceSchema = new Schema<ICategory, CategoryModel>(
 
 export const Category = model<ICategory, CategoryModel>(
   "Category",
-  serviceSchema
+  categorySchema
 );

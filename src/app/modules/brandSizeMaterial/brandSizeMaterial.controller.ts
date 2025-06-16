@@ -23,7 +23,8 @@ const getAllBrandSizeMaterial = catchAsync(
       statusCode: 200,
       success: true,
       message: `All ${type}s retrieved successfully`,
-      data: result,
+      pagination: result.pagination,
+      data: result.result,
     });
   }
 );

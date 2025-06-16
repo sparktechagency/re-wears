@@ -1,10 +1,10 @@
 import { StatusCodes } from "http-status-codes";
 import ApiError from "../../../errors/ApiErrors";
 import { ISubCategory } from "./subCategory.interface";
-import { subCategoryModel } from "./subCategory.model";
+import { SubCategory } from "./subCategory.model";
 
 const createSubCategoryToDB = async (payload: ISubCategory) => {
-  const result = await subCategoryModel.create(payload);
+  const result = await SubCategory.create(payload);
   if (!result) {
     throw new ApiError(StatusCodes.BAD_REQUEST, "Failed to create subCategory");
   }
@@ -12,7 +12,7 @@ const createSubCategoryToDB = async (payload: ISubCategory) => {
 };
 
 const getAllSubCategoryFromDB = async (): Promise<ISubCategory[]> => {
-  const result = await subCategoryModel.find({});
+  const result = await SubCategory.find();
   if (!result) {
     return [];
   }
@@ -22,7 +22,7 @@ const getAllSubCategoryFromDB = async (): Promise<ISubCategory[]> => {
 const getSingleSubCategoryFromDB = async (
   id: string
 ): Promise<ISubCategory | null> => {
-  const result = await subCategoryModel.findById(id);
+  const result = await SubCategory.findById(id);
   if (!result) {
     throw new ApiError(StatusCodes.NOT_FOUND, "SubCategory not found");
   }
@@ -33,7 +33,7 @@ const updateSubCategoryToDB = async (
   id: string,
   payload: Partial<ISubCategory>
 ): Promise<ISubCategory | null> => {
-  const result = await subCategoryModel.findOneAndUpdate({ _id: id }, payload, {
+  const result = await SubCategory.findOneAndUpdate({ _id: id }, payload, {
     new: true,
   });
   if (!result) {
@@ -45,7 +45,7 @@ const updateSubCategoryToDB = async (
 const deleteSubCategoryFromDB = async (
   id: string
 ): Promise<ISubCategory | null> => {
-  const result = await subCategoryModel.findByIdAndDelete(id);
+  const result = await SubCategory.findByIdAndDelete(id);
   if (!result) {
     throw new ApiError(StatusCodes.NOT_FOUND, "SubCategory not found");
   }

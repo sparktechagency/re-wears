@@ -17,6 +17,7 @@ import { OrderRoutes } from "../modules/order/order.route";
 import { ReportRoutes } from "../modules/report/report.route";
 import { TemplateRoutes } from "../modules/template/template.route";
 import { NotificationRoutes } from "../modules/notification/notification.routes";
+import { navRouter } from "../modules/navCategory/nav.routes";
 const router = express.Router();
 
 const apiRoutes = [
@@ -39,6 +40,7 @@ const apiRoutes = [
   { path: "/room", route: ChatRoutes },
   { path: "/chat", route: MessageRoutes },
   { path: "/order", route: OrderRoutes },
+  { path: "/nav", route: navRouter },
 ];
 
 apiRoutes.forEach((route) => router.use(route.path, route.route));

@@ -18,11 +18,11 @@ router.get(
   auth(USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMIN, USER_ROLES.USER),
   UserController.getUserProfile
 );
-  
+
 router.post(
-    '/create-admin',
-    validateRequest(UserValidation.createAdminZodSchema),
-    UserController.createAdmin
+  '/create-admin',
+  validateRequest(UserValidation.createAdminZodSchema),
+  UserController.createAdmin
 );
 
 router.post(
@@ -30,6 +30,8 @@ router.post(
   validateRequest(UserValidation.createUserZodSchema),
   UserController.createUser
 );
+
+router.get("/:id", UserController.getSingleUser)
 
 router.patch(
   "/update-profile",

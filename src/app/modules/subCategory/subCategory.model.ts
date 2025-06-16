@@ -18,11 +18,10 @@ const subCategorySchema = new Schema<ISubCategory>(
       required: true,
     },
   },
-  {
-    timestamps: true,
-  }
+  { timestamps: true }
 );
-export const subCategoryModel = model<ISubCategory>(
+
+export const SubCategory = model<ISubCategory>(
   "SubCategory",
   subCategorySchema
 );

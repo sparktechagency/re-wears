@@ -1,7 +1,7 @@
 import { model, Schema } from "mongoose";
 import { IChildSubCategory } from "./childSubCategory.interface";
 
-const childSubCategory = new Schema<IChildSubCategory>(
+const childSubCategorySchema = new Schema<IChildSubCategory>(
   {
     name: {
       type: String,
@@ -13,11 +13,10 @@ const childSubCategory = new Schema<IChildSubCategory>(
       required: true,
     },
   },
-  {
-    timestamps: true,
-  }
+  { timestamps: true }
 );
-export const childSubCategoryModel = model<IChildSubCategory>(
+
+export const ChildSubCategory = model<IChildSubCategory>(
   "ChildSubCategory",
-  childSubCategory
+  childSubCategorySchema
 );

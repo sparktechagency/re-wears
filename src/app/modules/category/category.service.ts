@@ -2,8 +2,6 @@ import { StatusCodes } from "http-status-codes";
 import ApiError from "../../../errors/ApiErrors";
 import { ICategory } from "./category.interface";
 import { Category } from "./category.model";
-import unlinkFile from "../../../shared/unlinkFile";
-import { Bookmark } from "../bookmark/bookmark.model";
 
 const createCategoryToDB = async (payload: ICategory) => {
   const { name } = payload;
@@ -16,11 +14,81 @@ const createCategoryToDB = async (payload: ICategory) => {
   return createCategory;
 };
 
-const getCategoriesFromDB = async (): Promise<ICategory[]> => {
-  const result = await Category.find({});
-  if (!result) {
-    throw new ApiError(StatusCodes.BAD_REQUEST, "Category doesn't exist");
-  }
+const getCategoriesFromDB = async () => {
+  const result = await Category.aggregate([
+    {
+      $lookup: {
+        from: "subcategories",
+        localField: "_id",
+        foreignField: "category",
+        as: "subCategories",
+        pipeline: [
+          {
+            $lookup: {
+              from: "childsubcategories",
+              localField: "_id",
+              foreignField: "subCategory",
+              as: "childSubCategories",
+            },
+          },
+          {
+            $project: {
+              name: 1,
+              icon: 1,
+              childSubCategories: {
+                $map: {
+                  input: "$childSubCategories",
+                  as: "childSubCategory",
+                  in: {
+                    name: "$$childSubCategory.name",
+                    _id: "$$childSubCategory._id",
+                  },
+                },
+              },
+            },
+          },
+        ],
+      },
+    },
+    {
+      $unwind: {
+        path: "$subCategories",
+        preserveNullAndEmptyArrays: true,
+      },
+    },
+    // {
+    //   $lookup: {
+    //     from: "childsubcategories",
+    //     let: { subCatId: "$subCategories._id" },
+    //     pipeline: [
+    //       {
+    //         $match: {
+    //           $expr: { $eq: ["$subCategory", "$$subCatId"] },
+    //         },
+    //       },
+    //       {
+    //         $project: {
+    //           _id: 1,
+    //           name: 1,
+    //         },
+    //       },
+    //     ],
+    //     as: "subCategories.childSubCategories",
+    //   },
+    // },
+    {
+      $group: {
+        _id: "$_id",
+        name: { $first: "$name" },
+        createdAt: { $first: "$createdAt" },
+        updatedAt: { $first: "$updatedAt" },
+        subCategories: {
+          $push: "$subCategories",
+        },
+      },
+    },
+  ]);
+
   return result;
 };
 
@@ -60,5 +128,5 @@ export const CategoryService = {
   getCategoriesFromDB,
   updateCategoryToDB,
   deleteCategoryToDB,
-  getSingleCategoryFromDB
+  getSingleCategoryFromDB,
 };
