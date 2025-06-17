@@ -4,6 +4,8 @@ import fileUploadHandler from "../../middlewares/fileUploaderHandler";
 import { getMultipleFilesPath } from "../../../shared/getFilePath";
 import auth from "../../middlewares/auth";
 import { USER_ROLES } from "../../../enums/user";
+import ApiError from "../../../errors/ApiErrors";
+import { StatusCodes } from "http-status-codes";
 
 const router = Router();
 
@@ -14,6 +16,7 @@ router.post(
   async (req, res, next) => {
     try {
       const payload = req.body;
+      console.log("payload", payload);
       const productImage = getMultipleFilesPath(req.files, "productImage");
       if (!productImage) {
         res.status(400).json({ message: "Product images are required" });
@@ -35,14 +38,13 @@ router.post(
         sizes: parseIfStringArray(payload.sizes),
         brands: parseIfStringArray(payload.brands),
         materials: parseIfStringArray(payload.materials),
+        productImage
       };
-      req.body = {
-        productImage,
-        ...parsedPayload,
-      };
+      req.body = parsedPayload;
       next();
     } catch (error) {
-      res.status(500).json({ message: "Failed to upload Image" });
+      console.log(error);
+      next(error);
     }
   },
   productController.createProduct

@@ -5,15 +5,29 @@ import sendResponse from "../../../shared/sendResponse";
 import { StatusCodes } from "http-status-codes";
 
 
-const createReview = catchAsync(async(req:Request, res:Response)=>{
-    const result = await ReviewService.createReviewToDB(req.body);
-
+const createReview = catchAsync(async (req: Request, res: Response) => {
+    const user = req.user;
+    const result = await ReviewService.createReviewToDB(user!, req.body);
     sendResponse(res, {
-        statusCode : StatusCodes.OK,
+        statusCode: StatusCodes.OK,
         success: true,
         message: "Review Created Successfully",
         data: result
     })
 })
 
-export  const ReviewController = {createReview}
+const getAllReview = catchAsync(async (req: Request, res: Response) => {
+    const result = await ReviewService.getAllReviews(req.query);
+    sendResponse(res, {
+        statusCode: StatusCodes.OK,
+        success: true,
+        message: "Review Fetched Successfully",
+        pagination: result.pagination,
+        data: result.data
+    })
+})
+
+export const ReviewController = {
+    createReview,
+    getAllReview
+}

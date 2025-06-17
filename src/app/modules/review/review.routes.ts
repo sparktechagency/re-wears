@@ -9,7 +9,7 @@ const router = express.Router();
 router.post(
   "/",
   auth(USER_ROLES.USER),
-  validateRequest(ReviewValidation.reviewZodSchema),
+  // validateRequest(ReviewValidation.reviewZodSchema),
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { rating, ...othersData } = req.body;
@@ -29,8 +29,16 @@ router.post(
         .json({ message: "Failed to convert string to number" });
     }
   },
-  auth(USER_ROLES.USER),
+  auth(USER_ROLES.USER, USER_ROLES.ADMIN, USER_ROLES.SUPER_ADMIN),
   ReviewController.createReview
+);
+
+
+// all review
+router.get(
+  "/",
+  auth(USER_ROLES.USER, USER_ROLES.ADMIN, USER_ROLES.SUPER_ADMIN),
+  ReviewController.getAllReview
 );
 
 
