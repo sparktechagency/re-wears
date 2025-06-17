@@ -117,7 +117,7 @@ const getAllUsers = catchAsync(async (req: Request, res: Response) => {
 
 
 const getSingleUser = catchAsync(async (req: Request, res: Response) => {
-  const id = req.params
+  const { id } = req.params
   const result = await UserService.getSingleUserFromDB(id)
   sendResponse(res, {
     success: true,
