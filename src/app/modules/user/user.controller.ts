@@ -127,6 +127,18 @@ const getSingleUser = catchAsync(async (req: Request, res: Response) => {
   });
 })
 
+
+const updateUserNickName = catchAsync(async (req: Request, res: Response) => {
+  const { id } = req.params
+  const result = await UserService.updateUserNickNameBaseOnIdFromDB(id, req.body)
+  sendResponse(res, {
+    success: true,
+    statusCode: StatusCodes.OK,
+    message: "User data updated successfully",
+    data: result,
+  });
+})
+
 export const UserController = {
   createUser,
   createAdmin,
@@ -136,5 +148,6 @@ export const UserController = {
   toggleUserBlocking,
   getUserProfile,
   getAllUsers,
-  getSingleUser
+  getSingleUser,
+  updateUserNickName
 };

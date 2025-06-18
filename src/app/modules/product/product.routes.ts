@@ -4,8 +4,6 @@ import fileUploadHandler from "../../middlewares/fileUploaderHandler";
 import { getMultipleFilesPath } from "../../../shared/getFilePath";
 import auth from "../../middlewares/auth";
 import { USER_ROLES } from "../../../enums/user";
-import ApiError from "../../../errors/ApiErrors";
-import { StatusCodes } from "http-status-codes";
 
 const router = Router();
 
@@ -32,6 +30,15 @@ router.post(
         }
         return value;
       };
+      if (!payload.status) {
+        return res.status(400).json({ message: "Status is required" });
+      }
+
+      if (!["Active", "Reserved", "Sold", "Hidden", "Draft"].includes(payload.status)) {
+        return res.status(400).json({
+          message: `Invalid status. Allowed values are: Active, Reserved, Sold, Hidden, Draft. Received: ${payload.status}`
+        });
+      }
       const parsedPayload = {
         ...payload,
         colors: parseIfStringArray(payload.colors),
@@ -80,9 +87,19 @@ router.patch(
       }
       return value;
     };
+    const data = req.body
+    if (!data.status) {
+      return res.status(400).json({ message: "Status is required" });
+    }
+
+    if (!["Active", "Reserved", "Sold", "Hidden", "Draft"].includes(data.status)) {
+      return res.status(400).json({
+        message: `Invalid status. Allowed values are: Active, Reserved, Sold, Hidden, Draft. Received: ${data.status}`
+      });
+    }
 
     const payload = {
-      ...req.body,
+      ...data,
       colors: parseIfStringArray(req.body.colors),
       sizes: parseIfStringArray(req.body.sizes),
       brands: parseIfStringArray(req.body.brands),

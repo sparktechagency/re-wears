@@ -71,7 +71,24 @@ const getAllWishListFromDB = async (
   }
 };
 
+const getWishListBaseOnIdAndProductId = async (
+  user: JwtPayload,
+  product: string) => {
+  const result = await Wishlist.findOne({
+    user: user.id,
+    product: product,
+  });
+  if (!result) {
+    throw new ApiError(StatusCodes.NOT_FOUND, "Wishlist not found");
+  }
+  return result;
+}
+
+
+
+
 export const WishlistServices = {
   createWishListIntoDB,
   getAllWishListFromDB,
+  getWishListBaseOnIdAndProductId
 };

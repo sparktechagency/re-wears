@@ -33,7 +33,26 @@ const getAllWishList = catchAsync(async (req: Request, res: Response) => {
     data: result && "data" in result ? result.data : result,
   });
 });
+
+const getWishListUsingUserIdAndProductId = catchAsync(
+  async (req: Request, res: Response) => {
+    const result = await WishlistServices.getWishListBaseOnIdAndProductId(
+      req.user!,
+      req.params.id
+    );
+    sendResponse(res, {
+      statusCode: 200,
+      success: true,
+      message: "Get all message",
+      data: result,
+    });
+  }
+);
+
+
 export const WishlistController = {
   createWishList,
   getAllWishList,
+
+  getWishListUsingUserIdAndProductId
 };

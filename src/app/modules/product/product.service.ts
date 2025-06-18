@@ -31,6 +31,7 @@ const createProduct = async (
 const getAllProducts = async (
   query: Record<string, any>
 ): Promise<{ data: any[]; meta: any }> => {
+  console.log("query", query);
   const { minPrice, maxPrice, ...restQuery } = query;
   const priceFilter: any = {};
   if (minPrice) priceFilter.$gte = Number(minPrice);
@@ -109,7 +110,7 @@ const getAllProducts = async (
 
 
 const getSingleProductIntoDB = async (id: string) => {
-  const result = await Product.findById(id).populate("brand").populate("size").populate("material").populate("colors").populate("user");
+  const result = await Product.findById(id).populate("brand").populate("size").populate("material").populate("colors").populate("user").populate("category.category").populate("category.subCategory").populate("category.childSubCategory");
   const favCount = await Wishlist.countDocuments({ product: id });
   if (!result) {
     throw new ApiError(StatusCodes.NOT_FOUND, "Product not found");

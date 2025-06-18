@@ -82,15 +82,6 @@ const updateProfileToDB = async (
   if (!isExistUser) {
     throw new ApiError(StatusCodes.BAD_REQUEST, "User doesn't exist!");
   }
-  if (payload.userName) {
-    const existingUser = await User.findOne({
-      userName: payload.userName,
-      _id: { $ne: id }
-    });
-    if (existingUser) {
-      throw new ApiError(StatusCodes.BAD_REQUEST, "Username already taken!");
-    }
-  }
 
   //unlink file here
   if (payload.image) {
@@ -231,7 +222,7 @@ const getSingleUserFromDB = async (id: string) => {
 
   const customerAvgRating = validRatings.length
     ? parseFloat((validRatings.reduce((acc, curr) => acc + curr, 0) / validRatings.length).toFixed(2))
-    : null;
+    : 0;
 
   return {
     followingCount: following.length,
@@ -241,6 +232,28 @@ const getSingleUserFromDB = async (id: string) => {
     user,
   };
 };
+
+const updateUserNickNameBaseOnIdFromDB = async (
+  id: string, payload: IUser) => {
+  const isExistUser: any = await User.isExistUserById(id);
+  if (!isExistUser) {
+    throw new ApiError(StatusCodes.BAD_REQUEST, "User doesn't exist!");
+  }
+  if (payload.userName) {
+    const existingUser = await User.findOne({
+      userName: payload.userName,
+      _id: { $ne: id }
+    });
+    if (existingUser) {
+      throw new ApiError(StatusCodes.BAD_REQUEST, "Username already taken!");
+    }
+  }
+  const result = await User.findByIdAndUpdate(id, payload, { new: true });
+  if (!result) {
+    throw new ApiError(StatusCodes.BAD_REQUEST, "Failed to update user");
+  }
+  return result;
+}
 
 
 
@@ -254,5 +267,6 @@ export const UserService = {
   deleteUserFromDB,
   getUserProfileFromDB,
   getAllUsers,
-  getSingleUserFromDB
+  getSingleUserFromDB,
+  updateUserNickNameBaseOnIdFromDB
 };
