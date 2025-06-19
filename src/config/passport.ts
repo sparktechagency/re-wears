@@ -6,40 +6,16 @@ import { User } from "../app/modules/user/user.model";
 
 // Google OAuth Strategy
 passport.use(new GoogleStrategy({
-    clientID: config.social.google_client_id as string,
-    clientSecret: config.social.google_client_secret as string,
-    callbackURL: "https://nadir.binarybards.online/api/v1/auth/google/callback"
+    clientID: config.google.clientID as string,
+    clientSecret: config.google.clientSecret as string,
+    callbackURL: config.google.callbackURL as string,
 }, async (accessToken, refreshToken, profile, done) => {
     try {
-        
+
         console.log(profile)
         done(null, profile);
     } catch (error) {
         done(error, undefined);
-    }
-}));
-
-// Facebook OAuth Strategy
-passport.use(new FacebookStrategy({
-    clientID: config.social.facebook_client_id as string,
-    clientSecret: config.social.facebook_client_secret as string,
-    callbackURL: "/auth/facebook/callback",
-    profileFields: ['id', 'displayName', 'emails']
-}, async (accessToken, refreshToken, profile, done) => {
-    try {
-        let user = await User.findOne({ appId: profile.id });
-
-        if (!user) {
-            user = await User.create({
-                appId: profile.id,
-                name: profile.displayName,
-                email: profile.emails?.[0]?.value
-            });
-        }
-
-        done(null, user);
-    } catch (error) {
-        done(error, null);
     }
 }));
 

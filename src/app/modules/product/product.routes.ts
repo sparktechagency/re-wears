@@ -88,30 +88,45 @@ router.patch(
       }
       return value;
     };
-    const data = req.body
-    if (!data.status) {
-      return res.status(400).json({ message: "Status is required" });
+    let productImageExist = req.body.productImage || [];
+    let arr = []
+    if (typeof productImageExist == 'string') {
+      arr = [productImageExist]
+      productImageExist = arr
     }
-
-    if (!["Active", "Reserved", "Sold", "Hidden", "Draft"].includes(data.status)) {
-      return res.status(400).json({
-        message: `Invalid status. Allowed values are: Active, Reserved, Sold, Hidden, Draft. Received: ${data.status}`
-      });
+    if (typeof productImage == 'string') {
+      arr.push(productImage)
     }
-
+    else {
+      const mergedImages = [
+        ...productImageExist,
+        ...(productImage || []),
+      ];
+      arr = mergedImages
+    }
     const payload = {
-      ...data,
+      ...req.body,
       colors: parseIfStringArray(req.body.colors),
       sizes: parseIfStringArray(req.body.sizes),
       brands: parseIfStringArray(req.body.brands),
       materials: parseIfStringArray(req.body.materials),
+      productImage: arr
     };
-
-    req.body = productImage ? { ...payload, productImage } : payload;
-
+    req.body = payload;
     next();
   },
   productController.updateProduct
+);
+
+
+
+
+
+// delete product
+router.delete(
+  "/:id",
+  auth(USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMIN, USER_ROLES.USER),
+  productController.deleteProduct
 );
 
 export const productRoutes = router;
