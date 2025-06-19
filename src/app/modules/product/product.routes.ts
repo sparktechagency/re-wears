@@ -6,7 +6,7 @@ import auth from "../../middlewares/auth";
 import { USER_ROLES } from "../../../enums/user";
 
 const router = Router();
-
+// create product route
 router.post(
   "/create",
   auth(USER_ROLES.USER),
@@ -57,20 +57,21 @@ router.post(
   productController.createProduct
 );
 
-//
+// get single product route
 router.get(
   "/:id",
   auth(USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMIN, USER_ROLES.USER),
   productController.getSingleProduct
 );
 
-//
+// get all products route
 router.get(
   "/",
   // auth(USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMIN, USER_ROLES.USER),
   productController.getAllProducts
 );
 
+// update product route
 router.patch(
   "/:id",
   auth(USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMIN, USER_ROLES.USER),

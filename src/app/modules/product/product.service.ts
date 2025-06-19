@@ -1,10 +1,19 @@
+
 import { StatusCodes } from "http-status-codes";
 import ApiError from "../../../errors/ApiErrors";
 import { IProduct } from "./product.interface";
 import { Product } from "./product.model";
 import QueryBuilder from "../../builder/queryBuilder";
 import { Wishlist } from "../wishlist/wishlist.model";
+import { Category } from "../category/category.model";
 
+/**
+ * Creates a new product in the database
+ * @param {IProduct} payload - The product data to be created
+ * @param {any} user - The user creating the product
+ * @returns {Promise<IProduct>} The created product
+ * @throws {ApiError} If category format is invalid or product creation fails
+ */
 const createProduct = async (
   payload: IProduct,
   user: any
@@ -28,11 +37,20 @@ const createProduct = async (
   return createdProduct;
 };
 
+
+
+/**
+ * Retrieves a list of products with pagination and filtering
+ * @param {Record<string, any>} query - Query parameters for filtering and pagination
+ * @returns {Promise<{ data: any[]; meta: any }>} Paginated product list with metadata
+ * @throws {ApiError} If product retrieval fails
+ */
 const getAllProducts = async (
   query: Record<string, any>
 ): Promise<{ data: any[]; meta: any }> => {
   console.log("query", query);
   const { minPrice, maxPrice, ...restQuery } = query;
+
   const priceFilter: any = {};
   if (minPrice) priceFilter.$gte = Number(minPrice);
   if (maxPrice) priceFilter.$lte = Number(maxPrice);
@@ -41,6 +59,30 @@ const getAllProducts = async (
   if (Object.keys(priceFilter).length > 0) {
     filter.price = priceFilter;
   }
+
+  // Handle category name to ID mapping
+  const categoryQuery: Record<string, string> = {};
+
+  if (restQuery['category.category']) {
+    const category = await Category.findOne({ name: restQuery['category.category'] });
+    if (category) categoryQuery['category.category'] = category._id.toString();
+    delete restQuery['category.category'];
+  }
+
+  if (restQuery['category.subCategory']) {
+    const subCategory = await Category.findOne({ name: restQuery['category.subCategory'] });
+    if (subCategory) categoryQuery['category.subCategory'] = subCategory._id.toString();
+    delete restQuery['category.subCategory'];
+  }
+
+  if (restQuery['category.childSubCategory']) {
+    const child = await Category.findOne({ name: restQuery['category.childSubCategory'] });
+    if (child) categoryQuery['category.childSubCategory'] = child._id.toString();
+    delete restQuery['category.childSubCategory'];
+  }
+
+  // Add mapped IDs to filter
+  Object.assign(restQuery, categoryQuery);
 
   const queryBuilder = new QueryBuilder<IProduct>(
     Product.find(filter),
@@ -79,22 +121,18 @@ const getAllProducts = async (
   const products = await queryBuilder.modelQuery;
   const pagination = await queryBuilder.getPaginationInfo();
 
-  // Collect product IDs
   const productIds = products?.map((p) => p?._id);
 
-  // Get wishlist counts grouped by product
   const wishlistCounts = await Wishlist.aggregate([
     { $match: { product: { $in: productIds } } },
     { $group: { _id: "$product", count: { $sum: 1 } } },
   ]);
 
-  // Convert to map for faster lookup
   const wishlistMap = wishlistCounts.reduce((acc, item) => {
     acc[item._id.toString()] = item.count;
     return acc;
   }, {} as Record<string, number>);
 
-  // Attach wishlist count to each product
   const dataWithWishlist = products?.map((p) => {
     return {
       ...p?.toObject(),
@@ -109,6 +147,14 @@ const getAllProducts = async (
 };
 
 
+/**
+ * Retrieves a single product by ID with related data
+ * @param {string} id - The product ID to retrieve
+ * @returns {Promise<{ result: IProduct; favCount: number }>} Product details and favorite count
+ * @throws {ApiError} If product is not found
+ */
+
+
 const getSingleProductIntoDB = async (id: string) => {
   const result = await Product.findById(id).populate("brand").populate("size").populate("material").populate("colors").populate("user").populate("category.category").populate("category.subCategory").populate("category.childSubCategory");
   const favCount = await Wishlist.countDocuments({ product: id });
@@ -118,6 +164,13 @@ const getSingleProductIntoDB = async (id: string) => {
   return { result, favCount };
 };
 
+/**
+ * Updates an existing product in the database
+ * @param {string} id - The ID of the product to update
+ * @param {IProduct} payload - The updated product data
+ * @returns {Promise<IProduct>} The updated product
+ * @throws {ApiError} If product is not found
+ */
 const updateProductFromDB = async (id: string, payload: IProduct) => {
   const result = await Product.findByIdAndUpdate(id, payload, { new: true });
 
