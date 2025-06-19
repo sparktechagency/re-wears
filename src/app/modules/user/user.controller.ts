@@ -117,12 +117,24 @@ const getAllUsers = catchAsync(async (req: Request, res: Response) => {
 
 
 const getSingleUser = catchAsync(async (req: Request, res: Response) => {
-  const id = req.params
+  const { id } = req.params
   const result = await UserService.getSingleUserFromDB(id)
   sendResponse(res, {
     success: true,
     statusCode: StatusCodes.OK,
     message: "User data retrieved successfully",
+    data: result,
+  });
+})
+
+
+const updateUserNickName = catchAsync(async (req: Request, res: Response) => {
+  const { id } = req.params
+  const result = await UserService.updateUserNickNameBaseOnIdFromDB(id, req.body)
+  sendResponse(res, {
+    success: true,
+    statusCode: StatusCodes.OK,
+    message: "User data updated successfully",
     data: result,
   });
 })
@@ -136,5 +148,6 @@ export const UserController = {
   toggleUserBlocking,
   getUserProfile,
   getAllUsers,
-  getSingleUser
+  getSingleUser,
+  updateUserNickName
 };

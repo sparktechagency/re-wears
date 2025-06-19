@@ -4,49 +4,51 @@ import { Review } from "./review.model";
 import { StatusCodes } from "http-status-codes";
 import { User } from "../user/user.model";
 import ApiError from "../../../errors/ApiErrors";
+import { JwtPayload } from "jsonwebtoken";
+import QueryBuilder from "../../builder/queryBuilder";
 
-const createReviewToDB = async(payload:IReview): Promise<IReview>=>{
-
-
-    // Fetch baber and check if it exists in one query
-    const user:any = await User.findById(payload.barber);
-    if (!user) {
-        throw new ApiError(StatusCodes.NOT_FOUND, "No User Found");
-    }
-
-    if (payload.rating) {
-
-        // checking the rating is valid or not;
-        const rating = Number(payload.rating);
-        if (rating < 1 || rating > 5) {
-            throw new ApiError(StatusCodes.BAD_REQUEST, "Invalid rating value");
-        }
-
-        // Update service's rating and total ratings count
-        const ratingCount = user.ratingCount + 1;
-
-        let newRating;
-        if (user.rating === null || user.rating === 0) {
-            // If no previous ratings, the new rating is the first one
-            newRating = rating;
-        } else {
-            // Calculate the new rating based on previous ratings
-            newRating = ((user.rating * user.ratingCount) + rating) / ratingCount;
-        }
-
-        await User.findByIdAndUpdate(
-            {_id: payload.barber}, 
-            {rating: parseFloat(newRating.toFixed(2)) , ratingCount: ratingCount  }, 
-            {new: true}
-        )
-    }
-
+const createReviewToDB = async (user: JwtPayload, payload: IReview): Promise<IReview> => {
+    payload.customer = user.id!;
     const result = await Review.create(payload);
-    if(!result){
-        throw new ApiError(StatusCodes.BAD_REQUEST, "Failed To create Review")
+    if (!result) {
+        throw new ApiError(StatusCodes.BAD_REQUEST, "Failed to create review");
     }
-    return payload;
+    return result
+
 };
 
+const getAllReviews = async (query: Record<string, any>): Promise<{ data: IReview[], pagination: any }> => {
+    const result = new QueryBuilder(Review.find(), query)
+        .fields()
+        .sort()
+        .paginate()
+    // .populate(['buyer', 'customer']);
 
-export const ReviewService ={ createReviewToDB}
+    if (!result) {
+        return {
+            data: [],
+            pagination: {
+                total: 0,
+                limit: 10,
+                page: 1,
+                totalPage: 0
+            }
+        };
+    }
+
+    const [data, pagination] = await Promise.all([
+        result.modelQuery,
+        result.getPaginationInfo()
+    ]);
+
+    return {
+        data,
+        pagination
+    };
+}
+
+
+export const ReviewService = {
+    createReviewToDB,
+    getAllReviews
+}

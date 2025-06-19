@@ -16,5 +16,10 @@ router.get(
   auth(USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMIN, USER_ROLES.USER),
   WishlistController.getAllWishList
 );
+router.get(
+  "/:id",
+  auth(USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMIN, USER_ROLES.USER),
+  WishlistController.getWishListUsingUserIdAndProductId
+);
 
 export const WishlistRoutes = router;

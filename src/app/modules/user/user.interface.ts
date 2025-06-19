@@ -32,6 +32,7 @@ export type IUser = {
   isDeleted: boolean;
   authentication?: IAuthenticationProps;
   accountInformation?: IStripeAccountInfo;
+  userName?: string;
   appId?: string;
   createdAt?: Date;
   updatedAt?: Date;

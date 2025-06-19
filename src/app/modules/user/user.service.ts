@@ -10,6 +10,7 @@ import { emailHelper } from "../../../helpers/emailHelper";
 import unlinkFile from "../../../shared/unlinkFile";
 import QueryBuilder from "../../builder/queryBuilder";
 import generateSequentialId from "../../utils/idGenerator";
+import { Review } from "../review/review.model";
 
 const createAdminToDB = async (payload: any): Promise<IUser> => {
   // check admin is exist or not;
@@ -173,14 +174,88 @@ const getAllUsers = async (
   return result;
 };
 
-
-const getSingleUserFromDB = async (id: JwtPayload) => {
-  const result = await User.findById(id)
-  if (!result) {
-    throw new ApiError(StatusCodes.BAD_REQUEST, "No user found")
+// TODO: need to return user follower how much user he follwing | user-name | follower | following | rating | reviews 
+const getSingleUserFromDB = async (id: string) => {
+  const user = await User.findById(id).lean();
+  if (!user) {
+    throw new ApiError(StatusCodes.BAD_REQUEST, "No user found");
   }
-  return result
+
+  // Reviews where this user is customer (he reviewed someone = following)
+  const followingReviews = await Review.find({ customer: id })
+    .populate("buyer", "name email")
+    .lean();
+
+  // Reviews where this user is buyer (he received reviews = followers)
+  const followerReviews = await Review.find({ buyer: id })
+    .populate("customer", "name email")
+    .lean();
+
+  // Unique buyers he follows
+  const following = Array.from(
+    new Map(
+      followingReviews
+        .filter(r => r.buyer)
+        .map(r => [r.buyer._id.toString(), r.buyer])
+    ).values()
+  );
+
+  // Unique customers who follow him
+  const followers = Array.from(
+    new Map(
+      followerReviews
+        .filter(r => r.customer)
+        .map(r => [r.customer._id.toString(), r.customer])
+    ).values()
+  );
+
+
+  // review and rating
+  const reviewCount = await Review.countDocuments({
+    $or: [{ customer: id }, { buyer: id }]
+  });
+  //  review count & avg rating
+  const customerReviews = await Review.find({ customer: id }).lean();
+  const validRatings = customerReviews
+    .map(r => r.rating)
+    .filter(r => typeof r === 'number' && !isNaN(r));
+
+  const customerAvgRating = validRatings.length
+    ? parseFloat((validRatings.reduce((acc, curr) => acc + curr, 0) / validRatings.length).toFixed(2))
+    : 0;
+
+  return {
+    followingCount: following.length,
+    followersCount: followers.length,
+    customerAvgRating,
+    reviewCount,
+    user,
+  };
+};
+
+const updateUserNickNameBaseOnIdFromDB = async (
+  id: string, payload: IUser) => {
+  const isExistUser: any = await User.isExistUserById(id);
+  if (!isExistUser) {
+    throw new ApiError(StatusCodes.BAD_REQUEST, "User doesn't exist!");
+  }
+  if (payload.userName) {
+    const existingUser = await User.findOne({
+      userName: payload.userName,
+      _id: { $ne: id }
+    });
+    if (existingUser) {
+      throw new ApiError(StatusCodes.BAD_REQUEST, "Username already taken!");
+    }
+  }
+  const result = await User.findByIdAndUpdate(id, payload, { new: true });
+  if (!result) {
+    throw new ApiError(StatusCodes.BAD_REQUEST, "Failed to update user");
+  }
+  return result;
 }
+
+
 
 
 export const UserService = {
@@ -192,5 +267,6 @@ export const UserService = {
   deleteUserFromDB,
   getUserProfileFromDB,
   getAllUsers,
-  getSingleUserFromDB
+  getSingleUserFromDB,
+  updateUserNickNameBaseOnIdFromDB
 };
