@@ -6,4 +6,4 @@ uploads
 .vscode
 dist
 .qodo
-rewares.json
+src/rewares.json
