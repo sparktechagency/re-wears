@@ -2,10 +2,10 @@ import express, { Request, Response } from "express";
 import cors from "cors";
 import { StatusCodes } from "http-status-codes";
 import { Morgan } from "./shared/morgan";
-import router from '../src/app/routes';
 import globalErrorHandler from './app/middlewares/globalErrorHandler';
 import session from "express-session";
-import passport from "./config/passport"; 
+import passport from "./config/passport";
+import router from "./app/routes";
 const app = express();
 
 // morgan
@@ -36,9 +36,9 @@ app.use(passport.session());
 //router
 app.use('/api/v1', router);
 
-app.get("/", (req: Request, res: Response)=>{
+app.get("/", (req: Request, res: Response) => {
     res.send(
-      `<h1 style="text-align: center; margin: 50px 0;">Re-wears server is running. Beep! Beep!</h1>`
+        `<h1 style="text-align: center; margin: 50px 0;">Re-wears server is running. Beep! Beep!</h1>`
     );
 })
 
@@ -46,7 +46,7 @@ app.get("/", (req: Request, res: Response)=>{
 app.use(globalErrorHandler);
 
 // handle not found route
-app.use((req: Request, res: Response)=>{
+app.use((req: Request, res: Response) => {
     res.status(StatusCodes.NOT_FOUND).json({
         success: false,
         message: "Not Found",

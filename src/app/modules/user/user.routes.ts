@@ -32,6 +32,8 @@ router.post(
 );
 
 router.get("/:id", UserController.getSingleUser)
+router.get('/google', UserController.loginWithGoogle);
+router.get('/apple', UserController.loginWithApple);
 
 router.patch(
   "/update-profile",

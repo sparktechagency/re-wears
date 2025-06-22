@@ -1,12 +1,6 @@
 import { Model } from "mongoose";
 import { GENDER, USER_ROLES } from "../../../enums/user";
 
-interface IStripeAccountInfo {
-  status: string;
-  stripeAccountId: string;
-  externalAccountId: string;
-  currency: string;
-}
 
 interface IAuthenticationProps {
   isResetPassword: boolean;
@@ -31,9 +25,11 @@ export type IUser = {
   isBlocked: boolean;
   isDeleted: boolean;
   authentication?: IAuthenticationProps;
-  accountInformation?: IStripeAccountInfo;
   userName?: string;
   appId?: string;
+  provider?: string;
+  lastSeenAt?: Date;
+  providerId?: string;
   createdAt?: Date;
   updatedAt?: Date;
 };

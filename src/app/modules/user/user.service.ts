@@ -147,6 +147,8 @@ const getUserProfileFromDB = async (
   if (!isExistUser) {
     throw new ApiError(StatusCodes.BAD_REQUEST, "User doesn't exist!");
   }
+  // Update enterTime hereh
+  await User.findByIdAndUpdate(id, { lastSeenAt: new Date() });
   return isExistUser;
 };
 
@@ -258,6 +260,31 @@ const updateUserNickNameBaseOnIdFromDB = async (
 
 //login with google
 
+const handleLoginWithGoogle = async () => {
+
+}
+
+
+// login with apple
+const handleLoginWithApple = async () => {
+
+}
+
+/**
+ * User login er somoy (socket connect) enterTime update korbe
+ */
+const updateEnterTime = async (userId: string): Promise<void> => {
+  await User.findByIdAndUpdate(userId, { enterTime: new Date() });
+};
+/**
+ * User logout ba socket disconnect er somoy leaveTime update korbe
+ */
+
+const updateLeaveTime = async (userId: string): Promise<void> => {
+  await User.findByIdAndUpdate(userId, { leaveTime: new Date() });
+};
+
+
 export const UserService = {
   createUserToDB,
   createAdminToDB,
@@ -268,5 +295,9 @@ export const UserService = {
   getUserProfileFromDB,
   getAllUsers,
   getSingleUserFromDB,
-  updateUserNickNameBaseOnIdFromDB
+  updateUserNickNameBaseOnIdFromDB,
+  handleLoginWithGoogle,
+  handleLoginWithApple,
+  updateEnterTime,
+  updateLeaveTime
 };

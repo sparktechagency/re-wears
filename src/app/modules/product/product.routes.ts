@@ -14,7 +14,6 @@ router.post(
   async (req, res, next) => {
     try {
       const payload = req.body;
-      console.log("payload", payload);
       const productImage = getMultipleFilesPath(req.files, "productImage");
       if (!productImage) {
         res.status(400).json({ message: "Product images are required" });
@@ -30,15 +29,6 @@ router.post(
         }
         return value;
       };
-      if (!payload.status) {
-        return res.status(400).json({ message: "Status is required" });
-      }
-
-      if (!["Active", "Reserved", "Sold", "Hidden", "Draft"].includes(payload.status)) {
-        return res.status(400).json({
-          message: `Invalid status. Allowed values are: Active, Reserved, Sold, Hidden, Draft. Received: ${payload.status}`
-        });
-      }
       const parsedPayload = {
         ...payload,
         colors: parseIfStringArray(payload.colors),
@@ -130,3 +120,5 @@ router.delete(
 );
 
 export const productRoutes = router;
+
+// 

@@ -5,6 +5,7 @@ dotenv.config({ path: path.join(process.cwd(), '.env') });
 export default {
     ip_address: process.env.IP,
     port: process.env.PORT,
+    PORT_PRD: process.env.PORT_PRD,
     database_url: process.env.DATABASE_URL,
     node_env: process.env.NODE_ENV,
     bcrypt_salt_rounds: process.env.BCRYPT_SALT_ROUNDS,
@@ -29,5 +30,12 @@ export default {
         clientID: process.env.GOOGLE_CLIENT_ID,
         clientSecret: process.env.GOOGLE_CLIENT_SECRET,
         callbackURL: process.env.GOOGLE_CALLBACK_URL
-    }
+    },
+    // apple: {
+    //     clientID: process.env.APPLE_CLIENT_ID,
+    //     teamID: process.env.APPLE_TEAM_ID,
+    //     keyID: process.env.APPLE_KEY_ID,
+    //     privateKey: process.env.APPLE_PRIVATE_KEY,
+    //     callbackURL: process.env.APPLE_CALLBACK_URL
+    // }
 }
