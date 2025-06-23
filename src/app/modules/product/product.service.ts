@@ -4,12 +4,12 @@ import { IProduct } from "./product.interface";
 import { Product } from "./product.model";
 import QueryBuilder from "../../builder/queryBuilder";
 import { Wishlist } from "../wishlist/wishlist.model";
+import { sendNotifications } from "../../../helpers/notificationsHelper";
 
 const createProduct = async (
   payload: IProduct,
   user: any
 ): Promise<IProduct> => {
-  // parse the category string to an object
   if (typeof payload.category === "string") {
     try {
       payload.category = JSON.parse(payload.category);
@@ -25,6 +25,19 @@ const createProduct = async (
   if (!createdProduct) {
     throw new ApiError(StatusCodes.BAD_REQUEST, "Failed to create product");
   }
+  //@ts-ignore
+  const io = global.io;
+  if (io) {
+    io.emit(`create-product::${createdProduct.user.id}`, createdProduct);
+  }
+  const notificationPayload = {
+    userId: payload.user,
+    title: 'New Message',
+    message: `You have a new message from ${(createdProduct?.user._id as any)?.firstName}`,
+    type: 'Message Send',
+    filePath: 'Product',
+  };
+  await sendNotifications(notificationPayload as any);
   return createdProduct;
 };
 

@@ -32,12 +32,29 @@ const getTopSellersAndBuyers = catchAsync(
       statusCode: 200,
       success: true,
       message: "Sellers and buyers retrieved successfully",
-      data: result,
+      // @ts-ignore
+      pagination: result.meta,
+      data: result.data,
     });
   })
+
+
+// update
+const updateOrderByProduct = catchAsync(async (req: Request, res: Response) => {
+  const { productId } = req.params;
+  const result = await OrderServices.updateOrderByProductId(productId, req.body);
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: "Order updated successfully using productId",
+    data: result,
+  });
+});
+
 
 export const OrderController = {
   createOrder,
   getAllOrder,
   getTopSellersAndBuyers,
+  updateOrderByProduct
 };

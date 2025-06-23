@@ -42,7 +42,7 @@ const forgetPassword = catchAsync(async (req: Request, res: Response) => {
 });
 
 const resetPassword = catchAsync(async (req: Request, res: Response) => {
-  const token = req.headers.authorization?.split(" ")[1]; // split if token is in bearer token
+  const token = req.headers.authorization;
   const { ...resetData } = req.body;
   const result = await AuthService.resetPasswordToDB(token!, resetData);
 
@@ -53,6 +53,7 @@ const resetPassword = catchAsync(async (req: Request, res: Response) => {
     data: result,
   });
 });
+
 
 const changePassword = catchAsync(async (req: Request, res: Response) => {
   const user = req.user;

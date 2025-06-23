@@ -147,7 +147,6 @@ const getUserProfileFromDB = async (
   if (!isExistUser) {
     throw new ApiError(StatusCodes.BAD_REQUEST, "User doesn't exist!");
   }
-  // Update enterTime hereh
   await User.findByIdAndUpdate(id, { lastSeenAt: new Date() });
   return isExistUser;
 };

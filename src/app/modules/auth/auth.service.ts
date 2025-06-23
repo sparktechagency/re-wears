@@ -171,7 +171,6 @@ const resetPasswordToDB = async (
   payload: IAuthResetPassword
 ) => {
   const { newPassword, confirmPassword } = payload;
-
   //isExist token
   const isExistToken = await ResetToken.isExistToken(token);
   if (!isExistToken) {

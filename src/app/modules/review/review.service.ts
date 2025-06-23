@@ -21,8 +21,9 @@ const getAllReviews = async (query: Record<string, any>): Promise<{ data: IRevie
     const result = new QueryBuilder(Review.find(), query)
         .fields()
         .sort()
-        .paginate()
-    // .populate(['buyer', 'customer']);
+        .paginate().populate(['customer'], {
+            customer: 'firstName lastName image',
+        });
 
     if (!result) {
         return {
@@ -40,10 +41,26 @@ const getAllReviews = async (query: Record<string, any>): Promise<{ data: IRevie
         result.modelQuery,
         result.getPaginationInfo()
     ]);
+    const stats = await Review.aggregate([
+        { $match: result.modelQuery.getFilter() },
+        {
+            $group: {
+                _id: null,
+                averageRating: { $avg: '$rating' },
+                totalRatingCount: { $sum: 1 },
+            },
+        },
+    ]);
+
+    const averageRating = stats[0]?.averageRating || 0;
+    const totalRatingCount = stats[0]?.totalRatingCount || 0;
 
     return {
         data,
-        pagination
+        pagination,
+        // @ts-ignore
+        averageRating,
+        totalRatingCount
     };
 }
 
