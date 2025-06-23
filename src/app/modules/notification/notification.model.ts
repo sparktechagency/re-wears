@@ -3,14 +3,9 @@ import { INotification, NotificationModel } from './notification.interface';
 
 const notificationSchema = new Schema<INotification, NotificationModel>(
     {
-        text: {
-            type: String,
-            required: true
-        },
         receiver: {
             type: Schema.Types.ObjectId,
             ref: 'User',
-            required: true
         },
         referenceId: {
             type: String,

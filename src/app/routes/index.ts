@@ -19,6 +19,7 @@ import { TemplateRoutes } from "../modules/template/template.route";
 import { NotificationRoutes } from "../modules/notification/notification.routes";
 import { navRouter } from "../modules/navCategory/nav.routes";
 import { ReviewRoutes } from "../modules/review/review.routes";
+import { profileRoutes } from "../modules/profile/profile.routes";
 const router = express.Router();
 
 const apiRoutes = [
@@ -42,7 +43,8 @@ const apiRoutes = [
   { path: "/chat", route: MessageRoutes },
   { path: "/order", route: OrderRoutes },
   { path: "/nav", route: navRouter },
-  { path: "/review", route: ReviewRoutes }
+  { path: "/review", route: ReviewRoutes },
+  { path: "/user-product", route: profileRoutes },
 ];
 
 apiRoutes.forEach((route) => router.use(route.path, route.route));

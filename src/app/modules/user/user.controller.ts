@@ -139,6 +139,27 @@ const updateUserNickName = catchAsync(async (req: Request, res: Response) => {
   });
 })
 
+
+const loginWithGoogle = catchAsync(async (req: Request, res: Response) => {
+  const result = await UserService.handleLoginWithGoogle()
+  sendResponse(res, {
+    success: true,
+    statusCode: StatusCodes.OK,
+    message: "User data updated successfully",
+    data: result,
+  });
+})
+
+const loginWithApple = catchAsync(async (req: Request, res: Response) => {
+  const result = await UserService.handleLoginWithApple()
+  sendResponse(res, {
+    success: true,
+    statusCode: StatusCodes.OK,
+    message: "User data updated successfully",
+    data: result,
+  });
+})
+
 export const UserController = {
   createUser,
   createAdmin,
@@ -149,5 +170,7 @@ export const UserController = {
   getUserProfile,
   getAllUsers,
   getSingleUser,
-  updateUserNickName
+  updateUserNickName,
+  loginWithGoogle,
+  loginWithApple
 };

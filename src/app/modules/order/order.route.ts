@@ -22,5 +22,11 @@ router.get(
   auth(USER_ROLES.USER, USER_ROLES.ADMIN, USER_ROLES.SUPER_ADMIN),
   OrderController.getTopSellersAndBuyers
 );
+// update order
+router.patch(
+  "/:productId",
+  auth(USER_ROLES.USER, USER_ROLES.ADMIN, USER_ROLES.SUPER_ADMIN),
+  OrderController.updateOrderByProduct
+);
 
 export const OrderRoutes = router;

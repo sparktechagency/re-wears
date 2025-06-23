@@ -18,6 +18,7 @@ const createBrandSizeMaterial = catchAsync(
 const getAllBrandSizeMaterial = catchAsync(
   async (req: Request, res: Response) => {
     const type = req.params.type;
+
     const result = await brandSizeMaterialService.getAllFromDB(type, req.query);
     sendResponse(res, {
       statusCode: 200,

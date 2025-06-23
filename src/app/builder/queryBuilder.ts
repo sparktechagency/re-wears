@@ -70,7 +70,7 @@ class QueryBuilder<T> {
     this.modelQuery = this.modelQuery.populate(
       populateFields.map(field => ({
         path: field,
-        select: selectFields[field],
+        select: selectFields?.[field] || '',
       }))
     );
     return this;

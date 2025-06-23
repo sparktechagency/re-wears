@@ -79,7 +79,7 @@ const getWishListBaseOnIdAndProductId = async (
     product: product,
   });
   if (!result) {
-    throw new ApiError(StatusCodes.NOT_FOUND, "Wishlist not found");
+    return null
   }
   return result;
 }

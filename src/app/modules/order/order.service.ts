@@ -8,7 +8,10 @@ import QueryBuilder from "../../builder/queryBuilder";
 const createOrderIntoDB = async (payload: IOrder) => {
   const isExistingOrder = await Order.findOne({ product: payload?.product });
   if (isExistingOrder) {
-    throw new ApiError(StatusCodes.BAD_REQUEST, "Product duplicate detected");
+    await Order.findByIdAndUpdate(isExistingOrder._id, payload);
+    await Product.findByIdAndUpdate(payload.product, {
+      status: "Reserved",
+    });
   }
   const result = await Order.create(payload);
   if (!result) {
@@ -31,7 +34,7 @@ const getAllOrderFromDB = async (query: Record<string, any>) => {
   const result = await queryBuilder.modelQuery
     .populate({
       path: "buyer seller",
-      select: "name email image role",
+      select: "firstName lastName email image role",
     })
     .populate("product");
   const pagination = await queryBuilder.getPaginationInfo();
@@ -41,223 +44,138 @@ const getAllOrderFromDB = async (query: Record<string, any>) => {
 
 // Get top sellers and buyers based on order count with search and pagination
 const getTopSellersAndBuyers = async (query: Record<string, any>) => {
-  // Extract query parameters with defaults - change 'type' to 'userType'
   const { userType = "both", searchTerm, page = 1, limit = 5 } = query;
 
-  // Calculate pagination values
   const pageNumber = Number(page);
   const limitNumber = Number(limit);
   const skip = (pageNumber - 1) * limitNumber;
 
-  // CASE 1: Handle specific type request - change 'sellers'/'buyers' to 'seller'/'buyer'
-  if (userType === "seller" || userType === "buyer") {
-    // Determine which field to use based on userType
-    const field = userType === "seller" ? "seller" : "buyer";
-
-    // Build the aggregation pipeline
-    const pipeline: any[] = [
-      // Step 1: Group by seller/buyer and count orders
+  const buildPipeline = (type: "seller" | "buyer") => {
+    return [
       {
         $group: {
-          _id: `$${field}`,
+          _id: `$${type}`,
           totalOrders: { $sum: 1 },
         },
       },
-
-      // Step 2: Add userType field in a separate project stage
       {
         $project: {
           _id: 1,
           totalOrders: 1,
-          userType: { $literal: userType },
-        },
-      },
-
-      // Step 3: Join with users collection to get user details
-      {
-        $lookup: {
-          from: "users",
-          localField: "_id",
-          foreignField: "_id",
-          as: "userDetails",
-        },
-      },
-      {
-        $unwind: {
-          path: "$userDetails",
-          preserveNullAndEmptyArrays: true,
+          userType: { $literal: type },
         },
       },
     ];
+  };
 
-    // Step 4: Add search filter if search term is provided
-    if (searchTerm) {
-      pipeline.push({
-        $match: {
-          $or: [
-            { "userDetails.name": { $regex: searchTerm, $options: "i" } },
-            { "userDetails.email": { $regex: searchTerm, $options: "i" } },
-          ],
-        },
-      });
-    }
+  let pipeline: any[] = [];
 
-    // Step 5: Use $facet to get both data and count in a single query
-    pipeline.push({
-      $facet: {
-        // Get total count for pagination metadata
-        metadata: [{ $count: "total" }],
-        // Get paginated and sorted data
-        data: [
-          { $sort: { totalOrders: -1 } },
-          { $skip: skip },
-          { $limit: limitNumber },
-          {
-            $project: {
-              _id: 1,
-              totalOrders: 1,
-              userType: 1,
-              name: "$userDetails.name",
-              email: "$userDetails.email",
-              image: "$userDetails.image",
-              role: "$userDetails.role",
-            },
-          },
-        ],
-      },
-    });
-
-    // Execute the aggregation
-    const [result] = await Order.aggregate(pipeline);
-
-    // Format and return the response
-    return {
-      data: result.data || [],
-      meta: {
-        page: pageNumber,
-        limit: limitNumber,
-        total: result.metadata[0]?.total || 0,
-      },
-    };
-  }
-  // CASE 2: Handle combined results (both sellers and buyers)
-  else {
-    // Build a pipeline that combines both sellers and buyers
-    const pipeline: any[] = [
-      // Step 1: First get all sellers with their order counts
-      {
-        $group: {
-          _id: "$seller",
-          totalOrders: { $sum: 1 },
-        },
-      },
-      // Add userType in a separate project stage
-      {
-        $project: {
-          _id: 1,
-          totalOrders: 1,
-          userType: { $literal: "seller" },
-        },
-      },
-
-      // Step 2: Union with buyers data
+  if (userType === "seller" || userType === "buyer") {
+    pipeline = buildPipeline(userType);
+  } else {
+    // Combine both seller and buyer pipelines
+    pipeline = [
+      ...buildPipeline("seller"),
       {
         $unionWith: {
           coll: "orders",
-          pipeline: [
-            {
-              $group: {
-                _id: "$buyer",
-                totalOrders: { $sum: 1 },
-              },
-            },
-            {
-              $project: {
-                _id: 1,
-                totalOrders: 1,
-                userType: { $literal: "buyer" },
-              },
-            },
-          ],
-        },
-      },
-
-      // Step 3: Join with users collection to get user details
-      {
-        $lookup: {
-          from: "users",
-          localField: "_id",
-          foreignField: "_id",
-          as: "userDetails",
-        },
-      },
-      {
-        $unwind: {
-          path: "$userDetails",
-          preserveNullAndEmptyArrays: true,
+          pipeline: buildPipeline("buyer"),
         },
       },
     ];
+  }
 
-    // Step 4: Add search filter if search term is provided
-    if (searchTerm) {
-      pipeline.push({
-        $match: {
-          $or: [
-            { "userDetails.name": { $regex: searchTerm, $options: "i" } },
-            { "userDetails.email": { $regex: searchTerm, $options: "i" } },
-          ],
-        },
-      });
+  // Join with user info
+  pipeline.push(
+    {
+      $lookup: {
+        from: "users",
+        localField: "_id",
+        foreignField: "_id",
+        as: "userDetails",
+      },
+    },
+    {
+      $unwind: {
+        path: "$userDetails",
+        preserveNullAndEmptyArrays: true,
+      },
+    },
+    {
+      $match: {
+        userDetails: { $ne: null }, // ✅ remove entries with no matched user
+      },
     }
+  );
 
-    // Step 5: Use $facet to get both data and count
+  // Add search
+  if (searchTerm) {
     pipeline.push({
-      $facet: {
-        metadata: [{ $count: "total" }],
-        data: [
-          // Sort combined results by order count
-          { $sort: { totalOrders: -1 } },
-          // Apply pagination
-          { $skip: skip },
-          { $limit: limitNumber },
-          // Project only needed fields
-          {
-            $project: {
-              _id: 1,
-              totalOrders: 1,
-              userType: 1,
-              name: "$userDetails.name",
-              email: "$userDetails.email",
-              image: "$userDetails.image",
-              role: "$userDetails.role",
-            },
-          },
+      $match: {
+        $or: [
+          { "userDetails.firstName": { $regex: searchTerm, $options: "i" } },
+          { "userDetails.lastName": { $regex: searchTerm, $options: "i" } },
+          { "userDetails.email": { $regex: searchTerm, $options: "i" } },
         ],
       },
     });
-
-    // Execute the aggregation
-    const [result] = await Order.aggregate(pipeline);
-
-    // Format and return the response
-    return {
-      data: result.data || [],
-      meta: {
-        page: pageNumber,
-        limit: limitNumber,
-        total: result.metadata[0]?.total || 0,
-      },
-    };
   }
+
+  // Final stage with pagination and total count
+  pipeline.push({
+    $facet: {
+      metadata: [{ $count: "total" }],
+      data: [
+        { $sort: { totalOrders: -1 } },
+        { $skip: skip },
+        { $limit: limitNumber },
+        {
+          $project: {
+            _id: 1,
+            totalOrders: 1,
+            userType: 1,
+            firstName: "$userDetails.firstName",
+            lastName: "$userDetails.lastName",
+            email: "$userDetails.email",
+            image: "$userDetails.image",
+            role: "$userDetails.role",
+          },
+        },
+      ],
+    },
+  });
+
+  const [result] = await Order.aggregate(pipeline);
+
+  return {
+    data: result.data || [],
+    meta: {
+      page: pageNumber,
+      limit: limitNumber,
+      total: result.metadata[0]?.total || 0,
+    },
+  };
 };
 
 
-// order update
 
+// order update
+const updateOrderByProductId = async (
+  productId: string,
+  payload: Partial<IOrder>
+): Promise<IOrder | null> => {
+  const result = await Order.findOneAndUpdate({ product: productId }, payload, {
+    new: true,
+  });
+  await Product.findByIdAndUpdate(productId, {
+    status: payload.status
+  })
+  return result;
+};
 
 export const OrderServices = {
   createOrderIntoDB,
   getAllOrderFromDB,
   getTopSellersAndBuyers,
+  updateOrderByProductId
 };

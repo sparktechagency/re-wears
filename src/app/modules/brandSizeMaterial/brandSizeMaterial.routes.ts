@@ -17,22 +17,35 @@ router.get(
   brandSizeMaterialController.getAllBrandSizeMaterial
 );
 
-router.get(
-  "/:type/:id",
-  auth(USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMIN, USER_ROLES.USER),
-  brandSizeMaterialController.getSingleBrandSizeMaterial
-);
+// router.get(
+//   "/:type/:id",
 
-router.patch(
-  "/:type/:id",
-  auth(USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMIN),
-  brandSizeMaterialController.updateBrandSizeMaterial
-);
+// );
 
-router.delete(
-  "/:type/:id",
-  auth(USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMIN),
-  brandSizeMaterialController.deleteBrandSizeMaterial
-);
+// router.patch(
+//   "/:type/:id",
+
+// );
+
+// router.delete(
+//   "/:type/:id",
+//   auth(USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMIN),
+//   brandSizeMaterialController.deleteBrandSizeMaterial
+// );
+
+router.route("/:type/:id")
+  .get(
+    auth(USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMIN, USER_ROLES.USER),
+    brandSizeMaterialController.getSingleBrandSizeMaterial
+)
+  .patch(
+    auth(USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMIN),
+    brandSizeMaterialController.updateBrandSizeMaterial
+)
+  .delete(
+    auth(USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMIN),
+    brandSizeMaterialController.deleteBrandSizeMaterial
+)
+
 
 export const brandSizeMaterialRoutes = router;

@@ -31,6 +31,15 @@ const userSchema = new Schema<IUser, UserModal>(
       unique: true,
       lowercase: true,
     },
+    provider: {
+      type: String,
+      required: false,
+    },
+    providerId: {
+      type: String,
+      required: false,
+    },
+
     password: {
       type: String,
       required: true,
@@ -73,6 +82,10 @@ const userSchema = new Schema<IUser, UserModal>(
       type: Boolean,
       default: false,
     },
+    lastSeenAt: {
+      type: Date,
+      default: null,
+    },
     isDeleted: {
       type: Boolean,
       default: false,
@@ -94,21 +107,7 @@ const userSchema = new Schema<IUser, UserModal>(
       },
       select: 0,
     },
-    accountInformation: {
-      status: {
-        type: Boolean,
-        default: false,
-      },
-      stripeAccountId: {
-        type: String,
-      },
-      externalAccountId: {
-        type: String,
-      },
-      currency: {
-        type: String,
-      },
-    },
+
     appId: {
       type: String,
       required: false,

@@ -171,7 +171,6 @@ const resetPasswordToDB = async (
   payload: IAuthResetPassword
 ) => {
   const { newPassword, confirmPassword } = payload;
-
   //isExist token
   const isExistToken = await ResetToken.isExistToken(token);
   if (!isExistToken) {
@@ -375,7 +374,6 @@ const socialLoginFromDB = async (payload: IUser) => {
 };
 
 // delete user
-// delete user
 const deleteUserFromDB = async (user: JwtPayload, password: string) => {
   const isExistUser = await User.findById(user.id).select("+password");
   if (!isExistUser) {
@@ -396,6 +394,9 @@ const deleteUserFromDB = async (user: JwtPayload, password: string) => {
   }
   return;
 };
+
+
+
 
 export const AuthService = {
   verifyEmailToDB,

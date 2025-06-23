@@ -4,7 +4,6 @@ import sendResponse from "../../../shared/sendResponse";
 import { productService } from "./product.service";
 
 const createProduct = catchAsync(async (req: Request, res: Response) => {
-  console.log("Request body", req.body);
   const result = await productService.createProduct(req.body, req.user);
   sendResponse(res, {
     statusCode: 200,
@@ -46,9 +45,22 @@ const updateProduct = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+
+const deleteProduct = catchAsync(async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const result = await productService.deleteProductFromDB(id);
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: `Product deleted successfully`,
+    data: result,
+  });
+});
+
 export const productController = {
   createProduct,
   getAllProducts,
   getSingleProduct,
   updateProduct,
+  deleteProduct,
 };
