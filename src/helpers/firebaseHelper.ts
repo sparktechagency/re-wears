@@ -1,5 +1,4 @@
 import admin from 'firebase-admin';
-// import serviceAccount from "../../src/rewares.json";
 import { logger } from '../shared/logger';
 
 // Cast serviceAccount to ServiceAccount type
