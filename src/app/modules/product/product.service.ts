@@ -28,12 +28,13 @@ const createProduct = async (
   //@ts-ignore
   const io = global.io;
   if (io) {
-    io.emit(`create-product::${createdProduct.user.id}`, createdProduct);
+    io.emit(`create-product::${createdProduct.user}`, createdProduct);
   }
   const notificationPayload = {
-    userId: payload.user,
+    userId: createdProduct.user,
     title: 'New Message',
-    message: `You have a new message from ${(createdProduct?.user._id as any)?.firstName}`,
+    // @ts-ignore
+    message: `You have a new message from ${(createdProduct?.user?.lastName || "User")}`,
     type: 'Message Send',
     filePath: 'Product',
   };

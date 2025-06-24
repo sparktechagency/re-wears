@@ -40,16 +40,16 @@ const readNotification = catchAsync(async (req: Request, res: Response) => {
     });
 });
 
-const adminReadNotification = catchAsync( async (req: Request, res: Response) => {
-    const result = await NotificationService.adminReadNotificationToDB();
+// const adminReadNotification = catchAsync( async (req: Request, res: Response) => {
+//     const result = await NotificationService.adminReadNotificationToDB();
 
-    sendResponse(res, {
-        statusCode: StatusCodes.OK,
-        success: true,
-        message: 'Notification Read Successfully',
-        data: result
-    });
-});
+//     sendResponse(res, {
+//         statusCode: StatusCodes.OK,
+//         success: true,
+//         message: 'Notification Read Successfully',
+//         data: result
+//     });
+// });
 
 // create admin notification
 const createAdminNotification = catchAsync( async (req: Request, res: Response) => {
@@ -66,6 +66,6 @@ export const NotificationController = {
     adminNotificationFromDB,
     getNotificationFromDB,
     readNotification,
-    adminReadNotification,
+    // adminReadNotification,
     createAdminNotification
 };

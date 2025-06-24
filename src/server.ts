@@ -6,6 +6,8 @@ import colors from 'colors';
 import { socketHelper } from "./helpers/socketHelper";
 import { Server } from "socket.io";
 import seedSuperAdmin from "./DB";
+import { deleteUnverifiedAccount } from "./shared/deleteUnverifiedAccount";
+import { scheduleProductStatusCron } from "./helpers/product.cron";
 
 process.on('uncaughtException', error => {
     errorLogger.error('uncaughtException Detected', error);
@@ -18,6 +20,8 @@ let io: Server;
 async function main() {
     try {
         seedSuperAdmin();
+        deleteUnverifiedAccount();
+        scheduleProductStatusCron();
 
         await mongoose.connect(config.database_url as string);
         logger.info(colors.green('🚀 Database connected successfully'));

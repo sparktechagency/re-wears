@@ -20,4 +20,6 @@ export type IProduct = {
   status: "Active" | "Reserved" | "Sold" | "Hidden" | "Draft";
   isBlocked?: boolean;
   isDeleted?: boolean;
+  createdAt?: Date;
+  updatedAt?: Date;
 };
