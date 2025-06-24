@@ -11,18 +11,9 @@ const notificationSchema = new Schema<INotification, NotificationModel>(
             type: String,
             required: false
         },
-        screen: {
-            type: String,
-            required: false
-        },
         read: {
             type: Boolean,
             default: false
-        },
-        type: {
-            type: String,
-            enum: ['ADMIN'],
-            required: false
         }
     },
     {

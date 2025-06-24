@@ -3,7 +3,7 @@ import { Notification } from "../app/modules/notification/notification.model";
 
 
 export const sendNotifications = async (data:any):Promise<INotification> =>{
-    console.log("Notification Data", data);
+    console.log("notification data", data);
     const result = await Notification.create(data);
 
     //@ts-ignore

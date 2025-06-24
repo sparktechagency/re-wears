@@ -37,18 +37,31 @@ const getAllProductsFilterByStatus = async (id: string, query: Record<string, an
 
 const getAllMyOrdersFromDB = async (id: string, query: Record<string, any>) => {
     const queryBuilder = new QueryBuilder(
-        Order.find({ buyer: new mongoose.Types.ObjectId(id) }),
-        query
+      Order.find({ buyer: new mongoose.Types.ObjectId(id) }),
+      query
     )
-        .filter()
-        .sort()
-        .paginate().populate(["buyer", "product", "seller"], {});
-
-    const data = await queryBuilder.modelQuery;
+      .filter()
+      .sort()
+      .paginate();
+  
+    const populatedQuery = queryBuilder.modelQuery.populate([
+      { path: 'buyer' },
+      { path: 'seller' },
+      {
+        path: 'product',
+        populate: [
+          { path: 'size', select: 'name' },
+          { path: 'material', select: 'name' },
+          { path: 'colors', select: 'name' },
+        ],
+      },
+    ]);
+  
+    const data = await populatedQuery;
     const pagination = await queryBuilder.getPaginationInfo();
-
+  
     return { data, pagination };
-};
+  };
 
 
 export const profileService = {

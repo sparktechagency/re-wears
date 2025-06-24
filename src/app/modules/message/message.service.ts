@@ -1,6 +1,7 @@
 import { JwtPayload } from "jsonwebtoken";
 import { IMessage } from "./message.interface";
 import { Message } from "./message.model";
+import { sendNotifications } from "../../../helpers/notificationsHelper";
 
 const sendMessageToDB = async (
   payload: any,
@@ -12,8 +13,15 @@ const sendMessageToDB = async (
   //@ts-ignore
   const io = global.io;
   if (io) {
-    io.emit(`getMessage::${payload?.chatId}`, response);
+    io.emit(`getMessages::${payload?.receiver}`, response);
   }
+  await sendNotifications({
+    receiver: payload?.receiver,
+    sender: user.id,
+    message: payload?.text,
+    type: "message",
+    chatId: payload?.chatId,
+  });
 
   return response;
 };

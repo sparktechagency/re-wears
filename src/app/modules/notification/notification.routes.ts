@@ -16,10 +16,10 @@ router.patch('/',
     auth(USER_ROLES.USER),
     NotificationController.readNotification
 );
-router.patch('/admin',
-    auth(USER_ROLES.USER),
-    NotificationController.adminReadNotification
-);
+// router.patch('/admin',
+//     auth(USER_ROLES.USER),
+//     NotificationController.adminReadNotification
+// );
 
 router.post(
   "/create-admin-notification",
