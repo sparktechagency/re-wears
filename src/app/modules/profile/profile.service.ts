@@ -94,6 +94,7 @@ const getAllMyOrdersFromDB = async (id: string, query: Record<string, any>) => {
     return {
       ...order.toObject(),
       seller: {
+        // @ts-ignore
         ...order.seller.toObject(),
         averageRating: parseFloat(avgRating.toFixed(2)),
       },
