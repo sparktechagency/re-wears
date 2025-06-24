@@ -3,20 +3,20 @@ import { Notification } from "../app/modules/notification/notification.model";
 
 
 export const sendNotifications = async (data: any): Promise<INotification> => {
-    console.log("notification data", data);
-    const result = await Notification.create(data);
+  console.log("notification data", data);
+  const result = await Notification.create(data);
 
-    //@ts-ignore
-    const io = global.io;
+  //@ts-ignore
+  const io = global.io;
 
-    if (io) {
-        const eventName = `get-notification::${data?.receiver}`;
-        console.log("🚀 Emitting Socket Event:", eventName);
-        io.emit(eventName, result);
-      } else {
-        console.log("❌ socketIo not initialized");
-      }
-    
+  if (io) {
+    const eventName = `get-notification::${data?.receiver}`;
+    console.log("🚀 Emitting Socket Event:", eventName);
+    io.emit(eventName, result);
+  } else {
+    console.log("❌ socketIo not initialized");
+  }
 
-    return result;
+
+  return result;
 }

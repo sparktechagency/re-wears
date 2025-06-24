@@ -4,6 +4,9 @@ import { IWishlist, WishlistModel } from "./wishlist.interface";
 import { Wishlist } from "./wishlist.model";
 import { JwtPayload } from "jsonwebtoken";
 import QueryBuilder from "../../builder/queryBuilder";
+import { User } from "../user/user.model";
+import { sendNotifications } from "../../../helpers/notificationsHelper";
+import { Product } from "../product/product.model";
 
 const createWishListIntoDB = async (payload: IWishlist, user: JwtPayload) => {
   if (!payload.product || !user.id) {
@@ -28,6 +31,23 @@ const createWishListIntoDB = async (payload: IWishlist, user: JwtPayload) => {
       StatusCodes.INTERNAL_SERVER_ERROR,
       "Failed to add to wishlist"
     );
+  }
+  const userDetails = await User.findById(user.id);
+  const notificationPayload = {
+    userId: user.id,
+    title: 'New Wishlist',
+    // @ts-ignore
+    message: `You have a new wishlist from ${(userDetails?.lastName || "User")}`,
+    type: 'Wishlist Create',
+  };
+
+  await sendNotifications(notificationPayload as any);
+  const productDetails = await Product.findById(payload.product).lean();
+
+  //@ts-ignore
+  const io = global.io;
+  if (io) {
+    io.emit(`createWishlist::${productDetails?.user._id}`, notificationPayload);
   }
   return addWishList;
 };

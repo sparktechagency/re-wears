@@ -5,6 +5,8 @@ import { Product } from "./product.model";
 import QueryBuilder from "../../builder/queryBuilder";
 import { Wishlist } from "../wishlist/wishlist.model";
 import { sendNotifications } from "../../../helpers/notificationsHelper";
+import { User } from "../user/user.model";
+import { log } from "winston";
 
 const createProduct = async (
   payload: IProduct,
@@ -25,20 +27,26 @@ const createProduct = async (
   if (!createdProduct) {
     throw new ApiError(StatusCodes.BAD_REQUEST, "Failed to create product");
   }
-  //@ts-ignore
-  const io = global.io;
-  if (io) {
-    io.emit(`create-product::${createdProduct.user}`, createdProduct);
-  }
+  const userDetails = await User.findById(user.id);
+
   const notificationPayload = {
-    userId: createdProduct.user,
-    title: 'New Message',
+    userId: user.id,
+    title: 'New Product',
     // @ts-ignore
-    message: `You have a new message from ${(createdProduct?.user?.lastName || "User")}`,
-    type: 'Message Send',
-    filePath: 'Product',
+    message: `You have a new product from ${(userDetails?.lastName || "User")}`,
+    type: 'Product Create',
   };
   await sendNotifications(notificationPayload as any);
+  const allUser = await User.find({ isVerified: true, isBlocked: false, isDeleted: false }).lean();
+  for (const user of allUser) {
+    //@ts-ignore
+    const io = global.io;
+    if (io) {
+      io.emit(`createProduct::${user._id}`, notificationPayload);
+    }
+  }
+
+
   return createdProduct;
 };
 
