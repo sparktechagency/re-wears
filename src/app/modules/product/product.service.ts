@@ -193,10 +193,21 @@ const deleteProductFromDB = async (id: string) => {
 };
 
 
+
+const productUpdateSoldStatus = async (id: string, payload: IProduct) => {
+  const product = await Product.findByIdAndUpdate(id);
+  if (!product) {
+    throw new ApiError(StatusCodes.NOT_FOUND, "Product not found");
+  }
+  return product
+}
+
+
 export const productService = {
   createProduct,
   getAllProducts,
   getSingleProductIntoDB,
   updateProductFromDB,
   deleteProductFromDB,
+  productUpdateSoldStatus
 };

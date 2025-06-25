@@ -4,25 +4,24 @@ import { MakeAnOffer } from "./makeanoffer.model";
 import ApiError from "../../../errors/ApiErrors";
 import { StatusCodes } from "http-status-codes";
 import QueryBuilder from "../../builder/queryBuilder";
-import { clearGlobalAppDefaultCred } from "firebase-admin/lib/app/credential-factory";
+import { sendNotifications } from "../../../helpers/notificationsHelper";
+import { Message } from "../message/message.model";
 
 const createMakeAnOfferIntoDB = async (
   payload: IMakeAnOffer,
   user: JwtPayload
 ) => {
-  try {
-    const result = await MakeAnOffer.create({
-      ...payload,
-      user: user.id,
-    });
-    console.log("result", result);
-    if (!result) {
-      throw new ApiError(StatusCodes.BAD_REQUEST, "Can't create offer");
-    }
-    return result;
-  } catch (error: unknown) {
-    console.warn(error);
+  const result = await MakeAnOffer.create({
+    ...payload,
+    user: user.id,
+  });
+  if (!result) {
+    throw new ApiError(StatusCodes.BAD_REQUEST, "Can't create offer");
   }
+  await sendNotifications({
+
+  });
+  return result;
 };
 
 const getAllOfferFromDB = async (
@@ -53,8 +52,47 @@ const getAllOfferFromDB = async (
     pagination: paginationInfo,
   };
 };
+// send offer to user
+const sendOfferUsingMessage = async (
+  user: JwtPayload,
+  payload: IMakeAnOffer & { receiver: string, chatId: string },
+) => {
+  const offer = await MakeAnOffer.create({
+    user: user.id,
+    price: payload.price,
+    product: payload.product,
+  });
+
+  const messageData = {
+    text: `Offered $${payload.price} for product`,
+    type: "offer",
+    chatId: payload.chatId,
+    receiver: payload.receiver,
+    sender: user.id,
+    offer: offer._id,
+  };
+  const message = await Message.create(messageData);
+  // @ts-ignore
+  const io = global.io;
+  if (io) {
+    const event = `getMessages::${payload.receiver}`;
+    console.log("📡 Emitting socket:", event);
+    io.emit(event, message);
+  }
+  await sendNotifications({
+    receiver: payload.receiver,
+    sender: user.id,
+    message: messageData.text,
+    type: "offer",
+    chatId: payload.chatId,
+    offerId: offer._id,
+  });
+
+  return message;
+};
 
 export const MakeAnOfferServices = {
   createMakeAnOfferIntoDB,
   getAllOfferFromDB,
+  sendOfferUsingMessage
 };

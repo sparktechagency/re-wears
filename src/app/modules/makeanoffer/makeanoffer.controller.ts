@@ -9,6 +9,7 @@ const createOffer = catchAsync(async (req: Request, res: Response) => {
     req.body,
     req.user!
   );
+
   sendResponse(res, {
     statusCode: 201,
     success: true,
@@ -30,7 +31,22 @@ const getAllOffer = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const getOfferUsingSocket = catchAsync(async (req: Request, res: Response) => {
+  const result = await MakeAnOfferServices.sendOfferUsingMessage(
+    req.user!,
+    req.body
+  );
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: "Offer send successfully",
+    data: result,
+  });
+});
+
+
 export const MakeAnOfferController = {
   createOffer,
   getAllOffer,
+  getOfferUsingSocket
 };

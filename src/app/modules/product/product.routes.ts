@@ -108,16 +108,16 @@ router.patch(
   productController.updateProduct
 );
 
-
-
-
-
+router.patch("/update-status/:id", auth(USER_ROLES.USER), productController.productStatusUpdate);
 // delete product
 router.delete(
   "/:id",
   auth(USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMIN, USER_ROLES.USER),
   productController.deleteProduct
 );
+
+
+
 
 export const productRoutes = router;
 

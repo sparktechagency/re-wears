@@ -17,31 +17,34 @@ const createReviewToDB = async (user: JwtPayload, payload: IReview): Promise<IRe
 
 };
 
-const getAllReviews = async (query: Record<string, any>): Promise<{ data: IReview[], pagination: any }> => {
-    const result = new QueryBuilder(Review.find(), query)
+// review.service.ts
+const getAllReviewsFromDB = async (
+    query: Record<string, any>,
+    sellerId: string
+): Promise<{
+    data: IReview[];
+    pagination: any;
+    averageRating: number;
+    totalRatingCount: number;
+}> => {
+    // Step 1: Filter by seller/buyer field
+    const filter: Record<string, any> = {
+        buyer: sellerId, // if buyer holds sellerId
+    };
+
+    const result = new QueryBuilder(Review.find(filter), query)
         .fields()
         .sort()
-        .paginate().populate(['customer'], {
+        .paginate()
+        .populate(['customer'], {
             customer: 'firstName lastName image',
         });
 
-    if (!result) {
-        return {
-            data: [],
-            pagination: {
-                total: 0,
-                limit: 10,
-                page: 1,
-                totalPage: 0
-            }
-        };
-    }
+    const [data] = await Promise.all([result.modelQuery]);
+    const pagination = await result.getPaginationInfo();
 
-    const [data,] = await Promise.all([
-        result.modelQuery
-    ]);
     const stats = await Review.aggregate([
-        { $match: result.modelQuery.getFilter() },
+        { $match: { buyer: new mongoose.Types.ObjectId(sellerId) } },
         {
             $group: {
                 _id: null,
@@ -56,14 +59,14 @@ const getAllReviews = async (query: Record<string, any>): Promise<{ data: IRevie
 
     return {
         data,
-        // @ts-ignore
+        pagination,
         averageRating,
-        totalRatingCount
+        totalRatingCount,
     };
-}
+};
 
 
 export const ReviewService = {
     createReviewToDB,
-    getAllReviews
+    getAllReviewsFromDB
 }

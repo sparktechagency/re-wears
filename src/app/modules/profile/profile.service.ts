@@ -39,14 +39,16 @@ const getAllProductsFilterByStatus = async (id: string, query: Record<string, an
 
 const getAllMyOrdersFromDB = async (id: string, query: Record<string, any>) => {
   const queryBuilder = new QueryBuilder(
-    Order.find({ buyer: new mongoose.Types.ObjectId(id) }),
+    Order.find({
+      buyer: new mongoose.Types.ObjectId(id),
+      status: 'Reserved', // only show reserved orders
+    }),
     query
   )
     .filter()
     .sort()
     .paginate();
 
-  // Populate buyer, seller, and product details
   const populatedQuery = queryBuilder.modelQuery.populate([
     { path: "buyer" },
     { path: "seller" },
@@ -61,54 +63,46 @@ const getAllMyOrdersFromDB = async (id: string, query: Record<string, any>) => {
   ]);
 
   const orders = await populatedQuery;
-
-  // STEP 1: Get all unique seller IDs
-  const sellerIds = orders
-    .filter(order => order?.seller?._id)
-    .map(order => new mongoose.Types.ObjectId(order.seller._id));
-
-  // STEP 2: Aggregate average rating from Review collection
-  const averageRatings = await Review.aggregate([
-    {
-      $match: {
-        buyer: { $in: sellerIds }, // If you're using `seller` field in Review model, replace `buyer` with `seller`
-      },
-    },
-    {
-      $group: {
-        _id: "$buyer", // Or "$seller" if field renamed
-        averageRating: { $avg: "$rating" },
-      },
-    },
-  ]);
-
-  // STEP 3: Map sellerId → averageRating
-  const ratingMap = new Map(
-    averageRatings.map(item => [item._id.toString(), item.averageRating])
-  );
-
-  // STEP 4: Inject average rating into seller object
-  const enrichedOrders = orders.map(order => {
-    const sellerId = order.seller?._id?.toString();
-    const avgRating = ratingMap.get(sellerId) || 0;
-
-    return {
-      ...order.toObject(),
-      seller: {
-        // @ts-ignore
-        ...order.seller.toObject(),
-        averageRating: parseFloat(avgRating.toFixed(2)),
-      },
-    };
-  });
-
   const pagination = await queryBuilder.getPaginationInfo();
 
+  const data = await Promise.all(
+    orders.map(async (order: any) => {
+      const orderObj = order.toObject();
+
+      // Calculate average rating for each seller
+      const sellerRating = await Review.aggregate([
+        {
+          $match: {
+            seller: new mongoose.Types.ObjectId(orderObj.seller._id),
+          },
+        },
+        {
+          $group: {
+            _id: "$seller",
+            averageRating: { $avg: "$rating" },
+          },
+        },
+      ]);
+
+      // Inject averageRating into seller object
+      const avgRating = sellerRating.length > 0 ? sellerRating[0].averageRating : 0;
+
+      orderObj.seller = {
+        ...orderObj.seller,
+        averageRating: avgRating,
+      };
+
+      return orderObj;
+    })
+  );
+
   return {
-    data: enrichedOrders,
+    data,
     pagination,
   };
 };
+
+
 
 
 

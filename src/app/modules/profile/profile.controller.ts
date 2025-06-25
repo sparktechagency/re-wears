@@ -15,9 +15,8 @@ const getAllProductBaseOnStatusFromDB = catchAsync(async (req: Request, res: Res
         data: result.productsWithWishlistCount
     })
 })
-const getAllMyOrdersFromDB = catchAsync(async (req: Request, res: Response) => {
-    const { id }: any = req.user
-    console.log(id);
+const getAllMyOrders = catchAsync(async (req: Request, res: Response) => {
+    const { id }: any = req.user;
     const result = await profileService.getAllMyOrdersFromDB(id!, req.query)
     sendResponse(res, {
         statusCode: 200,
@@ -44,6 +43,6 @@ const followUser = catchAsync(async (req: Request, res: Response) => {
 
 export const profileController = {
     getAllProductBaseOnStatusFromDB,
-    getAllMyOrdersFromDB,
+    getAllMyOrders,
     followUser
 }

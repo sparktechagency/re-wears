@@ -4,8 +4,9 @@ import { followerService } from "./follower.service";
 import sendResponse from "../../../shared/sendResponse";
 
 const followUser = catchAsync(async (req: Request, res: Response) => {
-    const userId = req.params.id;         // person to follow/unfollow
-    const followerId = req?.user?.id;       // logged-in user
+    const userId = req.params.id;
+    // @ts-ignore
+    const followerId = req?.user?.id;       
 
     const result = await followerService.followOrUnfollowUser(userId, followerId);
 
