@@ -6,8 +6,12 @@ import QueryBuilder from "../../builder/queryBuilder";
 import { Wishlist } from "../wishlist/wishlist.model";
 import { sendNotifications } from "../../../helpers/notificationsHelper";
 import { User } from "../user/user.model";
-import { log } from "winston";
-
+/*
+  @payload: IProduct,
+  @user: user.id
+  @return: IProduct
+  successfully created product
+*/
 const createProduct = async (
   payload: IProduct,
   user: any
@@ -50,6 +54,8 @@ const createProduct = async (
   return createdProduct;
 };
 
+
+// get all products
 const getAllProducts = async (
   query: Record<string, any>
 ): Promise<{ data: any[]; meta: any }> => {

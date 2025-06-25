@@ -11,7 +11,7 @@ const sendMessageToDB = async (
 ): Promise<IMessage> => {
 
   let messageData: any = {
-    text: payload?.text || `Offered ${payload?.price}`,
+    text: payload?.text || "",
     image: payload.image,
     type: payload?.type || "text",
     chatId: payload?.chatId,
