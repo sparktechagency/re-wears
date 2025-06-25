@@ -9,9 +9,6 @@ const createOffer = catchAsync(async (req: Request, res: Response) => {
     req.body,
     req.user!
   );
-  if (!result) {
-    throw new ApiError(StatusCodes.BAD_REQUEST, "Can't create offer");
-  }
   sendResponse(res, {
     statusCode: 201,
     success: true,

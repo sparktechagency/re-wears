@@ -37,9 +37,8 @@ const getAllReviews = async (query: Record<string, any>): Promise<{ data: IRevie
         };
     }
 
-    const [data, pagination] = await Promise.all([
-        result.modelQuery,
-        result.getPaginationInfo()
+    const [data,] = await Promise.all([
+        result.modelQuery
     ]);
     const stats = await Review.aggregate([
         { $match: result.modelQuery.getFilter() },
@@ -57,7 +56,6 @@ const getAllReviews = async (query: Record<string, any>): Promise<{ data: IRevie
 
     return {
         data,
-        pagination,
         // @ts-ignore
         averageRating,
         totalRatingCount

@@ -4,6 +4,7 @@ import { MakeAnOffer } from "./makeanoffer.model";
 import ApiError from "../../../errors/ApiErrors";
 import { StatusCodes } from "http-status-codes";
 import QueryBuilder from "../../builder/queryBuilder";
+import { clearGlobalAppDefaultCred } from "firebase-admin/lib/app/credential-factory";
 
 const createMakeAnOfferIntoDB = async (
   payload: IMakeAnOffer,
@@ -14,6 +15,7 @@ const createMakeAnOfferIntoDB = async (
       ...payload,
       user: user.id,
     });
+    console.log("result", result);
     if (!result) {
       throw new ApiError(StatusCodes.BAD_REQUEST, "Can't create offer");
     }

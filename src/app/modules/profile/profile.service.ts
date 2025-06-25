@@ -5,6 +5,7 @@ import { Product } from "../product/product.model"
 import mongoose from "mongoose";
 import { Wishlist } from "../wishlist/wishlist.model";
 import { Review } from "../review/review.model";
+import { User } from "../user/user.model";
 
 const getAllProductsFilterByStatus = async (id: string, query: Record<string, any>) => {
 
@@ -111,7 +112,25 @@ const getAllMyOrdersFromDB = async (id: string, query: Record<string, any>) => {
 
 
 
+
+// TODO: Add follower in user model 
+const followUser = async (userId: string, followerId: string) => {
+  const user = await User.findByIdAndUpdate(
+    userId,
+    {
+      $addToSet: { followers: followerId },
+    },
+    { new: true }
+  );
+  if (!user) {
+    throw new Error("User not found");
+  }
+  return user
+}
+
+
 export const profileService = {
   getAllProductsFilterByStatus,
-  getAllMyOrdersFromDB
+  getAllMyOrdersFromDB,
+  followUser
 }

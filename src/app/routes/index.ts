@@ -21,6 +21,7 @@ import { navRouter } from "../modules/navCategory/nav.routes";
 import { ReviewRoutes } from "../modules/review/review.routes";
 import { profileRoutes } from "../modules/profile/profile.routes";
 import { dashboardRoutes } from "../modules/dashboard/dashboard.routes";
+import { followerRoutes } from "../modules/follower/follower.routes";
 const router = express.Router();
 
 const apiRoutes = [
@@ -47,6 +48,7 @@ const apiRoutes = [
   { path: "/review", route: ReviewRoutes },
   { path: "/user-product", route: profileRoutes },
   { path: "/dashboard", route: dashboardRoutes },
+  { path: "/user", route: followerRoutes },
 ];
 
 apiRoutes.forEach((route) => router.use(route.path, route.route));
