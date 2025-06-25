@@ -32,15 +32,21 @@ const getAllOffer = catchAsync(async (req: Request, res: Response) => {
 });
 
 const getOfferUsingSocket = catchAsync(async (req: Request, res: Response) => {
-  const result = await MakeAnOfferServices.sendOfferUsingMessage(
-    req.user!,
-    req.body
-  );
+  const user = req.user;
+  const receiver = req.params.receiverId;
+  const { product, price } = req.body;
+
+  const message = await MakeAnOfferServices.sendOfferUsingMessage(user!, {
+    product,
+    price,
+    receiver,
+  });
+
   sendResponse(res, {
-    statusCode: 200,
+    statusCode: StatusCodes.OK,
     success: true,
-    message: "Offer send successfully",
-    data: result,
+    message: "Offer sent successfully",
+    data: message,
   });
 });
 

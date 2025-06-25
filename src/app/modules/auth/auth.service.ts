@@ -111,19 +111,19 @@ const verifyEmailToDB = async (payload: IVerifyEmail) => {
   if (!oneTimeCode) {
     throw new ApiError(
       StatusCodes.BAD_REQUEST,
-      "Please give the otp, check your email we send a code"
+      "Please give the OTP, check your email"
     );
   }
 
   if (isExistUser.authentication?.oneTimeCode !== oneTimeCode) {
-    throw new ApiError(StatusCodes.BAD_REQUEST, "You provided wrong otp");
+    throw new ApiError(StatusCodes.BAD_REQUEST, "You provided wrong OTP");
   }
 
   const date = new Date();
   if (date > isExistUser.authentication?.expireAt) {
     throw new ApiError(
       StatusCodes.BAD_REQUEST,
-      "Otp already expired, Please try again"
+      "OTP already expired, Please try again"
     );
   }
 
@@ -131,6 +131,7 @@ const verifyEmailToDB = async (payload: IVerifyEmail) => {
   let data;
 
   if (!isExistUser.isVerified) {
+    // ✅ Mark verified
     await User.findOneAndUpdate(
       { _id: isExistUser._id },
       {
@@ -138,8 +139,25 @@ const verifyEmailToDB = async (payload: IVerifyEmail) => {
         authentication: { oneTimeCode: null, expireAt: null },
       }
     );
-    message = "Email verify successfully";
+
+    // ✅ Token generate
+    const accessToken = jwtHelper.createToken(
+      { id: isExistUser._id, role: isExistUser.role, email: isExistUser.email },
+      config.jwt.jwt_secret as Secret,
+      config.jwt.jwt_expire_in as string
+    );
+
+    const refreshToken = jwtHelper.createToken(
+      { id: isExistUser._id, role: isExistUser.role, email: isExistUser.email },
+      config.jwt.jwtRefreshSecret as Secret,
+      config.jwt.jwtRefreshExpiresIn as string
+    );
+
+    message = "Email verified successfully";
+    data = { accessToken, refreshToken };
+
   } else {
+    // ✅ Already verified → Reset password flow
     await User.findOneAndUpdate(
       { _id: isExistUser._id },
       {
@@ -151,19 +169,21 @@ const verifyEmailToDB = async (payload: IVerifyEmail) => {
       }
     );
 
-    //create token ;
     const createToken = cryptoToken();
     await ResetToken.create({
       user: isExistUser._id,
       token: createToken,
       expireAt: new Date(Date.now() + 5 * 60000),
     });
+
     message =
-      "Verification Successful: Please securely store and utilize this code for reset password";
+      "Verification Successful: Please securely store and utilize this code for password reset";
     data = createToken;
   }
+
   return { data, message };
 };
+
 
 //forget password
 const resetPasswordToDB = async (

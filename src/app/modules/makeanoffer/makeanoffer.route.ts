@@ -11,7 +11,7 @@ router.post(
   MakeAnOfferController.createOffer
 );
 
-router.post("/send", auth(USER_ROLES.USER), MakeAnOfferController.getOfferUsingSocket);
+router.post("/send/:receiverId", auth(USER_ROLES.USER), MakeAnOfferController.getOfferUsingSocket);
 
 
 router.get(

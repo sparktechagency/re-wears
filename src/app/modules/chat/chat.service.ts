@@ -1,54 +1,58 @@
+import { Types } from 'mongoose';
 import { IMessage } from '../message/message.interface';
 import { Message } from '../message/message.model';
 import { IChat } from './chat.interface';
 import { Chat } from './chat.model';
 
-const createChatToDB = async (payload: any): Promise<IChat> => {
-    const isExistChat: IChat | null = await Chat.findOne({
-        participants: { $all: payload },
+const createChatToDB = async (participants: (string | Types.ObjectId)[]) => {
+    const existingChat = await Chat.findOne({
+        participants: { $all: participants },
     });
-    
-    if (isExistChat) {
-        return isExistChat;
+
+    if (existingChat) {
+        return existingChat; // returns saved doc with _id
     }
-    const chat: IChat = await Chat.create({ participants: payload });
+
+    // Chat.create() saves to DB and returns document with _id
+    const chat = await Chat.create({ participants });
     return chat;
-}
+};
+
 
 const getChatFromDB = async (user: any, search: string): Promise<IChat[]> => {
-  
+
     const chats: any = await Chat.find({ participants: { $in: [user.id] } })
         .populate({
             path: 'participants',
             select: '_id firstName lastName image',
             match: {
-            _id: { $ne: user.id }, // Exclude user.id in the populated participants
-            ...(search && { name: { $regex: search, $options: 'i' } }), // Apply $regex only if search is valid
+                _id: { $ne: user.id }, // Exclude user.id in the populated participants
+                ...(search && { name: { $regex: search, $options: 'i' } }), // Apply $regex only if search is valid
             }
         })
         .select('participants status');
-  
+
     // Filter out chats where no participants match the search (empty participants)
     const filteredChats = chats?.filter(
         (chat: any) => chat?.participants?.length > 0
     );
-  
+
     //Use Promise.all to handle the asynchronous operations inside the map
     const chatList: IChat[] = await Promise.all(
         filteredChats?.map(async (chat: any) => {
             const data = chat?.toObject();
-    
+
             const lastMessage: IMessage | null = await Message.findOne({ chatId: chat?._id })
-            .sort({ createdAt: -1 })
-            .select('text offer createdAt sender');
-    
+                .sort({ createdAt: -1 })
+                .select('text offer createdAt sender');
+
             return {
                 ...data,
                 lastMessage: lastMessage || null,
             };
         })
     );
-    
+
     return chatList;
 };
 
