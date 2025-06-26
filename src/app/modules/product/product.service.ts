@@ -6,6 +6,7 @@ import QueryBuilder from "../../builder/queryBuilder";
 import { Wishlist } from "../wishlist/wishlist.model";
 import { sendNotifications } from "../../../helpers/notificationsHelper";
 import { User } from "../user/user.model";
+import { Order } from "../order/order.model";
 /*
   @payload: IProduct,
   @user: user.id
@@ -201,7 +202,7 @@ const deleteProductFromDB = async (id: string) => {
 
 
 const productUpdateSoldStatus = async (id: string, payload: IProduct) => {
-  const product = await Product.findByIdAndUpdate(id);
+  const product = await Product.findByIdAndUpdate(id, payload, { new: true });
   if (!product) {
     throw new ApiError(StatusCodes.NOT_FOUND, "Product not found");
   }

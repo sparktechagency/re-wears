@@ -150,13 +150,23 @@ const loginWithGoogle = catchAsync(async (req: Request, res: Response) => {
   });
 })
 
-const loginWithApple = catchAsync(async (req: Request, res: Response) => {
-  const result = await UserService.handleLoginWithApple()
+const loginWithFacebook = catchAsync(async (req: Request, res: Response) => {
+  const result = await UserService.handleLoginWithFacebook(req.user!)
   sendResponse(res, {
     success: true,
     statusCode: StatusCodes.OK,
     message: "User data updated successfully",
     data: result,
+  });
+})
+
+const facebookCallback = catchAsync(async (req: Request, res: Response) => {
+  console.log(req.body);
+
+  sendResponse(res, {
+    success: true,
+    statusCode: StatusCodes.OK,
+    message: "User data updated successfully",
   });
 })
 
@@ -172,5 +182,5 @@ export const UserController = {
   getSingleUser,
   updateUserNickName,
   loginWithGoogle,
-  loginWithApple
+  loginWithFacebook
 };

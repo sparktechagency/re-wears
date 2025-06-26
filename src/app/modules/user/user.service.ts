@@ -12,6 +12,7 @@ import QueryBuilder from "../../builder/queryBuilder";
 import generateSequentialId from "../../utils/idGenerator";
 import { Review } from "../review/review.model";
 import { UserFollower } from "../follower/follower.model";
+import axios from "axios";
 
 const createAdminToDB = async (payload: any): Promise<IUser> => {
   // check admin is exist or not;
@@ -253,19 +254,28 @@ const handleLoginWithGoogle = async () => {
 
 
 // login with apple
-const handleLoginWithApple = async () => {
+const handleLoginWithFacebook = async (payload: any) => {
+  const url = `https://graph.facebook.com/${payload.userID}?fields=id,name,email,picture&access_token=${payload.accessToken}`;
+  const response = await axios.get(url);
+  const user: any = response.data;
+  let existingUser = await User.findOne({ facebookId: user.id });
+  if (!existingUser) {
+    // If the user doesn't exist, create a new user
+    existingUser = await User.create({
+      facebookId: payload.user.id,
+      name: payload.user.name,
+      email: payload.user.email,
+      profilePicture: user.picture.data.url,
+    });
+  }
+  return existingUser;
 
 }
 
-/**
- * User login er somoy (socket connect) enterTime update korbe
- */
+
 const updateEnterTime = async (userId: string): Promise<void> => {
   await User.findByIdAndUpdate(userId, { enterTime: new Date() });
 };
-/**
- * User logout ba socket disconnect er somoy leaveTime update korbe
- */
 
 const updateLeaveTime = async (userId: string): Promise<void> => {
   await User.findByIdAndUpdate(userId, { leaveTime: new Date() });
@@ -284,7 +294,7 @@ export const UserService = {
   getSingleUserFromDB,
   updateUserNickNameBaseOnIdFromDB,
   handleLoginWithGoogle,
-  handleLoginWithApple,
+  handleLoginWithFacebook,
   updateEnterTime,
   updateLeaveTime
 };

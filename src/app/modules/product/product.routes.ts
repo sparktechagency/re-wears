@@ -78,6 +78,16 @@ router.patch(
       }
       return value;
     };
+    // category parse
+    let category = req.body.category;
+    if (typeof category === "string") {
+      try {
+        category = JSON.parse(category);
+      } catch (error) {
+        // fallback if parsing fails
+      }
+    }
+
     let productImageExist = req.body.productImage || [];
     let arr = []
     if (typeof productImageExist == 'string') {
@@ -96,6 +106,7 @@ router.patch(
     }
     const payload = {
       ...req.body,
+      category,
       colors: parseIfStringArray(req.body.colors),
       sizes: parseIfStringArray(req.body.sizes),
       brands: parseIfStringArray(req.body.brands),
