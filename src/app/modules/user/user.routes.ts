@@ -31,7 +31,7 @@ router.post(
   UserController.createUser
 );
 
-router.get("/:id", UserController.getSingleUser)
+router.get("/:id", auth(USER_ROLES.USER), UserController.getSingleUser)
 router.get('/google', UserController.loginWithGoogle);
 router.get('/apple', UserController.loginWithApple);
 

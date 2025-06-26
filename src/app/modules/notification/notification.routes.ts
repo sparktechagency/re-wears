@@ -12,9 +12,20 @@ router.get('/admin',
     auth(USER_ROLES.ADMIN, USER_ROLES.SUPER_ADMIN),
     NotificationController.adminNotificationFromDB
 );
+
+router.get("/all",
+    //  auth(USER_ROLES.USER),
+    NotificationController.getAllNotification);
+
 router.patch('/',
     auth(USER_ROLES.USER),
     NotificationController.readNotification
+);
+
+router.patch(
+    '/update-notification/:notificationId',
+    auth(USER_ROLES.USER),
+    NotificationController.updateNotification
 );
 // router.patch('/admin',
 //     auth(USER_ROLES.USER),
@@ -22,9 +33,9 @@ router.patch('/',
 // );
 
 router.post(
-  "/create-admin-notification",
-  auth(USER_ROLES.ADMIN, USER_ROLES.SUPER_ADMIN),
-  NotificationController.createAdminNotification
+    "/create-admin-notification",
+    auth(USER_ROLES.ADMIN, USER_ROLES.SUPER_ADMIN),
+    NotificationController.createAdminNotification
 );
 
 export const NotificationRoutes = router;
