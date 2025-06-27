@@ -41,8 +41,8 @@ router.get('/auth/facebook', passport.authenticate('facebook'));
 
 // Facebook callback route
 router.get('/auth/facebook/callback',
-  passport.authenticate('facebook', { failureRedirect: '/' }),  // Redirect to '/' if failed
-  UserController.loginWithFacebook  // After successful login, call the controller's function
+  passport.authenticate('facebook', { failureRedirect: '/' }),
+  UserController.loginWithFacebook
 );
 
 router.patch(

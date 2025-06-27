@@ -77,7 +77,6 @@ const getAllWishListFromDB = async (
       path: "user"
     }]);
     const paginationInfo = await queryBuilder.getPaginationInfo();
-
     if (!result) {
       return [];
     }

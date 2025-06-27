@@ -4,8 +4,6 @@ import catchAsync from "../../../shared/catchAsync";
 import sendResponse from "../../../shared/sendResponse";
 
 const createWishList = catchAsync(async (req: Request, res: Response) => {
-  //   console.log("Body======>", req.body);
-  //   console.log("user======>", req.user);
   const result = await WishlistServices.createWishListIntoDB(
     req.body,
     req.user!
