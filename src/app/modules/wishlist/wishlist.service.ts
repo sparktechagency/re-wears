@@ -7,6 +7,7 @@ import QueryBuilder from "../../builder/queryBuilder";
 import { User } from "../user/user.model";
 import { sendNotifications } from "../../../helpers/notificationsHelper";
 import { Product } from "../product/product.model";
+import { populate } from "dotenv";
 
 const createWishListIntoDB = async (payload: IWishlist, user: JwtPayload) => {
   if (!payload.product || !user.id) {
@@ -66,13 +67,15 @@ const getAllWishListFromDB = async (
       .sort()
       .paginate()
       .fields()
-      .populate(["product user"], {
-        path: "product user",
-        select:
-          "_id user name description productImage condition brand size material colors price status isBlocked isDeleted createdAt updatedAt email profile role",
-      });
 
-    const result = await queryBuilder.modelQuery;
+    const result = await queryBuilder.modelQuery.populate([{
+      path: "product",
+      populate: {
+        path: "user",
+      }
+    }, {
+      path: "user"
+    }]);
     const paginationInfo = await queryBuilder.getPaginationInfo();
 
     if (!result) {
