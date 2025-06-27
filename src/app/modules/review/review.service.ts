@@ -27,24 +27,9 @@ const getAllReviewsFromDB = async (
     averageRating: number;
     totalRatingCount: number;
 }> => {
-    // Step 1: Filter by seller/buyer field
-    const filter: Record<string, any> = {
-        buyer: sellerId, // if buyer holds sellerId
-    };
-
-    const result = new QueryBuilder(Review.find(filter), query)
-        .fields()
-        .sort()
-        .paginate()
-        .populate(['customer'], {
-            customer: 'firstName lastName image',
-        });
-
-    const [data] = await Promise.all([result.modelQuery]);
-    const pagination = await result.getPaginationInfo();
-
+    const result = await Review.find({ user: sellerId })
     const stats = await Review.aggregate([
-        { $match: { buyer: new mongoose.Types.ObjectId(sellerId) } },
+        { $match: { user: new mongoose.Types.ObjectId(sellerId) } },
         {
             $group: {
                 _id: null,
@@ -55,13 +40,12 @@ const getAllReviewsFromDB = async (
     ]);
 
     const averageRating = stats[0]?.averageRating || 0;
-    const totalRatingCount = stats[0]?.totalRatingCount || 0;
+
 
     return {
-        data,
-        pagination,
         averageRating,
-        totalRatingCount,
+        // @ts-ignore
+        result,
     };
 };
 

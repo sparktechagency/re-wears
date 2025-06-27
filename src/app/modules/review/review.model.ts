@@ -8,7 +8,7 @@ const reviewSchema = new Schema<IReview, ReviewModel>(
             ref: "User",
             required: true,
         },
-        buyer: {
+        user: {
             type: Schema.Types.ObjectId,
             ref: "User",
             required: true,

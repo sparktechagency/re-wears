@@ -22,13 +22,7 @@ const getAllReview = catchAsync(async (req: Request, res: Response) => {
         statusCode: StatusCodes.OK,
         success: true,
         message: "Review Fetched Successfully",
-        meta: {
-            // @ts-ignore
-            averageRating: result?.averageRating,
-            // @ts-ignore
-            totalRatingCount: result?.totalRatingCount,
-        },
-        data: result.data,
+        data: result,
 
     })
 })

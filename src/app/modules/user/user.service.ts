@@ -196,11 +196,11 @@ const getSingleUserFromDB = async (id: string) => {
 
   // --- Review Count
   const reviewCount = await Review.countDocuments({
-    $or: [{ customer: id }, { buyer: id }]
+    $or: [{ customer: id }, { user: id }]
   });
 
   // --- Average Rating from customer reviews
-  const customerReviews = await Review.find({ customer: id }).lean();
+  const customerReviews = await Review.find({ user: id }).lean();
   const validRatings = customerReviews
     .map(r => r.rating)
     .filter(r => typeof r === 'number' && !isNaN(r));
