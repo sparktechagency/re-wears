@@ -5,6 +5,7 @@ import { Order } from "./order.model";
 import { Product } from "../product/product.model";
 import QueryBuilder from "../../builder/queryBuilder";
 import { IProduct } from "../product/product.interface";
+import { JwtPayload } from "jsonwebtoken";
 
 const createOrderIntoDB = async (payload: IOrder) => {
   const isExistingOrder = await Order.findOne({ product: payload?.product });
@@ -161,42 +162,20 @@ const getTopSellersAndBuyers = async (query: Record<string, any>) => {
 
 
 // order update
-const updateOrderByProductId = async (id: string, payload: Partial<IProduct>) => {
-  // Step 1: Update the product
-  const updatedProduct = await Product.findByIdAndUpdate(id, payload, {
+const updateOrderByProductId = async (user: JwtPayload, id: string, payload: { productStatus: string, orderStatus: string }) => {
+  const updatedProduct = await Product.findByIdAndUpdate(id, { status: payload.productStatus }, {
     new: true,
   });
 
   if (!updatedProduct) {
     throw new ApiError(StatusCodes.NOT_FOUND, "Product not found");
   }
-
-  // Step 2: Determine the corresponding order status
-  let orderStatus: "Reserved" | "Completed" | "Released" | null = null;
-
-  switch (updatedProduct.status) {
-    case "Reserved":
-      orderStatus = "Reserved";
-      break;
-    case "Sold":
-      orderStatus = "Completed";
-      break;
-    case "Active":
-      orderStatus = "Released";
-      break;
-    default:
-      orderStatus = null;
-  }
-
-  // Step 3: Update the matching order
-  if (orderStatus) {
-    await Order.findOneAndUpdate(
-      { product: updatedProduct._id },
-      { $set: { status: orderStatus } }
-    );
-  }
-
-  return updatedProduct;
+  const orderData = await Order.findOneAndUpdate(
+    { product: updatedProduct._id, buyer: user.id },
+    { status: payload.orderStatus },
+    { new: true }
+  );
+  return { updatedProduct, orderData };
 };
 export const OrderServices = {
   createOrderIntoDB,

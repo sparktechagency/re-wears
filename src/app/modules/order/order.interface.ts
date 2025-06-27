@@ -4,7 +4,7 @@ export type IOrder = {
   seller: Types.ObjectId;
   product: Types.ObjectId;
   buyer: Types.ObjectId;
-  status: "Reserved" | "Completed" | "Released";
+  status: "Reserved" | "Completed" | "Cancelled";
 };
 
 export type OrderModel = Model<IOrder>;

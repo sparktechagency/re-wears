@@ -20,7 +20,7 @@ const orderSchema = new Schema<IOrder, OrderModel>(
     },
     status: {
       type: String,
-      enum: ["Reserved", "Completed", "Released"],
+      enum: ["Reserved", "Completed", "Cancelled"],
       required: true,
       default: "Reserved",
     },
