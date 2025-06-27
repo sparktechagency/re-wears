@@ -8,6 +8,10 @@ const messageSchema = new Schema<IMessage, MessageModel>(
       required: true,
       ref: 'Chat',
     },
+    type: {
+      type: String,
+      enum: ['text', 'offer']
+    },
     sender: {
       type: Schema.Types.ObjectId,
       required: true,
@@ -18,13 +22,22 @@ const messageSchema = new Schema<IMessage, MessageModel>(
       required: true,
       ref: 'User',
     },
-    text: { 
-      type: String,
-      required: false 
+    price: {
+      type: Number,
+      required: false
     },
-    image: { 
+    text: {
       type: String,
-      required: false 
+      required: false
+    },
+    offer: {
+      type: Schema.Types.ObjectId,
+      required: false,
+      ref: 'MakeAnOffer',
+    },
+    image: {
+      type: String,
+      required: false
     },
   },
   {

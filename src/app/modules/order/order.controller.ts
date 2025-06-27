@@ -41,8 +41,9 @@ const getTopSellersAndBuyers = catchAsync(
 
 // update
 const updateOrderByProduct = catchAsync(async (req: Request, res: Response) => {
+  const user = req.user;
   const { productId } = req.params;
-  const result = await OrderServices.updateOrderByProductId(productId, req.body);
+  const result = await OrderServices.updateOrderByProductId(user!, productId, req.body);
   sendResponse(res, {
     statusCode: 200,
     success: true,

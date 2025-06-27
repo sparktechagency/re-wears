@@ -57,10 +57,23 @@ const deleteProduct = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+
+const productStatusUpdate = catchAsync(async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const result = await productService.productUpdateSoldStatus(id, req.body);
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: `Product status updated successfully`,
+    data: result,
+  });
+});
+
 export const productController = {
   createProduct,
   getAllProducts,
   getSingleProduct,
   updateProduct,
   deleteProduct,
+  productStatusUpdate
 };

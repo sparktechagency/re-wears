@@ -9,9 +9,7 @@ const createOffer = catchAsync(async (req: Request, res: Response) => {
     req.body,
     req.user!
   );
-  if (!result) {
-    throw new ApiError(StatusCodes.BAD_REQUEST, "Can't create offer");
-  }
+
   sendResponse(res, {
     statusCode: 201,
     success: true,
@@ -33,7 +31,28 @@ const getAllOffer = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const getOfferUsingSocket = catchAsync(async (req: Request, res: Response) => {
+  const user = req.user;
+  const receiver = req.params.receiverId;
+  const { product, price } = req.body;
+
+  const message = await MakeAnOfferServices.sendOfferUsingMessage(user!, {
+    product,
+    price,
+    receiver,
+  });
+
+  sendResponse(res, {
+    statusCode: StatusCodes.OK,
+    success: true,
+    message: "Offer sent successfully",
+    data: message,
+  });
+});
+
+
 export const MakeAnOfferController = {
   createOffer,
   getAllOffer,
+  getOfferUsingSocket
 };

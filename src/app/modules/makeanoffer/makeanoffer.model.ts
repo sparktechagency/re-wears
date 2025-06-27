@@ -2,6 +2,7 @@ import { Schema, model } from "mongoose";
 import { IMakeAnOffer, MakeAnOfferModel } from "./makeanoffer.interface";
 
 const makeAnOfferSchema = new Schema<IMakeAnOffer, MakeAnOfferModel>({
+
   user: {
     type: Schema.Types.ObjectId,
     required: true,

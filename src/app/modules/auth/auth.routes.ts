@@ -83,12 +83,12 @@ router.get("/google/callback",
 );
 
 // Facebook Auth Routes
-router.get("/facebook", passport.authenticate("facebook", { scope: ["email"] }));
+// router.get("/facebook", passport.authenticate("facebook", { scope: ["email"] }));
 
 router.get("/facebook/callback",
     passport.authenticate("facebook", { failureRedirect: "/" }),
     (req, res) => {
-        res.redirect("/dashboard"); // Redirect after successful login
+        res.redirect("/");
     }
 );
 

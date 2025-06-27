@@ -2,32 +2,66 @@ import { JwtPayload } from "jsonwebtoken";
 import { IMessage } from "./message.interface";
 import { Message } from "./message.model";
 import { sendNotifications } from "../../../helpers/notificationsHelper";
+import { MakeAnOffer } from "../makeanoffer/makeanoffer.model";
+
 
 const sendMessageToDB = async (
-  payload: any,
+  payload: IMessage & { type: "offer" | "text", product: string },
   user: JwtPayload
 ): Promise<IMessage> => {
-  // save to DB
-  const response = await Message.create({ ...payload, sender: user.id });
 
+  let messageData: any = {
+    text: payload?.text || "",
+    image: payload.image,
+    type: payload?.type || "text",
+    chatId: payload?.chatId,
+    receiver: payload?.receiver,
+    sender: user.id,
+  };
+
+  if (payload?.type === "offer") {
+    const offer = await MakeAnOffer.create({
+      user: user.id,
+      price: payload.price,
+      product: payload.product,
+    });
+    messageData.offerId = offer._id;
+  }
+
+  const message = await Message.create(messageData);
+  // Emit socket message
   //@ts-ignore
   const io = global.io;
   if (io) {
-    io.emit(`getMessages::${payload?.receiver}`, response);
+    const eventName = `getMessages::${payload.receiver}`;
+    io.emit(eventName, message);
+  } else {
+    console.log("❌ global.io not available");
   }
+
+  // Send notification
   await sendNotifications({
-    receiver: payload?.receiver,
+    receiver: payload.receiver,
     sender: user.id,
-    message: payload?.text,
-    type: "message",
-    chatId: payload?.chatId,
+    message: messageData.text,
+    type: messageData.type,
+    chatId: payload.chatId,
+    offerId: messageData.offerId,
   });
 
-  return response;
+  return message;
 };
 
+
 const getMessageFromDB = async (id: any): Promise<IMessage[]> => {
-  const messages = await Message.find({ chatId: id }).sort({ createdAt: -1 });
+  const messages = await Message.find({ chatId: id }).sort({ createdAt: 1 }).populate({
+    path: "offer",
+    select: "product",
+    populate: {
+      path: "product",
+      select: "name price",
+    },
+  });
   return messages;
 };
 

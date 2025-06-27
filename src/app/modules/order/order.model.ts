@@ -20,7 +20,7 @@ const orderSchema = new Schema<IOrder, OrderModel>(
     },
     status: {
       type: String,
-      enum: ["Reserved", "Completed", "Released"],
+      enum: ["Reserved", "Completed", "Cancelled"],
       required: true,
       default: "Reserved",
     },
@@ -31,3 +31,4 @@ const orderSchema = new Schema<IOrder, OrderModel>(
 );
 
 export const Order = model<IOrder, OrderModel>("Order", orderSchema);
+/// if product status is Reserved then order status will be Reserved if sold then Completed also If product status Active then order status will be Released.

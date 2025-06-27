@@ -5,6 +5,9 @@ import { UserValidation } from './user.validation';
 import auth from '../../middlewares/auth';
 import validateRequest from '../../middlewares/validateRequest';
 import fileUploadHandler from '../../middlewares/fileUploaderHandler';
+import "../../../config/passport"
+import passport from '../../../config/passport';
+import '../../../config/facebookPassport';
 const router = express.Router();
 
 router.get(
@@ -31,9 +34,16 @@ router.post(
   UserController.createUser
 );
 
-router.get("/:id", UserController.getSingleUser)
+router.get("/:id", auth(USER_ROLES.USER), UserController.getSingleUser)
 router.get('/google', UserController.loginWithGoogle);
-router.get('/apple', UserController.loginWithApple);
+// Facebook login route
+router.get('/auth/facebook', passport.authenticate('facebook'));
+
+// Facebook callback route
+router.get('/auth/facebook/callback',
+  passport.authenticate('facebook', { failureRedirect: '/' }),  // Redirect to '/' if failed
+  UserController.loginWithFacebook  // After successful login, call the controller's function
+);
 
 router.patch(
   "/update-profile",

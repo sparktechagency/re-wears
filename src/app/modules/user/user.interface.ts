@@ -30,6 +30,7 @@ export type IUser = {
   provider?: string;
   lastSeenAt?: Date;
   providerId?: string;
+  facebookId?: string;
   createdAt?: Date;
   updatedAt?: Date;
 };

@@ -11,6 +11,8 @@ import unlinkFile from "../../../shared/unlinkFile";
 import QueryBuilder from "../../builder/queryBuilder";
 import generateSequentialId from "../../utils/idGenerator";
 import { Review } from "../review/review.model";
+import { UserFollower } from "../follower/follower.model";
+import axios from "axios";
 
 const createAdminToDB = async (payload: any): Promise<IUser> => {
   // check admin is exist or not;
@@ -182,57 +184,44 @@ const getSingleUserFromDB = async (id: string) => {
     throw new ApiError(StatusCodes.BAD_REQUEST, "No user found");
   }
 
-  // Reviews where this user is customer (he reviewed someone = following)
-  const followingReviews = await Review.find({ customer: id })
-    .populate("buyer", "name email")
-    .lean();
+  // --- Followers: people who follow this user
+  const followerDoc = await UserFollower.findOne({ user: id }).lean();
+  const followers = followerDoc?.follower || [];
+  const followersCount = followers?.length;
 
-  // Reviews where this user is buyer (he received reviews = followers)
-  const followerReviews = await Review.find({ buyer: id })
-    .populate("customer", "name email")
-    .lean();
+  // --- Following: people this user follows (find all where follower array includes this user)
+  const followingDocs = await UserFollower.find({ follower: id }).lean();
+  const following = followingDocs?.map(doc => doc.user);
+  const followingCount = following?.length;
 
-  // Unique buyers he follows
-  const following = Array.from(
-    new Map(
-      followingReviews
-        .filter(r => r.buyer)
-        .map(r => [r.buyer._id.toString(), r.buyer])
-    ).values()
-  );
-
-  // Unique customers who follow him
-  const followers = Array.from(
-    new Map(
-      followerReviews
-        .filter(r => r.customer)
-        .map(r => [r.customer._id.toString(), r.customer])
-    ).values()
-  );
-
-
-  // review and rating
+  // --- Review Count
   const reviewCount = await Review.countDocuments({
-    $or: [{ customer: id }, { buyer: id }]
+    $or: [{ customer: id }, { user: id }]
   });
-  //  review count & avg rating
-  const customerReviews = await Review.find({ customer: id }).lean();
+
+  // --- Average Rating from customer reviews
+  const customerReviews = await Review.find({ user: id }).lean();
   const validRatings = customerReviews
     .map(r => r.rating)
     .filter(r => typeof r === 'number' && !isNaN(r));
 
   const customerAvgRating = validRatings.length
-    ? parseFloat((validRatings.reduce((acc, curr) => acc + curr, 0) / validRatings.length).toFixed(2))
+    ? parseFloat(
+      (
+        validRatings.reduce((acc, curr) => acc + curr, 0) / validRatings.length
+      ).toFixed(2)
+    )
     : 0;
 
   return {
-    followingCount: following.length,
-    followersCount: followers.length,
+    followingCount,
+    followersCount,
     customerAvgRating,
     reviewCount,
     user,
   };
 };
+
 
 const updateUserNickNameBaseOnIdFromDB = async (
   id: string, payload: IUser) => {
@@ -265,19 +254,28 @@ const handleLoginWithGoogle = async () => {
 
 
 // login with apple
-const handleLoginWithApple = async () => {
+const handleLoginWithFacebook = async (payload: any) => {
+  const url = `https://graph.facebook.com/${payload.userID}?fields=id,name,email,picture&access_token=${payload.accessToken}`;
+  const response = await axios.get(url);
+  const user: any = response.data;
+  let existingUser = await User.findOne({ facebookId: user.id });
+  if (!existingUser) {
+    // If the user doesn't exist, create a new user
+    existingUser = await User.create({
+      facebookId: payload.user.id,
+      name: payload.user.name,
+      email: payload.user.email,
+      profilePicture: user.picture.data.url,
+    });
+  }
+  return existingUser;
 
 }
 
-/**
- * User login er somoy (socket connect) enterTime update korbe
- */
+
 const updateEnterTime = async (userId: string): Promise<void> => {
   await User.findByIdAndUpdate(userId, { enterTime: new Date() });
 };
-/**
- * User logout ba socket disconnect er somoy leaveTime update korbe
- */
 
 const updateLeaveTime = async (userId: string): Promise<void> => {
   await User.findByIdAndUpdate(userId, { leaveTime: new Date() });
@@ -296,7 +294,7 @@ export const UserService = {
   getSingleUserFromDB,
   updateUserNickNameBaseOnIdFromDB,
   handleLoginWithGoogle,
-  handleLoginWithApple,
+  handleLoginWithFacebook,
   updateEnterTime,
   updateLeaveTime
 };

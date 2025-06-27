@@ -4,6 +4,9 @@ import { IOrder, OrderModel } from "./order.interface";
 import { Order } from "./order.model";
 import { Product } from "../product/product.model";
 import QueryBuilder from "../../builder/queryBuilder";
+import { IProduct } from "../product/product.interface";
+import { JwtPayload } from "jsonwebtoken";
+import mongoose from "mongoose";
 
 const createOrderIntoDB = async (payload: IOrder) => {
   const isExistingOrder = await Order.findOne({ product: payload?.product });
@@ -103,7 +106,7 @@ const getTopSellersAndBuyers = async (query: Record<string, any>) => {
     },
     {
       $match: {
-        userDetails: { $ne: null }, // ✅ remove entries with no matched user
+        userDetails: { $ne: null },
       },
     }
   );
@@ -161,16 +164,36 @@ const getTopSellersAndBuyers = async (query: Record<string, any>) => {
 
 // order update
 const updateOrderByProductId = async (
-  productId: string,
-  payload: Partial<IOrder>
-): Promise<IOrder | null> => {
-  const result = await Order.findOneAndUpdate({ product: productId }, payload, {
-    new: true,
-  });
-  await Product.findByIdAndUpdate(productId, {
-    status: payload.status
-  })
-  return result;
+  user: JwtPayload,
+  id: string,
+  payload: { productStatus: string; orderStatus: string }
+) => {
+  const updatedProduct = await Product.findByIdAndUpdate(
+    id,
+    { status: payload.productStatus },
+    { new: true }
+  );
+
+  if (!updatedProduct) {
+    throw new ApiError(StatusCodes.NOT_FOUND, "Product not found");
+  }
+
+  const orderData = await Order.findOneAndUpdate(
+    {
+      product: updatedProduct._id,
+      buyer: user.id
+    },
+    { status: payload.orderStatus },
+    { new: true }
+  );
+  console.log("Order data", orderData);
+
+
+  if (!orderData) {
+    throw new ApiError(StatusCodes.NOT_FOUND, "No active order found for this product");
+  }
+
+  return { updatedProduct, orderData };
 };
 
 export const OrderServices = {

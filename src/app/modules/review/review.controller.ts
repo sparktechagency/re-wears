@@ -17,19 +17,12 @@ const createReview = catchAsync(async (req: Request, res: Response) => {
 })
 
 const getAllReview = catchAsync(async (req: Request, res: Response) => {
-    const result = await ReviewService.getAllReviews(req.query);
+    const result = await ReviewService.getAllReviewsFromDB(req.query, req.params?.id!);
     sendResponse(res, {
         statusCode: StatusCodes.OK,
         success: true,
         message: "Review Fetched Successfully",
-        pagination: result.pagination,
-        meta: {
-            // @ts-ignore
-            averageRating: result?.averageRating,
-            // @ts-ignore
-            totalRatingCount: result?.totalRatingCount,
-        },
-        data: result.data,
+        data: result,
 
     })
 })

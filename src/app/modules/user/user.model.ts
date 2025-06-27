@@ -112,6 +112,11 @@ const userSchema = new Schema<IUser, UserModal>(
       type: String,
       required: false,
     },
+    facebookId: {
+      type: String,
+      unique: true,
+      sparse: true,
+    },
   },
   {
     timestamps: true,

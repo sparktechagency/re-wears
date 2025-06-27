@@ -5,7 +5,14 @@ import { Product } from "./product.model";
 import QueryBuilder from "../../builder/queryBuilder";
 import { Wishlist } from "../wishlist/wishlist.model";
 import { sendNotifications } from "../../../helpers/notificationsHelper";
-
+import { User } from "../user/user.model";
+import { Order } from "../order/order.model";
+/*
+  @payload: IProduct,
+  @user: user.id
+  @return: IProduct
+  successfully created product
+*/
 const createProduct = async (
   payload: IProduct,
   user: any
@@ -25,23 +32,31 @@ const createProduct = async (
   if (!createdProduct) {
     throw new ApiError(StatusCodes.BAD_REQUEST, "Failed to create product");
   }
-  //@ts-ignore
-  const io = global.io;
-  if (io) {
-    io.emit(`create-product::${createdProduct.user}`, createdProduct);
-  }
+  const userDetails = await User.findById(user.id);
+
   const notificationPayload = {
-    userId: createdProduct.user,
-    title: 'New Message',
+    userId: user.id,
+    title: 'New Product',
     // @ts-ignore
-    message: `You have a new message from ${(createdProduct?.user?.lastName || "User")}`,
-    type: 'Message Send',
-    filePath: 'Product',
+    message: `You have a new product from ${(userDetails?.lastName || "User")}`,
+    type: 'Product Create',
   };
   await sendNotifications(notificationPayload as any);
+  const allUser = await User.find({ isVerified: true, isBlocked: false, isDeleted: false }).lean();
+  for (const user of allUser) {
+    //@ts-ignore
+    const io = global.io;
+    if (io) {
+      io.emit(`createProduct::${user._id}`, notificationPayload);
+    }
+  }
+
+
   return createdProduct;
 };
 
+
+// get all products
 const getAllProducts = async (
   query: Record<string, any>
 ): Promise<{ data: any[]; meta: any }> => {
@@ -185,10 +200,21 @@ const deleteProductFromDB = async (id: string) => {
 };
 
 
+
+const productUpdateSoldStatus = async (id: string, payload: IProduct) => {
+  const product = await Product.findByIdAndUpdate(id, payload, { new: true });
+  if (!product) {
+    throw new ApiError(StatusCodes.NOT_FOUND, "Product not found");
+  }
+  return product
+}
+
+
 export const productService = {
   createProduct,
   getAllProducts,
   getSingleProductIntoDB,
   updateProductFromDB,
   deleteProductFromDB,
+  productUpdateSoldStatus
 };
