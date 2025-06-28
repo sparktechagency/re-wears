@@ -2,6 +2,8 @@ import { StatusCodes } from "http-status-codes";
 import ApiError from "../../../errors/ApiErrors";
 import { ISubCategory } from "./subCategory.interface";
 import { SubCategory } from "./subCategory.model";
+import QueryBuilder from "../../builder/queryBuilder";
+import { FilterQuery } from "mongoose";
 
 const createSubCategoryToDB = async (payload: ISubCategory) => {
 
@@ -16,13 +18,37 @@ const createSubCategoryToDB = async (payload: ISubCategory) => {
   return result;
 };
 
-const getAllSubCategoryFromDB = async (): Promise<ISubCategory[]> => {
-  const result = await SubCategory.find().populate("category");
-  if (!result) {
-    return [];
+const getAllSubCategoryFromDB = async (query: Record<string, any>) => {
+  const searchTerm = query.searchTerm || query.seachTerm || "";
+  const restQuery = { ...query };
+  delete restQuery.searchTerm;
+  delete restQuery.seachTerm;
+
+  const filter: FilterQuery<ISubCategory> = {};
+
+  if (searchTerm) {
+    filter.name = { $regex: searchTerm, $options: "i" };
   }
-  return result;
+
+  // rest same as before
+  const subCategoryQuery = SubCategory.find(filter);
+
+  const queryBuilder = new QueryBuilder<ISubCategory>(subCategoryQuery, restQuery)
+    .filter()
+    .sort()
+    .paginate()
+    .fields()
+    .populate(["category"], { name: 1 });
+
+  const result = await queryBuilder.modelQuery;
+  const meta = await queryBuilder.getPaginationInfo();
+
+  return {
+    meta,
+    data: result,
+  };
 };
+
 
 const getSingleSubCategoryFromDB = async (
   id: string
