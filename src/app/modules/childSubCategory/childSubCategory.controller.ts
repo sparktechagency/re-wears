@@ -18,13 +18,14 @@ const createChildSubCategory = catchAsync(async (req, res) => {
   });
 });
 const getAllChildSubCategories = catchAsync(async (req, res) => {
-  const result = await childSubCategoryService.getChildSubCategoriesFromDB();
+  const result = await childSubCategoryService.getChildSubCategoriesFromDB(req.query);
 
   sendResponse(res, {
     statusCode: StatusCodes.OK,
     success: true,
     message: "Child subcategories retrieved successfully",
-    data: result,
+    pagination: result.meta,
+    data: result.data,
   });
 });
 

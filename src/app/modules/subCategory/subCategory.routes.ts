@@ -49,9 +49,9 @@ router.patch(
       const payload = req.body;
       const icon = getSingleFilePath(req.files, "icon");
 
-      if (!icon) {
-        return res.status(400).json({ message: "Icon is required." });
-      }
+      // if (!icon) {
+      //   return res.status(400).json({ message: "Icon is required." });
+      // }
       req.body = {
         icon,
         ...payload,

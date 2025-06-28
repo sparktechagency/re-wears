@@ -196,7 +196,7 @@ const getSingleUserFromDB = async (id: string) => {
 
   // --- Review Count
   const reviewCount = await Review.countDocuments({
-    $or: [{ seller: id }, { buyer: id }]
+    seller: id
   });
 
   // --- Average Rating from customer reviews

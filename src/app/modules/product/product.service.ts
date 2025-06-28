@@ -73,7 +73,7 @@ const getAllProducts = async (
   if (minPrice) priceFilter.$gte = Number(minPrice);
   if (maxPrice) priceFilter.$lte = Number(maxPrice);
 
-  const filter: any = { status: { $nin: ["Draft", "Hidden"] } };
+  const filter: any = { status: "Active" };
   if (Object.keys(priceFilter).length > 0) {
     filter.price = priceFilter;
   }

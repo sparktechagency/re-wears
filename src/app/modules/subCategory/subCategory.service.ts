@@ -4,6 +4,11 @@ import { ISubCategory } from "./subCategory.interface";
 import { SubCategory } from "./subCategory.model";
 
 const createSubCategoryToDB = async (payload: ISubCategory) => {
+
+  const isExist = await SubCategory.findOne({ name: payload.name, category: payload.category });
+  if (isExist) {
+    throw new ApiError(StatusCodes.BAD_REQUEST, "SubCategory already exist");
+  }
   const result = await SubCategory.create(payload);
   if (!result) {
     throw new ApiError(StatusCodes.BAD_REQUEST, "Failed to create subCategory");
@@ -31,14 +36,16 @@ const getSingleSubCategoryFromDB = async (
 
 const updateSubCategoryToDB = async (
   id: string,
-  payload: Partial<ISubCategory>
-): Promise<ISubCategory | null> => {
+  payload: ISubCategory
+) => {
   const result = await SubCategory.findOneAndUpdate({ _id: id }, payload, {
     new: true,
   });
+
   if (!result) {
     throw new ApiError(StatusCodes.NOT_FOUND, "SubCategory not found");
   }
+
   return result;
 };
 

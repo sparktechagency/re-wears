@@ -27,9 +27,9 @@ const getAllReviewsFromDB = async (
     averageRating: number;
     totalRatingCount: number;
 }> => {
-    const result = await Review.find({ seller: new Types.ObjectId(sellerId) });
+    const result = await Review.find({ seller: new Types.ObjectId(sellerId) }).populate("buyer");
     const stats = await Review.aggregate([
-        { $match: { user: new mongoose.Types.ObjectId(sellerId) } },
+        { $match: { seller: new mongoose.Types.ObjectId(sellerId) } },
         {
             $group: {
                 _id: null,
