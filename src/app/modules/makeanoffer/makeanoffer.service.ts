@@ -84,14 +84,15 @@ const sendOfferUsingMessage = async (
   // @ts-ignore
   const io = global.io;
   if (io) {
-    const event = `getMessages::${receiver}`;
+    const event = `notifications::${receiver}`;
     io.emit(event, message);
   }
   await sendNotifications({
     receiver,
     sender: user.id,
     message: `Offered $${price} for product`,
-    type: "offer",
+    productId: product,
+    notificationType: "offer",
     chatId,
     offerId: offer._id,
   });

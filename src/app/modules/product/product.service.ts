@@ -7,6 +7,7 @@ import { Wishlist } from "../wishlist/wishlist.model";
 import { sendNotifications } from "../../../helpers/notificationsHelper";
 import { User } from "../user/user.model";
 import { Order } from "../order/order.model";
+import { JwtPayload } from "jsonwebtoken";
 /*
   @payload: IProduct,
   @user: user.id
@@ -35,11 +36,12 @@ const createProduct = async (
   const userDetails = await User.findById(user.id);
 
   const notificationPayload = {
-    userId: user.id,
-    title: 'New Product',
+    sender: user.id,
+    title: 'New Product added',
     // @ts-ignore
     message: `You have a new product from ${(userDetails?.lastName || "User")}`,
-    type: 'Product Create',
+    notificationType: 'createProduct',
+    productId: createdProduct._id,
   };
   await sendNotifications(notificationPayload as any);
   const allUser = await User.find({ isVerified: true, isBlocked: false, isDeleted: false }).lean();
@@ -47,11 +49,9 @@ const createProduct = async (
     //@ts-ignore
     const io = global.io;
     if (io) {
-      io.emit(`createProduct::${user._id}`, notificationPayload);
+      io.emit(`notifications::${user._id}`, notificationPayload);
     }
   }
-
-
   return createdProduct;
 };
 
@@ -182,12 +182,32 @@ const getSingleProductIntoDB = async (id: string) => {
   return { result, favCount };
 };
 
-const updateProductFromDB = async (id: string, payload: IProduct) => {
+const updateProductFromDB = async (id: string, user: JwtPayload, payload: IProduct) => {
   const result = await Product.findByIdAndUpdate(id, payload, { new: true });
 
   if (!result) {
     throw new ApiError(StatusCodes.NOT_FOUND, "Product not found");
   }
+  const userDetails = await User.findById(user.id);
+  // Send notification to all users
+  const notificationPayload = {
+    sender: user.id,
+    title: 'Product Updated',
+    // @ts-ignore
+    message: `${(userDetails?.lastName || "User")} has updated his product.`,
+    notificationType: 'editProduct',
+    productId: id
+  };
+  await sendNotifications(notificationPayload as any);
+  const allUser = await User.find({ isVerified: true, isBlocked: false, isDeleted: false }).lean();
+  for (const user of allUser) {
+    //@ts-ignore
+    const io = global.io;
+    if (io) {
+      io.emit(`notifications::${user._id}`, notificationPayload);
+    }
+  }
+
   return result;
 };
 

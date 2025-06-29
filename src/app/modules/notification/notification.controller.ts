@@ -64,12 +64,15 @@ const createAdminNotification = catchAsync(async (req: Request, res: Response) =
 
 
 const getAllNotification = catchAsync(async (req: Request, res: Response) => {
-    const result = await NotificationService.getAllNotificationFromDB(req.user!);
+    const result = await NotificationService.getAllNotificationFromDB(req.user!, req.query);
     sendResponse(res, {
         statusCode: StatusCodes.OK,
         success: true,
         message: 'Notifications Retrieved Successfully',
-        data: result
+        // @ts-ignore
+        pagination: result.meta,
+        // @ts-ignore
+        data: result.result
     });
 })
 

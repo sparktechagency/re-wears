@@ -7,7 +7,6 @@ import QueryBuilder from "../../builder/queryBuilder";
 import { User } from "../user/user.model";
 import { sendNotifications } from "../../../helpers/notificationsHelper";
 import { Product } from "../product/product.model";
-import { populate } from "dotenv";
 
 const createWishListIntoDB = async (payload: IWishlist, user: JwtPayload) => {
   if (!payload.product || !user.id) {
@@ -37,9 +36,10 @@ const createWishListIntoDB = async (payload: IWishlist, user: JwtPayload) => {
   const notificationPayload = {
     userId: user.id,
     title: 'New Wishlist',
+    productId: payload.product,
     // @ts-ignore
     message: `You have a new wishlist from ${(userDetails?.lastName || "User")}`,
-    type: 'Wishlist Create',
+    notificationType: 'wishlist',
   };
 
   await sendNotifications(notificationPayload as any);
@@ -48,7 +48,7 @@ const createWishListIntoDB = async (payload: IWishlist, user: JwtPayload) => {
   //@ts-ignore
   const io = global.io;
   if (io) {
-    io.emit(`createWishlist::${productDetails?.user._id}`, notificationPayload);
+    io.emit(`notifications::${productDetails?.user._id}`, notificationPayload);
   }
   return addWishList;
 };

@@ -2,7 +2,6 @@ import { Request, Response, NextFunction } from "express";
 import { MakeAnOfferServices } from "./makeanoffer.service";
 import catchAsync from "../../../shared/catchAsync";
 import sendResponse from "../../../shared/sendResponse";
-import ApiError from "../../../errors/ApiErrors";
 import { StatusCodes } from "http-status-codes";
 const createOffer = catchAsync(async (req: Request, res: Response) => {
   const result = await MakeAnOfferServices.createMakeAnOfferIntoDB(

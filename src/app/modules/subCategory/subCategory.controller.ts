@@ -25,6 +25,8 @@ const getAllSubCategory = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+
+
 const getSingleSubCategory = catchAsync(async (req: Request, res: Response) => {
   const { id } = req.params;
   const result = await SubCategoryService.getSingleSubCategoryFromDB(id);

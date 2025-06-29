@@ -4,6 +4,7 @@ import { Notification } from './notification.model';
 import { Types } from 'mongoose';
 import ApiError from '../../../errors/ApiErrors';
 import { StatusCodes } from 'http-status-codes';
+import QueryBuilder from '../../builder/queryBuilder';
 
 // get notifications
 const getNotificationFromDB = async (user: JwtPayload): Promise<INotification> => {
@@ -65,17 +66,40 @@ const createAdminNotification = async (payload: any): Promise<INotification | nu
 };
 
 
-const getAllNotificationFromDB = async (user: JwtPayload): Promise<INotification[]> => {
-    const userId = user.id
-    const result = await Notification.find({ receiver: userId }).populate({
-        path: 'sender',
-        select: 'name profile',
-    });
+const getAllNotificationFromDB = async (
+    user: JwtPayload,
+    query: Record<string, any>
+): Promise<{ result: INotification[]; meta: any }> => {
+
+    const queryBuilder = new QueryBuilder(
+        Notification.find({ receiver: user?.id }),
+        query
+    ).populate(
+        ['sender', 'productId'],
+        {
+            sender: 'firstName lastName userName image',
+            productId: 'name price',
+        }
+    );
+
+
+    queryBuilder
+        .filter()
+        .sort()
+        .paginate()
+        .fields();
+
+    const result = await queryBuilder.modelQuery.exec();
+    const meta = await queryBuilder.getPaginationInfo();
+
     if (!result) {
-        return []
+        return { result: [], meta };
     }
-    return result;
+
+    return { result, meta };
 };
+
+
 
 
 
