@@ -50,8 +50,25 @@ const getOfferUsingSocket = catchAsync(async (req: Request, res: Response) => {
 });
 
 
+
+const updateOfferStatus = catchAsync(async (req: Request, res: Response) => {
+  const result = await MakeAnOfferServices.offerUpdateFromDB(
+    req.user!,      // JwtPayload
+    req.body,       // IMakeAnOffer
+    req.params.id   // string
+  );
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: "Offer update successfully",
+    data: result,
+  });
+});
+
+
 export const MakeAnOfferController = {
   createOffer,
   getAllOffer,
-  getOfferUsingSocket
+  getOfferUsingSocket,
+  updateOfferStatus
 };

@@ -105,12 +105,12 @@ const getAllNotificationFromDB = async (
 
 const updateNotificationFromDB = async (notificationId: string, userId: string) => {
     // Use findOneAndUpdate instead of findByIdAndUpdate
-    const notification = await Notification.findOneAndUpdate(
+    const notification = await Notification.findByIdAndUpdate(
         {
             _id: new Types.ObjectId(notificationId),
             receiver: new Types.ObjectId(userId),
         },
-        { isRead: true },
+        { read: true },
         { new: true, runValidators: true }
     );
 

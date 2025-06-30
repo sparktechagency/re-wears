@@ -17,6 +17,11 @@ const makeAnOfferSchema = new Schema<IMakeAnOffer, MakeAnOfferModel>({
     required: true,
     ref: "Product",
   },
+  offerStatus: {
+    type: String,
+    enum: ["pending", "accepted", "rejected"],
+    default: "pending",
+  }
 });
 
 export const MakeAnOffer = model<IMakeAnOffer, MakeAnOfferModel>(

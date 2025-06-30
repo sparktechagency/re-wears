@@ -111,7 +111,8 @@ const getAllUsers = catchAsync(async (req: Request, res: Response) => {
     success: true,
     statusCode: StatusCodes.OK,
     message: "Users data retrieved successfully",
-    data: result,
+    pagination: result.meta,
+    data: result.result,
   });
 });
 
@@ -151,6 +152,7 @@ const loginWithGoogle = catchAsync(async (req: Request, res: Response) => {
 })
 
 const loginWithFacebook = catchAsync(async (req: Request, res: Response) => {
+  console.log("Query:::::::", req.query);
   const result = await UserService.handleLoginWithFacebook(req.user!)
   sendResponse(res, {
     success: true,

@@ -3,49 +3,28 @@ import { Strategy as FacebookStrategy } from 'passport-facebook';
 import config from ".";
 import { User } from "../app/modules/user/user.model";
 
-
-// facebook OAuth Strategy
-// passport.use(new FacebookStrategy({
-//     clientID: config.facebook.clientID,
-//     clientSecret: config.facebook.clientSecret,
-//     callbackURL: 'https://0ffe-115-127-157-41.ngrok-free.app/auth/facebook/callback',
-//     profileFields: ['id', 'email', 'name', 'picture']
-// }, async (accessToken, refreshToken, profile, done) => {
-//     try {
-//         let user = await User.findOne({ facebookId: profile.id });
-
-//         if (!user) {
-//             user = await User.create({
-//                 facebookId: profile.id,
-//                 name: profile.displayName,
-//                 email: profile.emails ? profile.emails[0].value : '',
-//                 profilePicture: profile.photos ? profile.photos[0].value : '',
-//             });
-//         }
-
-//         // Return the user data
-//         return done(null, user);
-//     } catch (error) {
-//         return done(error, null);
-//     }
-// }));
 passport.use(new FacebookStrategy({
     clientID: config.facebook.clientID!,
     clientSecret: config.facebook.clientSecret!,
-    callbackURL: 'https://0ffe-115-127-157-41.ngrok-free.app/auth/facebook/callback',
-    profileFields: ['id', 'email', 'name', 'picture'],
+    callbackURL: 'https://8838-115-127-157-41.ngrok-free.app/api/v1/auth/facebook/callback',
+    profileFields: ['id', 'email', 'name', 'picture', "gender"]
 }, async (accessToken, refreshToken, profile, done) => {
     try {
-        let user = await User.findOne({ facebookId: profile.id });
+        const profileData: any = profile._json;
+        let user = await User.findOne({ facebookId: profile.id }).lean();
 
         if (!user) {
-            // If the user doesn't exist, create a new user
             user = await User.create({
+                firstName: profileData.first_name || "",
+                lastName: profileData.last_name || "",
+                email: profile.emails ? profile.emails[0].value : `${profile.id}@facebook.com`,
+                image: profile.photos ? profile.photos[0].value : '',
+                gender: 'MALE',
+                role: "USER",
+                password: "12345678",
                 facebookId: profile.id,
-                name: profile.displayName,
-                email: profile.emails ? profile.emails[0].value : '',
-                profilePicture: profile.photos ? profile.photos[0].value : '',
-            });
+                isVerified: true,
+            })
         }
 
         // Pass the user data to the next middleware
@@ -54,3 +33,15 @@ passport.use(new FacebookStrategy({
         return done(error, null);
     }
 }));
+
+passport.serializeUser((user: any, done) => {
+    done(null, user?._id.toString());
+});
+passport.deserializeUser(async (id, done) => {
+    try {
+        const user = await User.findById(id);
+        done(null, user);
+    } catch (error) {
+        done(error, null);
+    }
+});

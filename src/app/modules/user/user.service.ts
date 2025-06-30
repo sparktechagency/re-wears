@@ -156,7 +156,7 @@ const getUserProfileFromDB = async (
 // get all users data
 const getAllUsers = async (
   query: Record<string, unknown>
-): Promise<IUser[]> => {
+): Promise<{ result: IUser[]; meta: any }> => {
   const searchableFields = ["id", "firstName", "lastName", "email", "code"];
 
   const userQuery = new QueryBuilder<IUser>(
@@ -170,11 +170,12 @@ const getAllUsers = async (
     .fields();
 
   const result = await userQuery.modelQuery;
+  const meta = await userQuery.getPaginationInfo();
 
   if (!result) {
-    throw new ApiError(StatusCodes.BAD_REQUEST, "Failed to get users");
+    throw new ApiError(StatusCodes.BAD_REQUEST, "No user found");
   }
-  return result;
+  return { result, meta };
 };
 
 // TODO: need to return user follower how much user he follwing | user-name | follower | following | rating | reviews 
@@ -258,17 +259,26 @@ const handleLoginWithFacebook = async (payload: any) => {
   const url = `https://graph.facebook.com/${payload.userID}?fields=id,name,email,picture&access_token=${payload.accessToken}`;
   const response = await axios.get(url);
   const user: any = response.data;
-  let existingUser = await User.findOne({ facebookId: user.id });
-  if (!existingUser) {
-    // If the user doesn't exist, create a new user
+  // let existingUser = await User.findOne();
+  // firstName: string;
+  // lastName: string;
+  // email: string;
+  // password: string;
+  // role: USER_ROLES;
+  // image: string;
+  // location: string;
+  // gender: GENDER;
+  // dob: Date;
+  // if (!existingUser) {
+  // If the user doesn't exist, create a new user
+  const name = payload.
     existingUser = await User.create({
-      facebookId: payload.user.id,
       name: payload.user.name,
       email: payload.user.email,
       profilePicture: user.picture.data.url,
     });
-  }
-  return existingUser;
+  // }
+  // return existingUser;
 
 }
 

@@ -7,6 +7,7 @@ import QueryBuilder from "../../builder/queryBuilder";
 import { sendNotifications } from "../../../helpers/notificationsHelper";
 import { Message } from "../message/message.model";
 import { ChatService } from "../chat/chat.service";
+import { Product } from "../product/product.model";
 
 const createMakeAnOfferIntoDB = async (
   payload: IMakeAnOffer,
@@ -19,9 +20,19 @@ const createMakeAnOfferIntoDB = async (
   if (!result) {
     throw new ApiError(StatusCodes.BAD_REQUEST, "Can't create offer");
   }
-  await sendNotifications({
-
+  const productDetails = await Product.findById(payload.product);
+  const notificationPayload = await sendNotifications({
+    title: "New offer",
+    body: `You have a new offer from ${user.name}`,
+    receiver: productDetails?.user,
+    notificationType: "offer",
+    productId: productDetails?._id,
   });
+  // @ts-ignore
+  const io = global.io;
+  if (io) {
+    io.emit(`notifications::${productDetails?.user}`, notificationPayload);
+  }
   return result;
 };
 
@@ -77,9 +88,11 @@ const sendOfferUsingMessage = async (
     text: `Offered $${price} for product`,
     type: "offer",
     chatId,
+    offerStatus: "pending",
     receiver,
     sender: user.id,
     offer: offer._id,
+    price
   });
   // @ts-ignore
   const io = global.io;
@@ -101,9 +114,24 @@ const sendOfferUsingMessage = async (
 };
 
 
+const offerUpdateFromDB = async (user: JwtPayload, payload: IMakeAnOffer, id: string) => {
+  const result = await MakeAnOffer.findByIdAndUpdate(
+    { user: user.id, _id: id },
+    payload,
+    { new: true }
+  );
+
+  if (!result) {
+    throw new ApiError(StatusCodes.BAD_REQUEST, "Can't update offer");
+  }
+  return result;
+}
+
+
 
 export const MakeAnOfferServices = {
   createMakeAnOfferIntoDB,
   getAllOfferFromDB,
-  sendOfferUsingMessage
+  sendOfferUsingMessage,
+  offerUpdateFromDB
 };

@@ -32,10 +32,13 @@ const createWishListIntoDB = async (payload: IWishlist, user: JwtPayload) => {
       "Failed to add to wishlist"
     );
   }
+  const productDetails = await Product.findById(payload.product).lean();
   const userDetails = await User.findById(user.id);
+  const receiver = productDetails?.user;
   const notificationPayload = {
     userId: user.id,
     title: 'New Wishlist',
+    receiver: receiver,
     productId: payload.product,
     // @ts-ignore
     message: `You have a new wishlist from ${(userDetails?.lastName || "User")}`,
@@ -43,7 +46,7 @@ const createWishListIntoDB = async (payload: IWishlist, user: JwtPayload) => {
   };
 
   await sendNotifications(notificationPayload as any);
-  const productDetails = await Product.findById(payload.product).lean();
+
 
   //@ts-ignore
   const io = global.io;
