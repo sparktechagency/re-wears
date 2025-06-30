@@ -69,6 +69,7 @@ const sendOfferUsingMessage = async (
   user: JwtPayload,
   payload: { product: string; price: number; receiver: string }
 ) => {
+
   const { product, price, receiver } = payload;
   const participants = [user.id, receiver];
   const chat = await ChatService.createChatToDB(participants);
@@ -82,7 +83,6 @@ const sendOfferUsingMessage = async (
     product,
     price,
   });
-
   await offer.save();
   const message = await Message.create({
     text: `Offered $${price} for product`,

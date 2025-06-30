@@ -8,6 +8,7 @@ import { sendNotifications } from "../../../helpers/notificationsHelper";
 import { User } from "../user/user.model";
 import { Order } from "../order/order.model";
 import { JwtPayload } from "jsonwebtoken";
+import { Notification } from "../notification/notification.model";
 /*
   @payload: IProduct,
   @user: user.id
@@ -41,11 +42,13 @@ const createProduct = async (
     // @ts-ignore
     message: `You have a new product from ${(userDetails?.lastName || "User")}`,
     notificationType: 'createProduct',
-    productId: createdProduct._id,
+    productId: createdProduct._id
   };
-  await sendNotifications(notificationPayload as any);
+  // await sendNotifications(notificationPayload as any);
   const allUser = await User.find({ isVerified: true, isBlocked: false, isDeleted: false }).lean();
   for (const user of allUser) {
+
+    await Notification.create({ ...notificationPayload, receiver: user._id });
     //@ts-ignore
     const io = global.io;
     if (io) {

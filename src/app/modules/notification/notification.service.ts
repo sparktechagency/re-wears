@@ -105,6 +105,8 @@ const getAllNotificationFromDB = async (
 
 const updateNotificationFromDB = async (notificationId: string, userId: string) => {
     // Use findOneAndUpdate instead of findByIdAndUpdate
+
+
     const notification = await Notification.findByIdAndUpdate(
         {
             _id: new Types.ObjectId(notificationId),
@@ -113,13 +115,6 @@ const updateNotificationFromDB = async (notificationId: string, userId: string) 
         { read: true },
         { new: true, runValidators: true }
     );
-
-    if (!notification) {
-        throw new ApiError(
-            StatusCodes.FORBIDDEN,
-            'Notification not found or does not belong to you'
-        );
-    }
 
     return notification;
 };
