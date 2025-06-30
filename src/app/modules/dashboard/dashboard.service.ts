@@ -88,7 +88,6 @@ const getUserGrowthFromDB = async (period: 'daily' | 'weakly' | 'yearly') => {
         result.forEach(item => {
             resultMap[item.date] = item.count;
         });
-
         return dateList.map(dateStr => ({
             date: dayNamesShort[new Date(dateStr).getDay()],
             count: resultMap[dateStr] || 0,
@@ -100,7 +99,6 @@ const getUserGrowthFromDB = async (period: 'daily' | 'weakly' | 'yearly') => {
             const weekNum = item.date.split("-W")[1];
             resultMap[weekNum] = item.count;
         });
-
         return dateList.map(weekNum => ({
             date: weekNum,
             count: resultMap[weekNum] || 0,
@@ -113,13 +111,11 @@ const getUserGrowthFromDB = async (period: 'daily' | 'weakly' | 'yearly') => {
             const monthName = monthNames[monthIndex];
             resultMap[monthName] = item.count;
         });
-
         return dateList.map(monthName => ({
             date: monthName,
             count: resultMap[monthName] || 0,
         }));
     }
-
     return [];
 };
 
@@ -128,7 +124,7 @@ const getUserGrowthFromDB = async (period: 'daily' | 'weakly' | 'yearly') => {
 
 // Logged In, product Items, Sold Items
 
-const getLoggedInProductSoldItemsFromDB      = async (period: 'daily' | 'weakly' | 'monthly') => {
+const getLoggedInProductSoldItemsFromDB = async (period: 'daily' | 'weakly' | 'monthly') => {
     const now = new Date();
     const start = new Date(now.getFullYear(), now.getMonth(), now.getDate());
     let match: any = { createdAt: { $gte: start } };
@@ -155,7 +151,7 @@ const getLoggedInProductSoldItemsFromDB      = async (period: 'daily' | 'weakly'
 };
 
 // Trending Categories
-const trendingCategoriesFromDB = async()=>{
+const trendingCategoriesFromDB = async () => {
     const trendingCategories = await Product.aggregate([
         {
             $group: {
@@ -170,10 +166,37 @@ const trendingCategoriesFromDB = async()=>{
     return trendingCategories;
 }
 
+
+// Active Users
+const totalActiveUserDataInDB = async (period: 'daily' | 'weekly' | 'monthly') => {
+    const now = new Date();
+    let from = new Date(now);
+
+    if (period === 'daily') {
+        from.setDate(now.getDate() - 1);
+    } else if (period === 'weekly') {
+        from.setDate(now.getDate() - 7);
+    } else if (period === 'monthly') {
+        from.setDate(now.getDate() - 30);
+    }
+
+    const match = { createdAt: { $gte: from } };
+
+    const [totalActiveUser, unActiveUser, listTedItems, soldItems] = await Promise.all([
+        User.countDocuments({ isVacation: false, ...match }),
+        User.countDocuments({ isVacation: true, ...match }),
+        Product.countDocuments(match),
+        Product.countDocuments({ status: "Sold", ...match }),
+    ]);
+
+    return { totalActiveUser, unActiveUser, listTedItems, soldItems };
+};
+
 // export function 
 export const dashboardService = {
     getTotalUserProductRevenueFromDB,
     getUserGrowthFromDB,
     getLoggedInProductSoldItemsFromDB,
-    trendingCategoriesFromDB
+    trendingCategoriesFromDB,
+    totalActiveUserDataInDB
 }

@@ -131,5 +131,3 @@ router.delete(
 
 
 export const productRoutes = router;
-
-// 
