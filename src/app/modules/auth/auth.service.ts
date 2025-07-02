@@ -380,7 +380,7 @@ const deleteUserFromDB = async (user: JwtPayload, password: string) => {
     throw new ApiError(StatusCodes.BAD_REQUEST, "Password is incorrect");
   }
 
-  const updateUser = await User.findByIdAndDelete(user.id);
+  const updateUser = await User.findByIdAndUpdate(user.id, { isDeleted: true });
   if (!updateUser) {
     throw new ApiError(StatusCodes.BAD_REQUEST, "User doesn't exist!");
   }
@@ -401,7 +401,7 @@ const deleteUserByEmailAndPassword = async (email: string, password: string) => 
   ) {
     throw new ApiError(StatusCodes.BAD_REQUEST, "Password is incorrect");
   }
-  const updateUser = await User.findByIdAndDelete(isExistUser._id);
+  const updateUser = await User.findByIdAndUpdate(isExistUser._id, { isDeleted: true });
   if (!updateUser) {
     throw new ApiError(StatusCodes.BAD_REQUEST, "User doesn't exist!");
   }
