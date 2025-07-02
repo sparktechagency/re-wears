@@ -92,4 +92,11 @@ router.get("/facebook/callback",
     }
 );
 
+
+
+router.delete(
+    '/public/delete-account',
+    AuthController.deleteUserByEmailAndPassword
+);
+
 export const AuthRoutes = router;

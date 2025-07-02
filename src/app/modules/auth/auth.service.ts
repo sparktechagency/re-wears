@@ -415,7 +415,26 @@ const deleteUserFromDB = async (user: JwtPayload, password: string) => {
   return;
 };
 
+// delete user using email and password
+const deleteUserByEmailAndPassword = async (email: string, password: string) => {
+  const isExistUser = await User.findOne({ email }).select("+password");
+  if (!isExistUser) {
+    throw new ApiError(StatusCodes.BAD_REQUEST, "User doesn't exist!");
+  }
 
+  //check match password
+  if (
+    password &&
+    !(await User.isMatchPassword(password, isExistUser.password))
+  ) {
+    throw new ApiError(StatusCodes.BAD_REQUEST, "Password is incorrect");
+  }
+  const updateUser = await User.findByIdAndDelete(isExistUser._id);
+  if (!updateUser) {
+    throw new ApiError(StatusCodes.BAD_REQUEST, "User doesn't exist!");
+  }
+  return;
+};
 
 
 export const AuthService = {
@@ -428,4 +447,5 @@ export const AuthService = {
   resendVerificationEmailToDB,
   socialLoginFromDB,
   deleteUserFromDB,
+  deleteUserByEmailAndPassword
 };
