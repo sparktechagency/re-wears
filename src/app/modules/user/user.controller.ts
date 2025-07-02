@@ -3,6 +3,7 @@ import { StatusCodes } from 'http-status-codes';
 import { UserService } from './user.service';
 import catchAsync from '../../../shared/catchAsync';
 import sendResponse from '../../../shared/sendResponse';
+import config from '../../../config';
 
 // register user
 const createUser = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
@@ -119,6 +120,7 @@ const getAllUsers = catchAsync(async (req: Request, res: Response) => {
 
 const getSingleUser = catchAsync(async (req: Request, res: Response) => {
   const { id } = req.params
+  console.log(config.google.clientSecret)
   const result = await UserService.getSingleUserFromDB(id)
   sendResponse(res, {
     success: true,
@@ -152,14 +154,12 @@ const loginWithGoogle = catchAsync(async (req: Request, res: Response) => {
 })
 
 const loginWithFacebook = catchAsync(async (req: Request, res: Response) => {
-  console.log("Query:::::::", req.query);
+
   const result = await UserService.handleLoginWithFacebook(req.user!)
-  sendResponse(res, {
-    success: true,
-    statusCode: StatusCodes.OK,
-    message: "User data updated successfully",
-    data: result,
-  });
+
+  return res.redirect(`${config.url.frontend_url}?token=${result}`)
+
+
 })
 
 const facebookCallback = catchAsync(async (req: Request, res: Response) => {

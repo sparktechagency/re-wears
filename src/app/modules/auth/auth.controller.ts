@@ -3,6 +3,7 @@ import { StatusCodes } from 'http-status-codes';
 import catchAsync from '../../../shared/catchAsync';
 import sendResponse from '../../../shared/sendResponse';
 import { AuthService } from './auth.service';
+import config from '../../../config';
 
 const verifyEmail = catchAsync(async (req: Request, res: Response) => {
     const { ...verifyData } = req.body;
@@ -94,14 +95,8 @@ const resendVerificationEmail = catchAsync(
 );
 
 const socialLogin = catchAsync(async (req: Request, res: Response) => {
-  const result = await AuthService.socialLoginFromDB(req.body);
-
-  sendResponse(res, {
-    success: true,
-    statusCode: StatusCodes.OK,
-    message: "Logged in Successfully",
-    data: result,
-  });
+  const result = await AuthService.socialLoginFromDB(req.user!);
+  return res.redirect(`${config.url.frontend_url}?token=${result}`)
 });
 
 // delete user
@@ -132,6 +127,9 @@ const deleteUserByEmailAndPassword = catchAsync(async (req: Request, res: Respon
     data: result,
   });
 });
+
+
+
 
 export const AuthController = {
     verifyEmail,

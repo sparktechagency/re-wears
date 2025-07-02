@@ -6,7 +6,7 @@ import { User } from "../app/modules/user/user.model";
 passport.use(new FacebookStrategy({
     clientID: config.facebook.clientID!,
     clientSecret: config.facebook.clientSecret!,
-    callbackURL: 'https://8838-115-127-157-41.ngrok-free.app/api/v1/auth/facebook/callback',
+    callbackURL: 'https://fde8-115-127-157-41.ngrok-free.app/api/v1/users/auth/facebook/callback',
     profileFields: ['id', 'email', 'name', 'picture', "gender"]
 }, async (accessToken, refreshToken, profile, done) => {
     try {

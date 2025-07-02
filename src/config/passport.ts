@@ -5,8 +5,10 @@ import { Strategy as AppleStrategy } from "passport-apple";
 import config from ".";
 import { User } from "../app/modules/user/user.model";
 import { Strategy as FacebookStrategy } from 'passport-facebook';
+import { USER_ROLES } from "../enums/user";
 
 // Google OAuth Strategy
+
 passport.use(new GoogleStrategy({
     clientID: config.google.clientID as string,
     clientSecret: config.google.clientSecret as string,
@@ -17,12 +19,18 @@ passport.use(new GoogleStrategy({
         if (existingUser) {
             done(null, existingUser);
         } else {
+            const [firstname,lastname]= profile.displayName.split(" ")
             const newUser = await User.create({
                 email: profile.emails?.[0].value,
-                name: profile.displayName,
                 provider: 'google',
                 providerId: profile.id,
-                isVerified: true
+                isVerified: true,
+                role: USER_ROLES.USER,
+                firstName: firstname,
+                lastName: lastname,
+                profilePicture: profile.photos?.[0].value,
+                password:"12345678",
+                location: "Dhaka",
             });
             done(null, newUser);
         }

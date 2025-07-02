@@ -5,6 +5,7 @@ import validateRequest from '../../middlewares/validateRequest';
 import { AuthController } from './auth.controller';
 import { AuthValidation } from './auth.validation';
 import passport from '../../../config/passport'
+// import passport from 'passport';
 const router = express.Router();
 
 router.post(
@@ -73,24 +74,24 @@ router.delete(
 
 
 // Google Auth Routes
-router.get("/google", passport.authenticate("google", { scope: ["profile", "email"] }));
+router.get("/google", passport.authenticate("google", { scope: ["profile", "email"] }), (req, res) => {
+    res.redirect("https://fde8-115-127-157-41.ngrok-free.app/api/v1/auth/google/callback");
+});
 
 router.get("/google/callback", 
     passport.authenticate("google", { failureRedirect: "/" }),
-    (req, res) => {
-        res.redirect("/"); // Redirect after successful login
-    }
+    AuthController.socialLogin
 );
 
 // Facebook Auth Routes
 // router.get("/facebook", passport.authenticate("facebook", { scope: ["email"] }));
 
-router.get("/facebook/callback",
-    passport.authenticate("facebook", { failureRedirect: "/" }),
-    (req, res) => {
-        res.redirect("/");
-    }
-);
+// router.get("/facebook/callback",
+//     passport.authenticate("facebook", { failureRedirect: "/" }),
+//     (req, res) => {
+//         res.redirect("/");
+//     }
+// );
 
 
 

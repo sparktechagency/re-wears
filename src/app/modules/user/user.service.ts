@@ -13,6 +13,8 @@ import generateSequentialId from "../../utils/idGenerator";
 import { Review } from "../review/review.model";
 import { UserFollower } from "../follower/follower.model";
 import axios from "axios";
+import { jwtHelper } from "../../../helpers/jwtHelper";
+import config from "../../../config";
 
 const createAdminToDB = async (payload: any): Promise<IUser> => {
   // check admin is exist or not;
@@ -256,30 +258,16 @@ const handleLoginWithGoogle = async () => {
 
 // login with apple
 const handleLoginWithFacebook = async (payload: any) => {
-  const url = `https://graph.facebook.com/${payload.userID}?fields=id,name,email,picture&access_token=${payload.accessToken}`;
-  const response = await axios.get(url);
-  const user: any = response.data;
-  // let existingUser = await User.findOne();
-  // firstName: string;
-  // lastName: string;
-  // email: string;
-  // password: string;
-  // role: USER_ROLES;
-  // image: string;
-  // location: string;
-  // gender: GENDER;
-  // dob: Date;
-  // if (!existingUser) {
-  // If the user doesn't exist, create a new user
-  const name = payload.
-    existingUser = await User.create({
-      name: payload.user.name,
-      email: payload.user.email,
-      profilePicture: user.picture.data.url,
-    });
-  // }
-  // return existingUser;
 
+  const user: IUser = payload
+
+  const accessToken = jwtHelper.createToken({
+    id: user._id,
+    email: user.email,
+    role: user.role,
+  }, config.jwt.jwt_secret!, config.jwt.jwt_expire_in!)
+
+  return accessToken
 }
 
 
