@@ -353,6 +353,24 @@ const productUpdateSoldStatus = async (id: string, payload: IProduct) => {
   return product
 }
 
+// is block true or false
+const isBlockedProductUpdateFromDB = async (id: string) => {
+  const product = await Product.findById(id);
+  if (!product) {
+    throw new ApiError(StatusCodes.NOT_FOUND, "Product not found");
+  }
+
+  // Toggle the isBlocked status
+  const updatedProduct = await Product.findByIdAndUpdate(
+    id,
+    { isBlocked: !product.isBlocked },
+    { new: true }
+  );
+
+  return updatedProduct;
+}
+
+
 
 export const productService = {
   createProduct,
@@ -360,5 +378,6 @@ export const productService = {
   getSingleProductIntoDB,
   updateProductFromDB,
   deleteProductFromDB,
-  productUpdateSoldStatus
+  productUpdateSoldStatus,
+  isBlockedProductUpdateFromDB,
 };

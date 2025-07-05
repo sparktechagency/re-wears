@@ -69,11 +69,23 @@ const productStatusUpdate = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const isBlockedProductUpdate = catchAsync(async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const result = await productService.isBlockedProductUpdateFromDB(id);
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: `Product Blocked successfully`,
+    data: result,
+  });
+});
+
 export const productController = {
   createProduct,
   getAllProducts,
   getSingleProduct,
   updateProduct,
   deleteProduct,
-  productStatusUpdate
+  productStatusUpdate,
+  isBlockedProductUpdate
 };
