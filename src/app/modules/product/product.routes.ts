@@ -119,7 +119,7 @@ router.patch(
   productController.updateProduct
 );
 
-router.patch("/update-status/:id", auth(USER_ROLES.USER), productController.productStatusUpdate);
+router.patch("/update-status/:id", auth(USER_ROLES.USER, USER_ROLES.ADMIN, USER_ROLES.SUPER_ADMIN), productController.productStatusUpdate);
 // delete product
 router.delete(
   "/:id",
