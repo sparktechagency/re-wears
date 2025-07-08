@@ -5,10 +5,6 @@ import { ISocial } from "./social.interface";
 import { Social } from "./social.model";
 
 
-import { StatusCodes } from 'http-status-codes';
-import { ISocial } from './social.interface';
-import { Social } from './social.model';
-import ApiError from '../../../errors/ApiErrors';
 
 // * This function creates a new social media link in the database
 
@@ -20,9 +16,6 @@ const createSocialToDB = async (payload: ISocial): Promise<ISocial | null> => {
 
       new: true, // return the updated document
       upsert: true, // create the document if it doesn't exist
-
-      new: true,         // return the updated document
-      upsert: true,      // create the document if it doesn't exist
 
       setDefaultsOnInsert: true, // apply default values if creating
     }

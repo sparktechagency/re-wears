@@ -199,7 +199,7 @@ const getSingleUserFromDB = async (id: string) => {
 
   // --- Review Count
  const reviewCount = await Review.countDocuments({
-    $or: [{ customer: id }, { user: id }],
+    $or: [{ buyer: id }, { seller: id }],
   });
 
 
@@ -266,23 +266,6 @@ const handleLoginWithFacebook = async (payload: any) => {
 
   return accessToken
 }
-
-  const url = `https://graph.facebook.com/${payload.userID}?fields=id,name,email,picture&access_token=${payload.accessToken}`;
-  const response = await axios.get(url);
-  const user: any = response.data;
-  let existingUser = await User.findOne({ facebookId: user.id });
-  if (!existingUser) {
-    // If the user doesn't exist, create a new user
-    existingUser = await User.create({
-      facebookId: payload.user.id,
-      name: payload.user.name,
-      email: payload.user.email,
-      profilePicture: user.picture.data.url,
-    });
-  }
-  return existingUser;
-};
-
 
 const updateEnterTime = async (userId: string): Promise<void> => {
   await User.findByIdAndUpdate(userId, { enterTime: new Date() });
