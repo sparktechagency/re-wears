@@ -42,10 +42,10 @@ const createAdminToDB = async (payload: any): Promise<IUser> => {
 };
 
 const createUserToDB = async (payload: Partial<IUser>): Promise<IUser> => {
-  // generate sequence id
-  const id = await generateSequentialId(User, "id");
-  payload.id = id;
-
+  const existingUser = await User.findOne({ email: payload.email });
+  if (existingUser) {
+    throw new ApiError(StatusCodes.CONFLICT, "This Email already exist");
+  }
   const createUser = await User.create(payload);
   if (!createUser) {
     throw new ApiError(StatusCodes.BAD_REQUEST, "Failed to create user");
@@ -180,7 +180,7 @@ const getAllUsers = async (
   return { result, meta };
 };
 
-// TODO: need to return user follower how much user he follwing | user-name | follower | following | rating | reviews 
+// TODO: need to return user follower how much user he follwing | user-name | follower | following | rating | reviews
 const getSingleUserFromDB = async (id: string) => {
   const user = await User.findById(id).lean();
   if (!user) {
@@ -194,26 +194,28 @@ const getSingleUserFromDB = async (id: string) => {
 
   // --- Following: people this user follows (find all where follower array includes this user)
   const followingDocs = await UserFollower.find({ follower: id }).lean();
-  const following = followingDocs?.map(doc => doc.user);
+  const following = followingDocs?.map((doc) => doc.user);
   const followingCount = following?.length;
 
   // --- Review Count
-  const reviewCount = await Review.countDocuments({
-    seller: id
+ const reviewCount = await Review.countDocuments({
+    $or: [{ customer: id }, { user: id }],
   });
+
 
   // --- Average Rating from customer reviews
   const customerReviews = await Review.find({ seller: id }).lean();
   const validRatings = customerReviews
-    .map(r => r.rating)
-    .filter(r => typeof r === 'number' && !isNaN(r));
+    .map((r) => r.rating)
+    .filter((r) => typeof r === "number" && !isNaN(r));
 
   const customerAvgRating = validRatings.length
     ? parseFloat(
-      (
-        validRatings.reduce((acc, curr) => acc + curr, 0) / validRatings.length
-      ).toFixed(2)
-    )
+        (
+          validRatings.reduce((acc, curr) => acc + curr, 0) /
+          validRatings.length
+        ).toFixed(2)
+      )
     : 0;
 
   return {
@@ -225,9 +227,7 @@ const getSingleUserFromDB = async (id: string) => {
   };
 };
 
-
-const updateUserNickNameBaseOnIdFromDB = async (
-  id: string, payload: IUser) => {
+const updateUserNickNameBaseOnIdFromDB = async (id: string, payload: IUser) => {
   const isExistUser: any = await User.isExistUserById(id);
   if (!isExistUser) {
     throw new ApiError(StatusCodes.BAD_REQUEST, "User doesn't exist!");
@@ -235,7 +235,7 @@ const updateUserNickNameBaseOnIdFromDB = async (
   if (payload.userName) {
     const existingUser = await User.findOne({
       userName: payload.userName,
-      _id: { $ne: id }
+      _id: { $ne: id },
     });
     if (existingUser) {
       throw new ApiError(StatusCodes.BAD_REQUEST, "Username already taken!");
@@ -246,18 +246,15 @@ const updateUserNickNameBaseOnIdFromDB = async (
     throw new ApiError(StatusCodes.BAD_REQUEST, "Failed to update user");
   }
   return result;
-}
-
+};
 
 //login with google
 
-const handleLoginWithGoogle = async () => {
-
-}
-
+const handleLoginWithGoogle = async () => {};
 
 // login with apple
 const handleLoginWithFacebook = async (payload: any) => {
+
 
   const user: IUser = payload
 
@@ -270,6 +267,22 @@ const handleLoginWithFacebook = async (payload: any) => {
   return accessToken
 }
 
+  const url = `https://graph.facebook.com/${payload.userID}?fields=id,name,email,picture&access_token=${payload.accessToken}`;
+  const response = await axios.get(url);
+  const user: any = response.data;
+  let existingUser = await User.findOne({ facebookId: user.id });
+  if (!existingUser) {
+    // If the user doesn't exist, create a new user
+    existingUser = await User.create({
+      facebookId: payload.user.id,
+      name: payload.user.name,
+      email: payload.user.email,
+      profilePicture: user.picture.data.url,
+    });
+  }
+  return existingUser;
+};
+
 
 const updateEnterTime = async (userId: string): Promise<void> => {
   await User.findByIdAndUpdate(userId, { enterTime: new Date() });
@@ -278,7 +291,6 @@ const updateEnterTime = async (userId: string): Promise<void> => {
 const updateLeaveTime = async (userId: string): Promise<void> => {
   await User.findByIdAndUpdate(userId, { leaveTime: new Date() });
 };
-
 
 export const UserService = {
   createUserToDB,
@@ -294,5 +306,5 @@ export const UserService = {
   handleLoginWithGoogle,
   handleLoginWithFacebook,
   updateEnterTime,
-  updateLeaveTime
+  updateLeaveTime,
 };

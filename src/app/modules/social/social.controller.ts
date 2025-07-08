@@ -1,15 +1,31 @@
+
 import { Request, Response } from "express";
 import catchAsync from "../../../shared/catchAsync";
 import { SocialServices } from "./social.service";
 import sendResponse from "../../../shared/sendResponse";
 
+
 const createSocial = catchAsync(async (req: Request, res: Response) => {
   const socialData = req.body;
   const result = await SocialServices.createSocialToDB(socialData);
-  sendResponse(res, {
+  sendResponse(res, 
     success: true,
     statusCode: 200,
     message: 'Social created successfully',
+    data: result,
+  });
+});
+
+
+//
+const updateSocial = catchAsync(async (req: Request, res: Response) => {
+  const socialId = req.params.id;
+  const socialData = req.body;
+  const result = await SocialServices.updateSocialToDB(socialId, socialData);
+  sendResponse(res, {
+    success: true,
+    statusCode: 200,
+    message: 'Social updated successfully',
     data: result,
   });
 });
@@ -28,4 +44,5 @@ const getAllSocial = catchAsync(async (req: Request, res: Response) => {
 export const SocialController = {
   createSocial,
   getAllSocial,
+
 };

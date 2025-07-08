@@ -18,5 +18,15 @@ router.get(
   "/",
   SocialController.getAllSocial
 );
+  // auth(USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMIN),
+  SocialController.getAllSocial
+);
+
+router.patch(
+  "/:id",
+  auth(USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMIN),
+  validateRequest(SocialValidations.socialUpdateSchemaZod),
+  SocialController.updateSocial
+);
 
 export const SocialRoutes = router;

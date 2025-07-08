@@ -1,3 +1,4 @@
+
 import { Schema, model } from "mongoose";
 import { ISocial } from "./social.interface";
 
