@@ -1,20 +1,20 @@
-import mongoose from "mongoose";
+import mongoose, { Types } from "mongoose";
 import { IReview } from "./review.interface";
 import { Review } from "./review.model";
 import { StatusCodes } from "http-status-codes";
-import { User } from "../user/user.model";
 import ApiError from "../../../errors/ApiErrors";
 import { JwtPayload } from "jsonwebtoken";
-import QueryBuilder from "../../builder/queryBuilder";
 
-const createReviewToDB = async (user: JwtPayload, payload: IReview): Promise<IReview> => {
-    payload.customer = user.id!;
-    const result = await Review.create(payload);
+const createReviewToDB = async (user: JwtPayload, payload: IReview) => {
+    const reviewData = {
+        ...payload,
+        buyer: user.id
+    };
+    const result = await Review.create(reviewData)
     if (!result) {
         throw new ApiError(StatusCodes.BAD_REQUEST, "Failed to create review");
     }
     return result
-
 };
 
 // review.service.ts
@@ -27,9 +27,9 @@ const getAllReviewsFromDB = async (
     averageRating: number;
     totalRatingCount: number;
 }> => {
-    const result = await Review.find({ user: sellerId })
+    const result = await Review.find({ seller: new Types.ObjectId(sellerId) }).populate("buyer");
     const stats = await Review.aggregate([
-        { $match: { user: new mongoose.Types.ObjectId(sellerId) } },
+        { $match: { seller: new mongoose.Types.ObjectId(sellerId) } },
         {
             $group: {
                 _id: null,
@@ -40,8 +40,6 @@ const getAllReviewsFromDB = async (
     ]);
 
     const averageRating = stats[0]?.averageRating || 0;
-
-
     return {
         averageRating,
         // @ts-ignore

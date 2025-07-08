@@ -2,8 +2,15 @@ import { StatusCodes } from "http-status-codes";
 import ApiError from "../../../errors/ApiErrors";
 import { ISubCategory } from "./subCategory.interface";
 import { SubCategory } from "./subCategory.model";
+import QueryBuilder from "../../builder/queryBuilder";
+import { FilterQuery } from "mongoose";
 
 const createSubCategoryToDB = async (payload: ISubCategory) => {
+
+  const isExist = await SubCategory.findOne({ name: payload.name, category: payload.category });
+  if (isExist) {
+    throw new ApiError(StatusCodes.BAD_REQUEST, "SubCategory already exist");
+  }
   const result = await SubCategory.create(payload);
   if (!result) {
     throw new ApiError(StatusCodes.BAD_REQUEST, "Failed to create subCategory");
@@ -11,13 +18,37 @@ const createSubCategoryToDB = async (payload: ISubCategory) => {
   return result;
 };
 
-const getAllSubCategoryFromDB = async (): Promise<ISubCategory[]> => {
-  const result = await SubCategory.find().populate("category");
-  if (!result) {
-    return [];
+const getAllSubCategoryFromDB = async (query: Record<string, any>) => {
+  const searchTerm = query.searchTerm || query.seachTerm || "";
+  const restQuery = { ...query };
+  delete restQuery.searchTerm;
+  delete restQuery.seachTerm;
+
+  const filter: FilterQuery<ISubCategory> = {};
+
+  if (searchTerm) {
+    filter.name = { $regex: searchTerm, $options: "i" };
   }
-  return result;
+
+  // rest same as before
+  const subCategoryQuery = SubCategory.find(filter);
+
+  const queryBuilder = new QueryBuilder<ISubCategory>(subCategoryQuery, restQuery)
+    .filter()
+    .sort()
+    .paginate()
+    .fields()
+    .populate(["category"], { name: 1 });
+
+  const result = await queryBuilder.modelQuery;
+  const meta = await queryBuilder.getPaginationInfo();
+
+  return {
+    meta,
+    data: result,
+  };
 };
+
 
 const getSingleSubCategoryFromDB = async (
   id: string
@@ -31,14 +62,16 @@ const getSingleSubCategoryFromDB = async (
 
 const updateSubCategoryToDB = async (
   id: string,
-  payload: Partial<ISubCategory>
-): Promise<ISubCategory | null> => {
+  payload: ISubCategory
+) => {
   const result = await SubCategory.findOneAndUpdate({ _id: id }, payload, {
     new: true,
   });
+
   if (!result) {
     throw new ApiError(StatusCodes.NOT_FOUND, "SubCategory not found");
   }
+
   return result;
 };
 

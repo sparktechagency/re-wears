@@ -186,7 +186,6 @@ const updateOrderByProductId = async (
     { status: payload.orderStatus },
     { new: true }
   );
-  console.log("Order data", orderData);
 
 
   if (!orderData) {

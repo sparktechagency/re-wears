@@ -13,6 +13,8 @@ import generateSequentialId from "../../utils/idGenerator";
 import { Review } from "../review/review.model";
 import { UserFollower } from "../follower/follower.model";
 import axios from "axios";
+import { jwtHelper } from "../../../helpers/jwtHelper";
+import config from "../../../config";
 
 const createAdminToDB = async (payload: any): Promise<IUser> => {
   // check admin is exist or not;
@@ -156,7 +158,7 @@ const getUserProfileFromDB = async (
 // get all users data
 const getAllUsers = async (
   query: Record<string, unknown>
-): Promise<IUser[]> => {
+): Promise<{ result: IUser[]; meta: any }> => {
   const searchableFields = ["id", "firstName", "lastName", "email", "code"];
 
   const userQuery = new QueryBuilder<IUser>(
@@ -170,11 +172,12 @@ const getAllUsers = async (
     .fields();
 
   const result = await userQuery.modelQuery;
+  const meta = await userQuery.getPaginationInfo();
 
   if (!result) {
-    throw new ApiError(StatusCodes.BAD_REQUEST, "Failed to get users");
+    throw new ApiError(StatusCodes.BAD_REQUEST, "No user found");
   }
-  return result;
+  return { result, meta };
 };
 
 // TODO: need to return user follower how much user he follwing | user-name | follower | following | rating | reviews
@@ -195,12 +198,13 @@ const getSingleUserFromDB = async (id: string) => {
   const followingCount = following?.length;
 
   // --- Review Count
-  const reviewCount = await Review.countDocuments({
+ const reviewCount = await Review.countDocuments({
     $or: [{ customer: id }, { user: id }],
   });
 
+
   // --- Average Rating from customer reviews
-  const customerReviews = await Review.find({ user: id }).lean();
+  const customerReviews = await Review.find({ seller: id }).lean();
   const validRatings = customerReviews
     .map((r) => r.rating)
     .filter((r) => typeof r === "number" && !isNaN(r));
@@ -250,6 +254,19 @@ const handleLoginWithGoogle = async () => {};
 
 // login with apple
 const handleLoginWithFacebook = async (payload: any) => {
+
+
+  const user: IUser = payload
+
+  const accessToken = jwtHelper.createToken({
+    id: user._id,
+    email: user.email,
+    role: user.role,
+  }, config.jwt.jwt_secret!, config.jwt.jwt_expire_in!)
+
+  return accessToken
+}
+
   const url = `https://graph.facebook.com/${payload.userID}?fields=id,name,email,picture&access_token=${payload.accessToken}`;
   const response = await axios.get(url);
   const user: any = response.data;
@@ -265,6 +282,7 @@ const handleLoginWithFacebook = async (payload: any) => {
   }
   return existingUser;
 };
+
 
 const updateEnterTime = async (userId: string): Promise<void> => {
   await User.findByIdAndUpdate(userId, { enterTime: new Date() });

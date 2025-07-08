@@ -7,4 +7,5 @@ export enum CmsType {
   Payments = "payments",
   SafetyReporting = "safety-reporting",
   MyAccountSettings = "my-account-settings",
+  deleteAccount = "delete-account",
 }

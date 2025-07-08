@@ -56,7 +56,7 @@ const sendMessageToDB = async (
 const getMessageFromDB = async (id: any): Promise<IMessage[]> => {
   const messages = await Message.find({ chatId: id }).sort({ createdAt: 1 }).populate({
     path: "offer",
-    select: "product",
+    select: "product offerStatus",
     populate: {
       path: "product",
       select: "name price",

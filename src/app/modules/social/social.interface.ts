@@ -1,3 +1,5 @@
+
+export interface ISocial {
 import { Model } from 'mongoose';
 
 export type ISocial = {
@@ -5,6 +7,7 @@ export type ISocial = {
   instagramUrl: string;
   tikTokUrl: string;
   email: string;
+}
 };
 
 export type SocialModel = Model<ISocial>;

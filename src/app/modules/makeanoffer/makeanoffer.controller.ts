@@ -2,7 +2,6 @@ import { Request, Response, NextFunction } from "express";
 import { MakeAnOfferServices } from "./makeanoffer.service";
 import catchAsync from "../../../shared/catchAsync";
 import sendResponse from "../../../shared/sendResponse";
-import ApiError from "../../../errors/ApiErrors";
 import { StatusCodes } from "http-status-codes";
 const createOffer = catchAsync(async (req: Request, res: Response) => {
   const result = await MakeAnOfferServices.createMakeAnOfferIntoDB(
@@ -51,8 +50,25 @@ const getOfferUsingSocket = catchAsync(async (req: Request, res: Response) => {
 });
 
 
+
+const updateOfferStatus = catchAsync(async (req: Request, res: Response) => {
+  const result = await MakeAnOfferServices.offerUpdateFromDB(
+    req.user!,      // JwtPayload
+    req.body,       // IMakeAnOffer
+    req.params.id   // string
+  );
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: "Offer update successfully",
+    data: result,
+  });
+});
+
+
 export const MakeAnOfferController = {
   createOffer,
   getAllOffer,
-  getOfferUsingSocket
+  getOfferUsingSocket,
+  updateOfferStatus
 };

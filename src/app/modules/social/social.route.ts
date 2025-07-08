@@ -16,6 +16,8 @@ router.post(
 
 router.get(
   "/",
+  SocialController.getAllSocial
+);
   // auth(USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMIN),
   SocialController.getAllSocial
 );

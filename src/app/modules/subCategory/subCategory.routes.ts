@@ -43,25 +43,28 @@ router.get(
 
 router.patch(
   "/:id",
-  fileUploadHandler(),
+  (req, res, next) => {
+    fileUploadHandler()(req, res, err => {
+      if (err) {
+        return res.status(400).json({ message: err.message });
+      }
+      next();
+    });
+  },
   async (req, res, next) => {
     try {
       const payload = req.body;
-      const icon = getSingleFilePath(req.files, "icon");
+      const icon = req.files ? getSingleFilePath(req.files, 'icon') : undefined;
 
-      if (!icon) {
-        return res.status(400).json({ message: "Icon is required." });
-      }
-      req.body = {
-        icon,
-        ...payload,
-      };
+      if (!icon) delete payload.icon;
+      else payload.icon = icon;
+
+      req.body = payload;
       next();
-    } catch (error) {
-      res.status(500).json({ message: "Failed to upload Image" });
+    } catch (err) {
+      res.status(500).json({ message: 'Failed to upload Image' });
     }
   },
-  // auth(USER_ROLES.SUPER_ADMIN),
   SubCategoryController.updateSubCategory
 );
 router.delete(

@@ -15,14 +15,17 @@ const createSubCategory = catchAsync(async (req: Request, res: Response) => {
 });
 
 const getAllSubCategory = catchAsync(async (req: Request, res: Response) => {
-  const result = await SubCategoryService.getAllSubCategoryFromDB();
+  const result = await SubCategoryService.getAllSubCategoryFromDB(req.query);
   sendResponse(res, {
     success: true,
     statusCode: StatusCodes.OK,
     message: "SubCategory get successfully",
-    data: result,
+    pagination: result.meta,
+    data: result.data,
   });
 });
+
+
 
 const getSingleSubCategory = catchAsync(async (req: Request, res: Response) => {
   const { id } = req.params;

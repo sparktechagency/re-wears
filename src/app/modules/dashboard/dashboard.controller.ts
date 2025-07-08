@@ -45,11 +45,23 @@ const getTrendingCategories = catchAsync(async (req: Request, res: Response) => 
 });
 
 
+const getActiveUsers = catchAsync(async (req: Request, res: Response) => {
+    const result = await dashboardService.totalActiveUserDataInDB(req.query.period as 'daily' | 'weekly' | 'monthly');
+    sendResponse(res, {
+        statusCode: 200,
+        success: true,
+        message: "Active users fetched successfully",
+        data: result,
+    });
+});
+
+
 
 // export function
 export const dashboardController = {
     getTotalUserProductRevenueFromDB,
     getUserGrowth,
     getLoggedInProductSoldItems,
-    getTrendingCategories
+    getTrendingCategories,
+    getActiveUsers
 }

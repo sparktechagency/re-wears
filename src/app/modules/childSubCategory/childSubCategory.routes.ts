@@ -1,6 +1,4 @@
 import { Router } from "express";
-import auth from "../../middlewares/auth";
-import { USER_ROLES } from "../../../enums/user";
 import { childSubCategoryController } from "./childSubCategory.controller";
 
 const router = Router();

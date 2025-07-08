@@ -10,7 +10,7 @@ const userSchema = new Schema<IUser, UserModal>(
   {
     id: {
       type: String,
-      required: true,
+      // required: true,
     },
     firstName: {
       type: String,

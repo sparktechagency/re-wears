@@ -10,4 +10,6 @@ router.get("/user-growth", auth(USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMIN), dashb
 router.get("/logged-in-product-sold-items", auth(USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMIN), dashboardController.getLoggedInProductSoldItems);
 router.get("/trending-categories", auth(USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMIN), dashboardController.getTrendingCategories);
 
+router.get("/active-users", auth(USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMIN), dashboardController.getActiveUsers);
+
 export const dashboardRoutes = router;

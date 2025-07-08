@@ -34,4 +34,8 @@ const socialUpdateSchemaZod = z.object({
 export const SocialValidations = {
   socialSchemaZod,
   socialUpdateSchemaZod
+
+
+
 };
+
