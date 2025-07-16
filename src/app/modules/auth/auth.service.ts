@@ -355,42 +355,14 @@ const resendVerificationEmailToDB = async (email: string) => {
 };
 
 // social authentication
-const socialLoginFromDB = async (payload: IUser) => {
-  const { appId, role } = payload;
-  const isExistUser = await User.findOne({ appId });
-  if (isExistUser) {
-    //create token
-    const accessToken = jwtHelper.createToken(
-      { id: isExistUser._id, role: isExistUser.role },
-      config.jwt.jwt_secret as Secret,
-      config.jwt.jwt_expire_in as string
-    );
-    //create token
-    const refreshToken = jwtHelper.createToken(
-      { id: isExistUser._id, role: isExistUser.role },
-      config.jwt.jwtRefreshSecret as Secret,
-      config.jwt.jwtRefreshExpiresIn as string
-    );
-    return { accessToken, refreshToken };
-  } else {
-    const user = await User.create({ appId, role, isVerified: true });
-    if (!user) {
-      throw new ApiError(StatusCodes.BAD_REQUEST, "Failed to created User");
-    }
-    //create token
-    const accessToken = jwtHelper.createToken(
-      { id: user._id, role: user.role },
-      config.jwt.jwt_secret as Secret,
-      config.jwt.jwt_expire_in as string
-    );
-    //create token
-    const refreshToken = jwtHelper.createToken(
-      { id: user._id, role: user.role },
-      config.jwt.jwtRefreshSecret as Secret,
-      config.jwt.jwtRefreshExpiresIn as string
-    );
-    return { accessToken, refreshToken };
-  }
+const socialLoginFromDB = async (payload: any) => {
+  const user: IUser = payload
+  const accessToken = jwtHelper.createToken({
+    id: user._id,
+    role: user.role,
+    email: user.email
+  }, config.jwt.jwt_secret as Secret, config.jwt.jwt_expire_in as string)
+  return accessToken
 };
 
 // delete user
@@ -408,14 +380,33 @@ const deleteUserFromDB = async (user: JwtPayload, password: string) => {
     throw new ApiError(StatusCodes.BAD_REQUEST, "Password is incorrect");
   }
 
-  const updateUser = await User.findByIdAndDelete(user.id);
+  const updateUser = await User.findByIdAndUpdate(user.id, { isDeleted: true });
   if (!updateUser) {
     throw new ApiError(StatusCodes.BAD_REQUEST, "User doesn't exist!");
   }
   return;
 };
 
+// delete user using email and password
+const deleteUserByEmailAndPassword = async (email: string, password: string) => {
+  const isExistUser = await User.findOne({ email }).select("+password");
+  if (!isExistUser) {
+    throw new ApiError(StatusCodes.BAD_REQUEST, "User doesn't exist!");
+  }
 
+  //check match password
+  if (
+    password &&
+    !(await User.isMatchPassword(password, isExistUser.password))
+  ) {
+    throw new ApiError(StatusCodes.BAD_REQUEST, "Password is incorrect");
+  }
+  const updateUser = await User.findByIdAndUpdate(isExistUser._id, { isDeleted: true });
+  if (!updateUser) {
+    throw new ApiError(StatusCodes.BAD_REQUEST, "User doesn't exist!");
+  }
+  return;
+};
 
 
 export const AuthService = {
@@ -428,4 +419,5 @@ export const AuthService = {
   resendVerificationEmailToDB,
   socialLoginFromDB,
   deleteUserFromDB,
+  deleteUserByEmailAndPassword
 };

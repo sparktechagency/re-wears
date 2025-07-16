@@ -119,7 +119,14 @@ router.patch(
   productController.updateProduct
 );
 
-router.patch("/update-status/:id", auth(USER_ROLES.USER), productController.productStatusUpdate);
+router.patch("/update-status/:id", auth(USER_ROLES.USER, USER_ROLES.ADMIN, USER_ROLES.SUPER_ADMIN), productController.productStatusUpdate);
+
+// product blocked
+router.patch(
+  "/block/:id",
+  auth(USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMIN, USER_ROLES.USER),
+  productController.isBlockedProductUpdate
+);
 // delete product
 router.delete(
   "/:id",
@@ -131,5 +138,3 @@ router.delete(
 
 
 export const productRoutes = router;
-
-// 

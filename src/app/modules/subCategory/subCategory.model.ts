@@ -5,8 +5,7 @@ const subCategorySchema = new Schema<ISubCategory>(
   {
     name: {
       type: String,
-      required: true,
-      unique: true,
+      required: true
     },
     icon: {
       type: String,

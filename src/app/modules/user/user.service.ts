@@ -12,6 +12,8 @@ import QueryBuilder from "../../builder/queryBuilder";
 import { Review } from "../review/review.model";
 import { UserFollower } from "../follower/follower.model";
 import axios from "axios";
+import { jwtHelper } from "../../../helpers/jwtHelper";
+import config from "../../../config";
 
 const createAdminToDB = async (payload: any): Promise<IUser> => {
   // check admin is exist or not;
@@ -44,9 +46,7 @@ const createUserToDB = async (payload: Partial<IUser>): Promise<IUser> => {
   if (existingUser) {
     throw new ApiError(StatusCodes.BAD_REQUEST, "Email already exists!");
   }
-
-  // Create the user with verified as false
-  const createUser = await User.create({ ...payload, verified: false });
+  const createUser = await User.create(payload);
   if (!createUser) {
     throw new ApiError(StatusCodes.BAD_REQUEST, "Failed to create user");
   }
@@ -161,7 +161,7 @@ const getUserProfileFromDB = async (
 // get all users data
 const getAllUsers = async (
   query: Record<string, unknown>
-): Promise<IUser[]> => {
+): Promise<{ result: IUser[]; meta: any }> => {
   const searchableFields = ["id", "firstName", "lastName", "email", "code"];
 
   const userQuery = new QueryBuilder<IUser>(
@@ -175,11 +175,12 @@ const getAllUsers = async (
     .fields();
 
   const result = await userQuery.modelQuery;
+  const meta = await userQuery.getPaginationInfo();
 
   if (!result) {
-    throw new ApiError(StatusCodes.BAD_REQUEST, "Failed to get users");
+    throw new ApiError(StatusCodes.BAD_REQUEST, "No user found");
   }
-  return result;
+  return { result, meta };
 };
 
 // TODO: need to return user follower how much user he follwing | user-name | follower | following | rating | reviews
@@ -200,12 +201,14 @@ const getSingleUserFromDB = async (id: string) => {
   const followingCount = following?.length;
 
   // --- Review Count
-  const reviewCount = await Review.countDocuments({
-    $or: [{ customer: id }, { user: id }],
+ 
+ const reviewCount = await Review.countDocuments({
+    $or: [{ buyer: id }, { seller: id }],
   });
 
+
   // --- Average Rating from customer reviews
-  const customerReviews = await Review.find({ user: id }).lean();
+  const customerReviews = await Review.find({ seller: id }).lean();
   const validRatings = customerReviews
     .map((r) => r.rating)
     .filter((r) => typeof r === "number" && !isNaN(r));
@@ -255,21 +258,18 @@ const handleLoginWithGoogle = async () => {};
 
 // login with apple
 const handleLoginWithFacebook = async (payload: any) => {
-  const url = `https://graph.facebook.com/${payload.userID}?fields=id,name,email,picture&access_token=${payload.accessToken}`;
-  const response = await axios.get(url);
-  const user: any = response.data;
-  let existingUser = await User.findOne({ facebookId: user.id });
-  if (!existingUser) {
-    // If the user doesn't exist, create a new user
-    existingUser = await User.create({
-      facebookId: payload.user.id,
-      name: payload.user.name,
-      email: payload.user.email,
-      profilePicture: user.picture.data.url,
-    });
-  }
-  return existingUser;
-};
+
+
+  const user: IUser = payload
+
+  const accessToken = jwtHelper.createToken({
+    id: user._id,
+    email: user.email,
+    role: user.role,
+  }, config.jwt.jwt_secret!, config.jwt.jwt_expire_in!)
+
+  return accessToken
+}
 
 const updateEnterTime = async (userId: string): Promise<void> => {
   await User.findByIdAndUpdate(userId, { enterTime: new Date() });

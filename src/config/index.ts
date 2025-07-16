@@ -34,5 +34,8 @@ export default {
     facebook: {
         clientID: process.env.FACEBOOK_CLIENT_ID!,
         clientSecret: process.env.FACEBOOK_CLIENT_SECRET!,
+    },
+    url: {
+        frontend_url: process.env.FRONTEND_URL
     }
 }

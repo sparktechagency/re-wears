@@ -32,22 +32,26 @@ const createWishListIntoDB = async (payload: IWishlist, user: JwtPayload) => {
       "Failed to add to wishlist"
     );
   }
+  const productDetails = await Product.findById(payload.product).lean();
   const userDetails = await User.findById(user.id);
+  const receiver = productDetails?.user;
   const notificationPayload = {
     userId: user.id,
     title: 'New Wishlist',
+    receiver: receiver,
+    productId: payload.product,
     // @ts-ignore
     message: `You have a new wishlist from ${(userDetails?.lastName || "User")}`,
-    type: 'Wishlist Create',
+    notificationType: 'wishlist',
   };
 
   await sendNotifications(notificationPayload as any);
-  const productDetails = await Product.findById(payload.product).lean();
+
 
   //@ts-ignore
   const io = global.io;
   if (io) {
-    io.emit(`createWishlist::${productDetails?.user._id}`, notificationPayload);
+    io.emit(`notifications::${productDetails?.user._id}`, notificationPayload);
   }
   return addWishList;
 };
@@ -66,15 +70,16 @@ const getAllWishListFromDB = async (
       .sort()
       .paginate()
       .fields()
-      .populate(["product user"], {
-        path: "product user",
-        select:
-          "_id user name description productImage condition brand size material colors price status isBlocked isDeleted createdAt updatedAt email profile role",
-      });
 
-    const result = await queryBuilder.modelQuery;
+    const result = await queryBuilder.modelQuery.populate([{
+      path: "product",
+      populate: {
+        path: "user",
+      }
+    }, {
+      path: "user"
+    }]);
     const paginationInfo = await queryBuilder.getPaginationInfo();
-
     if (!result) {
       return [];
     }

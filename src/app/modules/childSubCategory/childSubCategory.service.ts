@@ -2,6 +2,7 @@ import { StatusCodes } from "http-status-codes";
 import ApiError from "../../../errors/ApiErrors";
 import { IChildSubCategory } from "./childSubCategory.interface";
 import { ChildSubCategory } from "./childSubCategory.model";
+import QueryBuilder from "../../builder/queryBuilder";
 
 const createChildSubCategoryToDB = async (payload: IChildSubCategory) => {
   const result = await ChildSubCategory.create(payload);
@@ -13,13 +14,39 @@ const createChildSubCategoryToDB = async (payload: IChildSubCategory) => {
   }
   return result;
 };
-const getChildSubCategoriesFromDB = async (): Promise<IChildSubCategory[]> => {
-  const result = await ChildSubCategory.find({}).populate("subCategory");
-  if (!result) {
-    return [];
-  }
-  return result;
+
+// get all child sub categories
+const getChildSubCategoriesFromDB = async (
+  query: Record<string, unknown>
+): Promise<{ data: IChildSubCategory[]; meta: Record<string, any> }> => {
+  const modelQuery = ChildSubCategory.find();
+
+  const queryBuilder = new QueryBuilder<IChildSubCategory>(modelQuery, query);
+
+  const resultQuery = queryBuilder
+    .search(['name'])
+    .filter()
+    .sort()
+    .paginate()
+    .fields();
+
+  const data = await resultQuery.modelQuery
+    .populate({
+      path: 'subCategory',
+      populate: {
+        path: 'category',
+        select: 'name',
+      },
+      select: 'name category',
+    });
+
+  const meta = await resultQuery.getPaginationInfo();
+
+  return { data, meta };
 };
+
+// get single oe child sub category
+
 const getChildSubCategoryByIdFromDB = async (
   id: string
 ): Promise<IChildSubCategory | null> => {
