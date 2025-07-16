@@ -1,7 +1,6 @@
 import { Model } from "mongoose";
 import { GENDER, USER_ROLES } from "../../../enums/user";
 
-
 interface IAuthenticationProps {
   isResetPassword: boolean;
   oneTimeCode: number;
@@ -10,7 +9,6 @@ interface IAuthenticationProps {
 
 export type IUser = {
   _id: string;
-  id?: string;
   firstName: string;
   lastName: string;
   email: string;

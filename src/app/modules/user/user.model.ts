@@ -8,10 +8,6 @@ import config from "../../../config";
 
 const userSchema = new Schema<IUser, UserModal>(
   {
-    id: {
-      type: String,
-      required: true,
-    },
     firstName: {
       type: String,
       required: true,
@@ -23,7 +19,7 @@ const userSchema = new Schema<IUser, UserModal>(
     userName: {
       type: String,
       unique: true,
-      required: false,
+      sparse: true,
     },
     email: {
       type: String,

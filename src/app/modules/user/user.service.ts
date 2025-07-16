@@ -9,7 +9,6 @@ import { emailTemplate } from "../../../shared/emailTemplate";
 import { emailHelper } from "../../../helpers/emailHelper";
 import unlinkFile from "../../../shared/unlinkFile";
 import QueryBuilder from "../../builder/queryBuilder";
-import generateSequentialId from "../../utils/idGenerator";
 import { Review } from "../review/review.model";
 import { UserFollower } from "../follower/follower.model";
 import axios from "axios";
@@ -20,9 +19,6 @@ const createAdminToDB = async (payload: any): Promise<IUser> => {
   if (isExistAdmin) {
     throw new ApiError(StatusCodes.CONFLICT, "This Email already exist");
   }
-  // generate siquence id
-  const id = await generateSequentialId(User, "id");
-  payload.id = id;
 
   // create admin to db
   const createAdmin = await User.create(payload);
@@ -40,19 +36,27 @@ const createAdminToDB = async (payload: any): Promise<IUser> => {
 };
 
 const createUserToDB = async (payload: Partial<IUser>): Promise<IUser> => {
-  // generate sequence id
-  const id = await generateSequentialId(User, "id");
-  payload.id = id;
+  if (!payload.userName) {
+    delete payload.userName;
+  }
+  // Check if the email already exists
+  const existingUser = await User.findOne({ email: payload.email });
+  if (existingUser) {
+    throw new ApiError(StatusCodes.BAD_REQUEST, "Email already exists!");
+  }
 
-  const createUser = await User.create(payload);
+  // Create the user with verified as false
+  const createUser = await User.create({ ...payload, verified: false });
   if (!createUser) {
     throw new ApiError(StatusCodes.BAD_REQUEST, "Failed to create user");
   }
 
-  //send email
+  // Generate OTP
   const otp = generateOTP();
+
+  // Email template for account verification
   const values = {
-    name: createUser.firstName,
+    name: createUser.lastName,
     otp: otp,
     email: createUser.email!,
   };
@@ -60,15 +64,16 @@ const createUserToDB = async (payload: Partial<IUser>): Promise<IUser> => {
   const createAccountTemplate = emailTemplate.createAccount(values);
   emailHelper.sendEmail(createAccountTemplate);
 
-  //save to DB
-  const authentication = {
-    oneTimeCode: otp,
-    expireAt: new Date(Date.now() + 3 * 60000),
-  };
-
-  await User.findOneAndUpdate(
-    { _id: createUser._id },
-    { $set: { authentication } }
+  // Save OTP to the user's authentication object
+  const updatedUser = await User.findByIdAndUpdate(
+    createUser._id,
+    {
+      authentication: {
+        oneTimeCode: otp,
+        expireAt: new Date(Date.now() + 3 * 60000), // OTP expires in 3 minutes
+      },
+    },
+    { new: true }
   );
 
   return createUser;
@@ -177,7 +182,7 @@ const getAllUsers = async (
   return result;
 };
 
-// TODO: need to return user follower how much user he follwing | user-name | follower | following | rating | reviews 
+// TODO: need to return user follower how much user he follwing | user-name | follower | following | rating | reviews
 const getSingleUserFromDB = async (id: string) => {
   const user = await User.findById(id).lean();
   if (!user) {
@@ -191,26 +196,27 @@ const getSingleUserFromDB = async (id: string) => {
 
   // --- Following: people this user follows (find all where follower array includes this user)
   const followingDocs = await UserFollower.find({ follower: id }).lean();
-  const following = followingDocs?.map(doc => doc.user);
+  const following = followingDocs?.map((doc) => doc.user);
   const followingCount = following?.length;
 
   // --- Review Count
   const reviewCount = await Review.countDocuments({
-    $or: [{ customer: id }, { user: id }]
+    $or: [{ customer: id }, { user: id }],
   });
 
   // --- Average Rating from customer reviews
   const customerReviews = await Review.find({ user: id }).lean();
   const validRatings = customerReviews
-    .map(r => r.rating)
-    .filter(r => typeof r === 'number' && !isNaN(r));
+    .map((r) => r.rating)
+    .filter((r) => typeof r === "number" && !isNaN(r));
 
   const customerAvgRating = validRatings.length
     ? parseFloat(
-      (
-        validRatings.reduce((acc, curr) => acc + curr, 0) / validRatings.length
-      ).toFixed(2)
-    )
+        (
+          validRatings.reduce((acc, curr) => acc + curr, 0) /
+          validRatings.length
+        ).toFixed(2)
+      )
     : 0;
 
   return {
@@ -222,9 +228,7 @@ const getSingleUserFromDB = async (id: string) => {
   };
 };
 
-
-const updateUserNickNameBaseOnIdFromDB = async (
-  id: string, payload: IUser) => {
+const updateUserNickNameBaseOnIdFromDB = async (id: string, payload: IUser) => {
   const isExistUser: any = await User.isExistUserById(id);
   if (!isExistUser) {
     throw new ApiError(StatusCodes.BAD_REQUEST, "User doesn't exist!");
@@ -232,7 +236,7 @@ const updateUserNickNameBaseOnIdFromDB = async (
   if (payload.userName) {
     const existingUser = await User.findOne({
       userName: payload.userName,
-      _id: { $ne: id }
+      _id: { $ne: id },
     });
     if (existingUser) {
       throw new ApiError(StatusCodes.BAD_REQUEST, "Username already taken!");
@@ -243,15 +247,11 @@ const updateUserNickNameBaseOnIdFromDB = async (
     throw new ApiError(StatusCodes.BAD_REQUEST, "Failed to update user");
   }
   return result;
-}
-
+};
 
 //login with google
 
-const handleLoginWithGoogle = async () => {
-
-}
-
+const handleLoginWithGoogle = async () => {};
 
 // login with apple
 const handleLoginWithFacebook = async (payload: any) => {
@@ -269,9 +269,7 @@ const handleLoginWithFacebook = async (payload: any) => {
     });
   }
   return existingUser;
-
-}
-
+};
 
 const updateEnterTime = async (userId: string): Promise<void> => {
   await User.findByIdAndUpdate(userId, { enterTime: new Date() });
@@ -280,7 +278,6 @@ const updateEnterTime = async (userId: string): Promise<void> => {
 const updateLeaveTime = async (userId: string): Promise<void> => {
   await User.findByIdAndUpdate(userId, { leaveTime: new Date() });
 };
-
 
 export const UserService = {
   createUserToDB,
@@ -296,5 +293,5 @@ export const UserService = {
   handleLoginWithGoogle,
   handleLoginWithFacebook,
   updateEnterTime,
-  updateLeaveTime
+  updateLeaveTime,
 };
