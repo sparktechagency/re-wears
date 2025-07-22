@@ -31,21 +31,21 @@ router.post(
 );
 
 router.post(
-  "/verify-otp",
-  async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const { email, oneTimeCode } = req.body;
+    "/verify-otp",
+    async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            const { email, oneTimeCode } = req.body;
 
-      req.body = { email, oneTimeCode: Number(oneTimeCode) };
-      next();
-    } catch (error) {
-      return res
-        .status(500)
-        .json({ message: "Failed to convert string to number" });
-    }
-  },
-  validateRequest(AuthValidation.createVerifyEmailZodSchema),
-  AuthController.verifyEmail
+            req.body = { email, oneTimeCode: Number(oneTimeCode) };
+            next();
+        } catch (error) {
+            return res
+                .status(500)
+                .json({ message: "Failed to convert string to number" });
+        }
+    },
+    validateRequest(AuthValidation.createVerifyEmailZodSchema),
+    AuthController.verifyEmail
 );
 
 router.post(
@@ -75,10 +75,10 @@ router.delete(
 
 // Google Auth Routes
 router.get("/google", passport.authenticate("google", { scope: ["profile", "email"] }), (req, res) => {
-    res.redirect("https://fde8-115-127-157-41.ngrok-free.app/api/v1/auth/google/callback");
+    res.redirect("https://api.re-wears.com/api/v1/auth/google/callback");
 });
 
-router.get("/google/callback", 
+router.get("/google/callback",
     passport.authenticate("google", { failureRedirect: "/" }),
     AuthController.socialLogin
 );

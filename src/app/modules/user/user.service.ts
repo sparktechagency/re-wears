@@ -201,11 +201,10 @@ const getSingleUserFromDB = async (id: string) => {
   const followingCount = following?.length;
 
   // --- Review Count
- 
- const reviewCount = await Review.countDocuments({
+
+  const reviewCount = await Review.countDocuments({
     $or: [{ buyer: id }, { seller: id }],
   });
-
 
   // --- Average Rating from customer reviews
   const customerReviews = await Review.find({ seller: id }).lean();
@@ -258,18 +257,20 @@ const handleLoginWithGoogle = async () => {};
 
 // login with apple
 const handleLoginWithFacebook = async (payload: any) => {
+  const user: IUser = payload;
 
+  const accessToken = jwtHelper.createToken(
+    {
+      id: user._id,
+      email: user.email,
+      role: user.role,
+    },
+    config.jwt.jwt_secret!,
+    config.jwt.jwt_expire_in!
+  );
 
-  const user: IUser = payload
-
-  const accessToken = jwtHelper.createToken({
-    id: user._id,
-    email: user.email,
-    role: user.role,
-  }, config.jwt.jwt_secret!, config.jwt.jwt_expire_in!)
-
-  return accessToken
-}
+  return accessToken;
+};
 
 const updateEnterTime = async (userId: string): Promise<void> => {
   await User.findByIdAndUpdate(userId, { enterTime: new Date() });
