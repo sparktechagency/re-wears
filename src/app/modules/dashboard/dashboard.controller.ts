@@ -55,6 +55,31 @@ const getActiveUsers = catchAsync(async (req: Request, res: Response) => {
     });
 });
 
+// getActiveUserAndListedItemAndSoldItemsAndSoldItemsAndCategoryItems
+
+const getActiveUserAndListedItemsAndSoldItemsAndCategoryItems = catchAsync(async (req: Request, res: Response) => {
+    const result = await dashboardService.getActiveUserAndListedItemAndSoldItemsAndSoldItemsAndCategoryItemsFromDB();
+    sendResponse(res, {
+        statusCode: 200,
+        success: true,
+        message: "Active user and listed items and sold items and category items fetched successfully",
+        data: result,
+    });
+});
+
+// tranding category
+const getTrendingCategorie = catchAsync(async (req: Request, res: Response) => {
+    const result = await dashboardService.getTrendingCategoriesFromDB(
+        req.query.period as "daily" | "weekly" | "monthly"
+    );
+
+    sendResponse(res, {
+        statusCode: 200,
+        success: true,
+        message: "Trending categories fetched successfully",
+        data: result,
+    });
+});
 
 
 // export function
@@ -63,5 +88,7 @@ export const dashboardController = {
     getUserGrowth,
     getLoggedInProductSoldItems,
     getTrendingCategories,
-    getActiveUsers
+    getActiveUsers,
+    getActiveUserAndListedItemsAndSoldItemsAndCategoryItems,
+    getTrendingCategorie
 }

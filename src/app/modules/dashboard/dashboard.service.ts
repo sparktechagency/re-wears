@@ -1,5 +1,6 @@
 // total user ,Active Users,Total Products,Total Revenue
 import { getISOWeekNumber } from "../../utils/getISOWeekNumber";
+import { Category } from "../category/category.model";
 import { Product } from "../product/product.model";
 import { User } from "../user/user.model";
 
@@ -192,11 +193,89 @@ const totalActiveUserDataInDB = async (period: 'daily' | 'weekly' | 'monthly') =
     return { totalActiveUser, unActiveUser, listTedItems, soldItems };
 };
 
+// Active Users && Sold Items && Logged In && ListTedItems
+
+const getActiveUserAndListedItemAndSoldItemsAndSoldItemsAndCategoryItemsFromDB = async () => {
+
+    // total active user with percentage
+    const totalUser = await User.countDocuments();
+    const activeUser = await User.countDocuments({ lastSeenAt: { $gte: new Date(Date.now() - 1000 * 60 * 5) } });
+    const activeUserPercentage = totalUser > 0 ? Math.round((activeUser / totalUser) * 100) : 0;
+    const activeUserObject = { activeUser, activeUserPercentage }
+    // Listed Items
+
+    const listedItems = await Product.countDocuments({ status: { $ne: "Draft" } })
+    // Sold Items
+    const soldItems = await Product.countDocuments({ status: "Sold" })
+
+    // category
+    const category = await Category.countDocuments()
+
+    return { activeUserObject, listedItems, soldItems, category };
+}
+
+
+// Trending Categories
+const getTrendingCategoriesFromDB = async (period: "daily" | "weekly" | "monthly") => {
+    const now = new Date();
+    let startDate: Date;
+
+    switch (period) {
+        case "daily":
+            startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+            break;
+        case "weekly":
+            const startOfWeek = now.getDate() - now.getDay();
+            startDate = new Date(now.getFullYear(), now.getMonth(), startOfWeek);
+            break;
+        case "monthly":
+            startDate = new Date(now.getFullYear(), now.getMonth(), 1);
+            break;
+        default:
+            throw new Error("Invalid period");
+    }
+
+    const allCategories = await Category.find({}, "_id name").lean();
+
+    const soldCounts = await Product.aggregate([
+        {
+            $match: {
+                status: "Sold",
+                createdAt: { $gte: startDate },
+            },
+        },
+        {
+            $group: {
+                _id: "$category.category",
+                soldCount: { $sum: 1 },
+            },
+        },
+    ]);
+
+    const merged = allCategories.map((cat) => {
+        const matched = soldCounts.find(
+            (sold) => sold._id?.toString() === cat._id.toString()
+        );
+        return {
+            categoryId: cat._id,
+            categoryName: cat.name,
+            soldCount: matched ? matched.soldCount : 0,
+        };
+    });
+
+    merged.sort((a, b) => b.soldCount - a.soldCount);
+
+    return merged;
+};
+
+
 // export function 
 export const dashboardService = {
     getTotalUserProductRevenueFromDB,
     getUserGrowthFromDB,
     getLoggedInProductSoldItemsFromDB,
     trendingCategoriesFromDB,
-    totalActiveUserDataInDB
+    totalActiveUserDataInDB,
+    getActiveUserAndListedItemAndSoldItemsAndSoldItemsAndCategoryItemsFromDB,
+    getTrendingCategoriesFromDB
 }
