@@ -15,7 +15,7 @@ app.use(Morgan.errorHandler);
 //body parser
 app.use(
   cors({
-    origin: "https://re-wears.com",
+    origin: "https://re-wears.com | http://localhost:3000",
     credentials: true,
   })
 );

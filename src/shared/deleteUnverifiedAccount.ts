@@ -5,14 +5,14 @@ import { logger } from "../shared/logger";
 export const deleteUnverifiedAccount = () => {
     const GRACE_PERIOD_MINUTES = 5;
 
-    cron.schedule("* * * * *", async () => { // Runs every minute
+    cron.schedule("*/10 * * * *", async () => { // Runs every 10 minutes
         try {
             const cutoffDate = new Date(Date.now() - GRACE_PERIOD_MINUTES * 60 * 1000);
 
             // Delete unverified accounts older than the grace period
             const result = await User.deleteMany({
-              isVerified: false,
-              createdAt: { $lt: cutoffDate }, // Only delete accounts created before the cutoff date
+                isVerified: false,
+                createdAt: { $lt: cutoffDate }, // Only delete accounts created before the cutoff date
             });
 
             logger.info(`Deleted ${result.deletedCount} unverified accounts.`);
@@ -20,5 +20,5 @@ export const deleteUnverifiedAccount = () => {
             logger.error("Error during unverified account cleanup:", error);
         }
     });
-    logger.info("Unverified account cleanup job scheduled to run every minute.");
+    logger.info("Unverified account cleanup job scheduled to run every 10 minutes.");
 };
