@@ -7,7 +7,7 @@ const createAccount = (values: ICreateAccount) => {
     html: `
         <body style="margin: 0 !important; padding: 0 !important; background-color: #f8f9fa; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif; -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%;">
                 
-                                        <div style="margin: 10px 10px 10px 10px; text-align: center;">
+                                        <div>
                                                  <img src="https://res.cloudinary.com/dabd4udau/image/upload/v1753263876/qn93vgcydyy8bsniu4ru.jpg" alt="Logo" style="display: block; margin: 0 auto 20px; width:150px" />
                                         </div>
                      
@@ -33,7 +33,7 @@ const createAccount = (values: ICreateAccount) => {
                                                 </tr>
                                         </table>
                                         <p style="font-size: 14px; color: #999999; margin: 0 0 30px; line-height: 1.5;">
-                                                This code expires in 30 minutes and can only be used once.
+                                                This code expires in 3 minutes and can only be used once.
                                                 Please ensure timely completion.
                                         </p>
                                         <p style="font-size: 14px; color: #999999; margin: 0; line-height: 1.5; padding: 0 20px;">
