@@ -16,7 +16,6 @@ app.use(Morgan.errorHandler);
 app.use(
   cors({
     origin: ["https://re-wears.com", "https://admin.re-wears.com" ],
-    methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
     credentials: true,
   })
 );
