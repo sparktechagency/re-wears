@@ -15,7 +15,7 @@ app.use(Morgan.errorHandler);
 //body parser
 app.use(
   cors({
-    origin: ["https://re-wears.com", "https://admin.re-wears.com"],
+    origin: ["https://re-wears.com", "https://admin.re-wears.com",  "https://accounts.google.com" ],
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
     credentials: true,
   })
