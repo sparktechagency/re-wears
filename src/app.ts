@@ -15,7 +15,8 @@ app.use(Morgan.errorHandler);
 //body parser
 app.use(
   cors({
-    origin: "https://re-wears.com | http://localhost:3000",
+    origin: "*",
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
     credentials: true,
   })
 );
@@ -43,12 +44,24 @@ app.use(passport.session());
 app.use("/api/v1", router);
 
 app.get("/", (req: Request, res: Response) => {
-  res.send(
-    `<h1 style="text-align: center; margin: 50px 0;">Re-wears server is running. Beep! Beep!</h1>`
-  );
+  res.send(`
+    <div style="font-family: 'Arial', sans-serif; background-color: #f4f4f4; padding: 20px; text-align: center;">
+      <h1 style="color: #333; margin-bottom: 20px;">Re-wears server is running!</h1>
+      <p style="font-size: 18px; color: #666;">Beep! Beep!</p>
+<p style="font-size: 16px; color: #666;">Welcome to the Re-wears server!</p>
+<p style="font-size: 16px; color: #666;">We're excited to have you here. Feel free to explore and make the most of our services.</p>
+<p style="font-size: 16px; color: #666;">If you have any questions or need assistance, don't hesitate to reach out to our support team.</p>
+<p style="font-size: 16px; color: #666;">Happy exploring!</p>
+<p style="font-size: 16px; color: #666;">Best regards,</p>
+<p style="font-size: 16px; color: #666;">The Re-wears Team</p>
+<p style="font-size: 16px; color: #666;">P.S. If you're interested in our services, please visit our website at <a href="https://re-wears.com" style="color: #007bff; text-decoration: none;">https://re-wears.com</a>.</p>
+<p style="font-size: 16px; color: #666;">Thank you for choosing Re-wears!</p>
+
+    </div>
+  `);
 });
 
-//global error handle
+//global error handler
 app.use(globalErrorHandler);
 
 // handle not found route

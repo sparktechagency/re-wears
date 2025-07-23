@@ -58,7 +58,7 @@ const getActiveUsers = catchAsync(async (req: Request, res: Response) => {
 // getActiveUserAndListedItemAndSoldItemsAndSoldItemsAndCategoryItems
 
 const getActiveUserAndListedItemsAndSoldItemsAndCategoryItems = catchAsync(async (req: Request, res: Response) => {
-    const result = await dashboardService.getActiveUserAndListedItemAndSoldItemsAndSoldItemsAndCategoryItemsFromDB();
+    const result = await dashboardService.getActiveUserAndListedItemAndSoldItemsAndSoldItemsAndCategoryItemsFromDB(req.query.period as 'daily' | 'weekly' | 'monthly');
     sendResponse(res, {
         statusCode: 200,
         success: true,
