@@ -9,35 +9,11 @@ const createAccount = (values: ICreateAccount) => {
         <table role="presentation" cellspacing="0" cellpadding="0" border="0" style="margin: 0 auto; max-width: 600px; background-color: #ffffff; mso-table-lspace: 0pt; mso-table-rspace: 0pt;">
             <tr>
                 <td style="padding: 40px 40px 20px; text-align: center; background-color: #ffffff;">
-                    <div style="font-size: 32px; font-weight: 300; color: #b8b095; letter-spacing: 2px; margin-bottom: 40px;">
-                        re-wears
-                    </div>
-                    <div style="margin: 20px 0 40px; text-align: center;">
-                        <div style="width: 280px; height: 160px; margin: 0 auto; position: relative; display: inline-block;">
-                            <div style="width: 90px; height: 160px; background-color: #2c2c2c; border: 3px solid #2c2c2c; border-radius: 20px; position: absolute; left: 20px; top: 0;">
-                                <div style="width: 78px; height: 140px; background-color: #ffffff; border-radius: 15px; position: absolute; top: 6px; left: 6px;">
-                                    <div style="width: 20px; height: 4px; background-color: #2c2c2c; border-radius: 2px; position: absolute; top: 8px; left: 29px;"></div>
-                                    <div style="width: 40px; height: 40px; background-color: #b8b095; border-radius: 50%; position: absolute; top: 50px; left: 19px; display: flex; align-items: center; justify-content: center;">
-                                        <div style="width: 12px; height: 6px; border-left: 3px solid #ffffff; border-bottom: 3px solid #ffffff; transform: rotate(-45deg); margin-top: -3px;"></div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div style="width: 120px; height: 160px; position: absolute; right: 20px; top: 0;">
-                                <div style="width: 100px; height: 140px; border: 2px solid #2c2c2c; border-radius: 5px; position: absolute; right: 0; top: 10px; background-color: #ffffff;">
-                                    <div style="width: 40px; height: 40px; border: 1px solid #d0d0d0; position: absolute; top: 15px; left: 10px;"></div>
-                                    <div style="width: 40px; height: 40px; border: 1px solid #d0d0d0; position: absolute; top: 15px; right: 10px;"></div>
-                                    <div style="width: 40px; height: 40px; border: 1px solid #d0d0d0; position: absolute; bottom: 30px; left: 10px;"></div>
-                                    <div style="width: 40px; height: 40px; border: 1px solid #d0d0d0; position: absolute; bottom: 30px; right: 10px;"></div>
-                                    <div style="width: 4px; height: 4px; background-color: #2c2c2c; border-radius: 50%; position: absolute; right: 15px; top: 65px;"></div>
-                                </div>
-                                <div style="width: 104px; height: 6px; background-color: #2c2c2c; position: absolute; right: -2px; top: 8px;"></div>
-                                <div style="width: 6px; height: 144px; background-color: #2c2c2c; position: absolute; right: -4px; top: 8px;"></div>
-                                <div style="width: 6px; height: 144px; background-color: #2c2c2c; position: absolute; left: 96px; top: 8px;"></div>
-                            </div>
-                            <div style="width: 35px; height: 80px; position: absolute; left: 140px; bottom: 0;">
+                    <div style="width: 35px; height: 80px; position: absolute; left: 140px; bottom: 0;">
                                 <img src="https://res.cloudinary.com/dabd4udau/image/upload/v1751207222/n70qrjvilechglrvndqw.png" alt="Logo" style="display: block; margin: 0 auto 20px; width:150px" />
                             </div>
-                        </div>
+                    <div style="margin: 10px 10px 10px 10px; text-align: center;">
+                         <img src="https://res.cloudinary.com/dabd4udau/image/upload/v1753263876/qn93vgcydyy8bsniu4ru.jpg" alt="Logo" style="display: block; margin: 0 auto 20px; width:150px" />
                     </div>
                 </td>
             </tr>
@@ -100,10 +76,10 @@ const createAccount = (values: ICreateAccount) => {
 };
 
 const resetPassword = (values: IResetPassword) => {
-    const data = {
-        to: values.email,
-        subject: "Reset your password",
-        html: `
+  const data = {
+    to: values.email,
+    subject: "Reset your password",
+    html: `
         <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif; background-color: #f8f9fa; margin: 0; padding: 20px 0;">
             <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
                 <div style="padding: 40px 40px 20px; text-align: center; background-color: #ffffff;">
@@ -161,8 +137,8 @@ const resetPassword = (values: IResetPassword) => {
             </div>
         </body>
         `,
-    };
-    return data;
+  };
+  return data;
 };
 const forgetPassword = (values: IResetPassword) => {
   const data = {
