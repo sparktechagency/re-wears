@@ -5,71 +5,65 @@ const createAccount = (values: ICreateAccount) => {
     to: values.email,
     subject: "Verify your account",
     html: `
-    <body style="margin: 0 !important; padding: 0 !important; background-color: #f8f9fa; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif; -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%;">
-        <table role="presentation" cellspacing="0" cellpadding="0" border="0" style="margin: 0 auto; max-width: 600px; background-color: #ffffff; mso-table-lspace: 0pt; mso-table-rspace: 0pt;">
-            <tr>
-                <td style="padding: 40px 40px 20px; text-align: center; background-color: #ffffff;">
-                    <div style="width: 35px; height: 80px; position: absolute; left: 140px; bottom: 0;">
-                                <img src="https://res.cloudinary.com/dabd4udau/image/upload/v1751207222/n70qrjvilechglrvndqw.png" alt="Logo" style="display: block; margin: 0 auto 20px; width:150px" />
-                            </div>
-                    <div style="margin: 10px 10px 10px 10px; text-align: center;">
-                         <img src="https://res.cloudinary.com/dabd4udau/image/upload/v1753263876/qn93vgcydyy8bsniu4ru.jpg" alt="Logo" style="display: block; margin: 0 auto 20px; width:150px" />
-                    </div>
-                </td>
-            </tr>
-            <tr>
-                <td style="padding: 0 40px 40px; text-align: center;">
-                    <h1 style="font-size: 28px; font-weight: 600; color: #2c2c2c; margin: 0 0 30px; line-height: 1.3;">
-                        Email Verification Required
-                    </h1>
-                    <p style="font-size: 16px; color: #666666; margin: 0 0 30px; line-height: 1.5;">
-                        ${values.name},
-                    </p>
-                    <p style="font-size: 16px; color: #666666; margin: 0 0 30px; line-height: 1.5; padding: 0 20px;">
-                        Thank you for signing up with re-wears! To complete the
-                        verification process, please enter the following code.
-                    </p>
-                    <table role="presentation" cellspacing="0" cellpadding="0" border="0" style="margin: 0 auto 30px; mso-table-lspace: 0pt; mso-table-rspace: 0pt;">
+        <body style="margin: 0 !important; padding: 0 !important; background-color: #f8f9fa; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif; -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%;">
+                
+                                        <div style="margin: 10px 10px 10px 10px; text-align: center;">
+                                                 <img src="https://res.cloudinary.com/dabd4udau/image/upload/v1753263876/qn93vgcydyy8bsniu4ru.jpg" alt="Logo" style="display: block; margin: 0 auto 20px; width:150px" />
+                                        </div>
+                     
                         <tr>
-                            <td style="background-color: #f8f9fa; border: 2px dashed #b8b095; border-radius: 8px; padding: 20px 40px; text-align: center;">
-                                <div style="font-size: 24px; font-weight: 700; color: #2c2c2c; letter-spacing: 4px; font-family: 'Courier New', monospace;">
-                                    ${values.otp}
-                                </div>
-                            </td>
+                                <td style="padding: 0 40px 40px; text-align: center;">
+                                        <h1 style="font-size: 28px; font-weight: 600; color: #2c2c2c; margin: 0 0 30px; line-height: 1.3;">
+                                                Email Verification Required
+                                        </h1>
+                                        <p style="font-size: 16px; color: #666666; margin: 0 0 30px; line-height: 1.5;">
+                                                ${values.name},
+                                        </p>
+                                        <p style="font-size: 16px; color: #666666; margin: 0 0 30px; line-height: 1.5; padding: 0 20px;">
+                                                Thank you for signing up with re-wears! To complete the
+                                                verification process, please enter the following code.
+                                        </p>
+                                        <table role="presentation" cellspacing="0" cellpadding="0" border="0" style="margin: 0 auto 30px; mso-table-lspace: 0pt; mso-table-rspace: 0pt;">
+                                                <tr>
+                                                        <td style="background-color: #f8f9fa; border: 2px dashed #b8b095; border-radius: 8px; padding: 20px 40px; text-align: center;">
+                                                                <div style="font-size: 24px; font-weight: 700; color: #2c2c2c; letter-spacing: 4px; font-family: 'Courier New', monospace;">
+                                                                        ${values.otp}
+                                                                </div>
+                                                        </td>
+                                                </tr>
+                                        </table>
+                                        <p style="font-size: 14px; color: #999999; margin: 0 0 30px; line-height: 1.5;">
+                                                This code expires in 30 minutes and can only be used once.
+                                                Please ensure timely completion.
+                                        </p>
+                                        <p style="font-size: 14px; color: #999999; margin: 0; line-height: 1.5; padding: 0 20px;">
+                                                If you did not initiate this request or do not have an account with re-wears,
+                                                you may disregard this email.
+                                        </p>
+                                </td>
                         </tr>
-                    </table>
-                    <p style="font-size: 14px; color: #999999; margin: 0 0 30px; line-height: 1.5;">
-                        This code expires in 30 minutes and can only be used once.
-                        Please ensure timely completion.
-                    </p>
-                    <p style="font-size: 14px; color: #999999; margin: 0; line-height: 1.5; padding: 0 20px;">
-                        If you did not initiate this request or do not have an account with re-wears,
-                        you may disregard this email.
-                    </p>
-                </td>
-            </tr>
-            <tr>
-                <td style="padding: 40px; text-align: center; background-color: #b8b095;">
-                    <div style="margin-bottom: 20px;">
-                        <a href="#" style="display: inline-block; margin: 0 10px; width: 30px; height: 30px; background-color: rgba(255,255,255,0.2); border-radius: 50%; text-decoration: none; line-height: 30px; text-align: center;">
-                            <span style="color: #ffffff; font-size: 14px;">@</span>
-                        </a>
-                        <a href="#" style="display: inline-block; margin: 0 10px; width: 30px; height: 30px; background-color: rgba(255,255,255,0.2); border-radius: 50%; text-decoration: none; line-height: 30px; text-align: center;">
-                            <span style="color: #ffffff; font-size: 14px;">f</span>
-                        </a>
-                    </div>
-                    <p style="font-size: 12px; color: #ffffff; line-height: 1.6; margin: 0; max-width: 400px; margin: 0 auto;">
-                        We're sending you this email to comply with our Terms and Conditions as you have
-                        previously signed up on our site. Don't want to receive these emails? You can
-                        <a href="#" style="color: #ffffff; text-decoration: underline;">unsubscribe</a> at any time or
-                        <a href="#" style="color: #ffffff; text-decoration: underline;">contact us</a> from our website. We hope
-                        you continue to have a wonderful time shopping online with us!
-                    </p>
-                </td>
-            </tr>
-        </table>
-    </body>
-    `,
+                        <tr>
+                                <td style="padding: 40px; text-align: center; background-color: #b8b095;">
+                                        <div style="margin-bottom: 20px;">
+                                                <a href="#" style="display: inline-block; margin: 0 10px; width: 30px; height: 30px; background-color: rgba(255,255,255,0.2); border-radius: 50%; text-decoration: none; line-height: 30px; text-align: center;">
+                                                        <span style="color: #ffffff; font-size: 14px;">@</span>
+                                                </a>
+                                                <a href="#" style="display: inline-block; margin: 0 10px; width: 30px; height: 30px; background-color: rgba(255,255,255,0.2); border-radius: 50%; text-decoration: none; line-height: 30px; text-align: center;">
+                                                        <span style="color: #ffffff; font-size: 14px;">f</span>
+                                                </a>
+                                        </div>
+                                        <p style="font-size: 12px; color: #ffffff; line-height: 1.6; margin: 0; max-width: 400px; margin: 0 auto;">
+                                                We're sending you this email to comply with our Terms and Conditions as you have
+                                                previously signed up on our site. Don't want to receive these emails? You can
+                                                <a href="#" style="color: #ffffff; text-decoration: underline;">unsubscribe</a> at any time or
+                                                <a href="#" style="color: #ffffff; text-decoration: underline;">contact us</a> from our website. We hope
+                                                you continue to have a wonderful time shopping online with us!
+                                        </p>
+                                </td>
+                        </tr>
+                </table>
+        </body>
+        `,
   };
 
   return data;
