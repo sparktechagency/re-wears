@@ -61,10 +61,10 @@ router.post(
     AuthController.changePassword
 );
 
-router.post(
-    '/social-login',
-    AuthController.socialLogin
-);
+// router.post(
+//     '/social-login',
+//     AuthController.socialLogin
+// );
 
 router.delete(
     '/delete-account',
