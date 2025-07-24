@@ -144,15 +144,15 @@ const updateUserNickName = catchAsync(async (req: Request, res: Response) => {
 })
 
 
-const loginWithGoogle = catchAsync(async (req: Request, res: Response) => {
-  const result = await UserService.handleLoginWithGoogle()
-  sendResponse(res, {
-    success: true,
-    statusCode: StatusCodes.OK,
-    message: "User data login successfully",
-    data: result,
-  });
-})
+// const loginWithGoogle = catchAsync(async (req: Request, res: Response) => {
+//   const result = await UserService.handleLoginWithGoogle()
+//   sendResponse(res, {
+//     success: true,
+//     statusCode: StatusCodes.OK,
+//     message: "User data login successfully",
+//     data: result,
+//   });
+// })
 
 const loginWithFacebook = catchAsync(async (req: Request, res: Response) => {
 
@@ -184,6 +184,6 @@ export const UserController = {
   getAllUsers,
   getSingleUser,
   updateUserNickName,
-  loginWithGoogle,
+  // loginWithGoogle,
   loginWithFacebook
 };

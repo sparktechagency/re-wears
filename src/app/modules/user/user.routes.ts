@@ -35,7 +35,7 @@ router.post(
 );
 
 router.get("/:id", auth(USER_ROLES.USER), UserController.getSingleUser)
-router.get('/google', UserController.loginWithGoogle);
+// router.get('/google', UserController.loginWithGoogle);
 // Facebook login route
 router.get('/auth/facebook', passport.authenticate('facebook'));
 

@@ -253,7 +253,7 @@ const updateUserNickNameBaseOnIdFromDB = async (id: string, payload: IUser) => {
 
 //login with google
 
-const handleLoginWithGoogle = async () => {};
+// const handleLoginWithGoogle = async () => {};
 
 // login with apple
 const handleLoginWithFacebook = async (payload: any) => {
@@ -291,7 +291,7 @@ export const UserService = {
   getAllUsers,
   getSingleUserFromDB,
   updateUserNickNameBaseOnIdFromDB,
-  handleLoginWithGoogle,
+  // handleLoginWithGoogle,
   handleLoginWithFacebook,
   updateEnterTime,
   updateLeaveTime,
