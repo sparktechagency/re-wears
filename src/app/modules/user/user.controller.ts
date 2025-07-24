@@ -149,7 +149,7 @@ const loginWithGoogle = catchAsync(async (req: Request, res: Response) => {
   sendResponse(res, {
     success: true,
     statusCode: StatusCodes.OK,
-    message: "User data updated successfully",
+    message: "User data login successfully",
     data: result,
   });
 })

@@ -75,6 +75,7 @@ router.delete(
 
 // Google Auth Routes
 router.get("/google", passport.authenticate("google", { scope: ["profile", "email"] }), (req, res) => {
+    res.setHeader('Access-Control-Allow-Origin',"*")
     res.redirect("https://api.re-wears.com/api/v1/auth/google/callback");
 });
 
