@@ -21,7 +21,6 @@ import { navRouter } from "../modules/navCategory/nav.routes";
 import { ReviewRoutes } from "../modules/review/review.routes";
 import { profileRoutes } from "../modules/profile/profile.routes";
 import { dashboardRoutes } from "../modules/dashboard/dashboard.routes";
-import { followerRoutes } from "../modules/follower/follower.routes";
 import { SocialRoutes } from "../modules/social/social.route";
 const router = express.Router();
 

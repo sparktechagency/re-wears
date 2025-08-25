@@ -25,7 +25,7 @@ const updateSupport = catchAsync(async (req: Request, res: Response) => {
     message: "Support Updated Successfully",
     data: result,
   });
-})
+});
 
 const getAllSupport = catchAsync(async (req: Request, res: Response) => {
   const result = await SupportServices.getAllSupportFromDB(req.query);
@@ -38,20 +38,30 @@ const getAllSupport = catchAsync(async (req: Request, res: Response) => {
 });
 
 // get support overview
-const getSupportOverview = catchAsync(
-  async (req: Request, res: Response) => {
-    const result = await SupportServices.getSupportOverviewFromDB();
-    sendResponse(res, {
-      statusCode: StatusCodes.OK,
-      success: true,
-      message: "Support overview fetched successfully",
-      data: result,
-    });
-  })
+const getSupportOverview = catchAsync(async (req: Request, res: Response) => {
+  const result = await SupportServices.getSupportOverviewFromDB();
+  sendResponse(res, {
+    statusCode: StatusCodes.OK,
+    success: true,
+    message: "Support overview fetched successfully",
+    data: result,
+  });
+});
+
+const sendSupportMail = catchAsync(async (req: Request, res: Response) => {
+  const result = await SupportServices.replaySupportMessageFromDB(req.body);
+  sendResponse(res, {
+    statusCode: StatusCodes.OK,
+    success: true,
+    message: "Support mail sent successfully",
+    data: result,
+  });
+});
 
 export const SupportController = {
   createSupport,
   updateSupport,
   getAllSupport,
   getSupportOverview,
+  sendSupportMail,
 };

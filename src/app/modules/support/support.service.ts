@@ -4,6 +4,9 @@ import { ISupport } from "./support.interface";
 import { Support } from "./support.model";
 import QueryBuilder from "../../builder/queryBuilder";
 import { SupportStatus } from "./support.constants";
+import { emailHelper } from "../../../helpers/emailHelper";
+import config from "../../../config";
+import { z } from "zod";
 
 // create support
 const createSupportIntoDB = async (payload: ISupport) => {
@@ -148,9 +151,42 @@ const getSupportOverviewFromDB = async () => {
   };
 };
 
+const replaySupportMessageFromDB = async ({
+  email: recipientEmail,
+  message,
+  subject = "Support Reply",
+}: ISupport) => {
+  const emailValidation = z.string().email().safeParse(recipientEmail);
+
+  if (!emailValidation.success) {
+    throw new ApiError(
+      StatusCodes.BAD_REQUEST,
+      `Invalid email address: ${recipientEmail}`
+    );
+  }
+
+  const userWithOpenTicket = await Support.findOne({
+    email: recipientEmail,
+  });
+
+  if (!userWithOpenTicket) {
+    throw new ApiError(StatusCodes.BAD_REQUEST, "No support ticket found");
+  }
+
+  await emailHelper.sendEmail({
+    to: recipientEmail,
+    subject,
+    html: `<p>${message}</p>`,
+  });
+  await userWithOpenTicket.updateOne({
+    status: SupportStatus.PENDING,
+  });
+};
+
 export const SupportServices = {
   createSupportIntoDB,
   updateSupportIntoDB,
   getAllSupportFromDB,
   getSupportOverviewFromDB,
+  replaySupportMessageFromDB,
 };
