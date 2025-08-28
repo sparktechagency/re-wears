@@ -34,8 +34,7 @@ router.post(
         colors: parseIfStringArray(payload.colors),
         sizes: parseIfStringArray(payload.sizes),
         brands: parseIfStringArray(payload.brands),
-        materials: parseIfStringArray(payload.materials),
-        productImage
+        productImage,
       };
       req.body = parsedPayload;
       next();
@@ -89,20 +88,16 @@ router.patch(
     }
 
     let productImageExist = req.body.productImage || [];
-    let arr = []
-    if (typeof productImageExist == 'string') {
-      arr = [productImageExist]
-      productImageExist = arr
+    let arr = [];
+    if (typeof productImageExist == "string") {
+      arr = [productImageExist];
+      productImageExist = arr;
     }
-    if (typeof productImage == 'string') {
-      arr.push(productImage)
-    }
-    else {
-      const mergedImages = [
-        ...productImageExist,
-        ...(productImage || []),
-      ];
-      arr = mergedImages
+    if (typeof productImage == "string") {
+      arr.push(productImage);
+    } else {
+      const mergedImages = [...productImageExist, ...(productImage || [])];
+      arr = mergedImages;
     }
     const payload = {
       ...req.body,
@@ -111,7 +106,7 @@ router.patch(
       sizes: parseIfStringArray(req.body.sizes),
       brands: parseIfStringArray(req.body.brands),
       materials: parseIfStringArray(req.body.materials),
-      productImage: arr
+      productImage: arr,
     };
     req.body = payload;
     next();
@@ -119,7 +114,11 @@ router.patch(
   productController.updateProduct
 );
 
-router.patch("/update-status/:id", auth(USER_ROLES.USER, USER_ROLES.ADMIN, USER_ROLES.SUPER_ADMIN), productController.productStatusUpdate);
+router.patch(
+  "/update-status/:id",
+  auth(USER_ROLES.USER, USER_ROLES.ADMIN, USER_ROLES.SUPER_ADMIN),
+  productController.productStatusUpdate
+);
 
 // product blocked
 router.patch(
@@ -133,8 +132,5 @@ router.delete(
   auth(USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMIN, USER_ROLES.USER),
   productController.deleteProduct
 );
-
-
-
 
 export const productRoutes = router;

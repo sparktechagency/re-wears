@@ -4,12 +4,10 @@ import { Message } from "./message.model";
 import { sendNotifications } from "../../../helpers/notificationsHelper";
 import { MakeAnOffer } from "../makeanoffer/makeanoffer.model";
 
-
 const sendMessageToDB = async (
-  payload: IMessage & { type: "offer" | "text", product: string },
+  payload: IMessage & { type: "offer" | "text"; product: string },
   user: JwtPayload
 ): Promise<IMessage> => {
-
   let messageData: any = {
     text: payload?.text || "",
     image: payload.image,
@@ -52,16 +50,17 @@ const sendMessageToDB = async (
   return message;
 };
 
-
 const getMessageFromDB = async (id: any): Promise<IMessage[]> => {
-  const messages = await Message.find({ chatId: id }).sort({ createdAt: 1 }).populate({
-    path: "offer",
-    select: "product offerStatus",
-    populate: {
-      path: "product",
-      select: "name price",
-    },
-  });
+  const messages = await Message.find({ chatId: id })
+    .sort({ createdAt: 1 })
+    .populate({
+      path: "offer",
+      select: "product offerStatus",
+      populate: {
+        path: "product",
+        select: "name price",
+      },
+    });
   return messages;
 };
 

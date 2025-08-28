@@ -26,8 +26,7 @@ const productSchema = new Schema<IProduct>(
       required: true,
     },
     brand: {
-      type: Schema.Types.ObjectId,
-      ref: "Brand",
+      type: String,
       required: true,
     },
     size: {
@@ -38,6 +37,7 @@ const productSchema = new Schema<IProduct>(
     material: {
       type: Schema.Types.ObjectId,
       ref: "Brand",
+      required: false,
     },
     category: {
       category: {
@@ -69,7 +69,7 @@ const productSchema = new Schema<IProduct>(
       type: String,
       enum: ["Active", "Reserved", "Sold", "Hidden", "Draft"],
       required: true,
-      default: "Active"
+      default: "Active",
     },
     isBlocked: {
       type: Boolean,
@@ -82,12 +82,12 @@ const productSchema = new Schema<IProduct>(
     createdAt: {
       type: Date,
       default: Date.now,
-      required: false 
+      required: false,
     },
     updatedAt: {
       type: Date,
       default: Date.now,
-      required: false 
+      required: false,
     },
   },
   { timestamps: true }

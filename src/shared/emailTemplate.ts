@@ -19,6 +19,9 @@ const createAccount = (values: ICreateAccount) => {
                                         <p style="font-size: 16px; color: #666666; margin: 0 0 30px; line-height: 1.5;">
                                                 ${values.name},
                                         </p>
+                                        <p style="font-size: 16px; color: #666666; margin: 0 0 30px; line-height: 1.5;">
+                                                ${values.email},
+                                        </p>
                                         <p style="font-size: 16px; color: #666666; margin: 0 0 30px; line-height: 1.5; padding: 0 20px;">
                                                 Thank you for signing up with re-wears! To complete the
                                                 verification process, please enter the following code.

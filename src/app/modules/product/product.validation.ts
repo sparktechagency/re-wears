@@ -10,7 +10,7 @@ const createProductValidation = {
     }),
     brand: z.string({ required_error: "brand is required" }),
     size: z.string({ required_error: "size is required" }),
-    material: z.string({ required_error: "material is required" }),
+    material: z.string({ required_error: "material is required" }).optional(),
     category: z.object(
       {
         category: z.string({ required_error: "category is required" }),

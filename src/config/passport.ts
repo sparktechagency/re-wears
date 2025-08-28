@@ -26,9 +26,9 @@ passport.use(new GoogleStrategy({
                 providerId: profile.id,
                 isVerified: true,
                 role: USER_ROLES.USER,
+                image: profile.photos?.[0].value,
                 firstName: firstname,
                 lastName: lastname,
-                profilePicture: profile.photos?.[0].value,
                 password:"12345678",
                 location: "Dhaka",
             });

@@ -291,7 +291,7 @@ const getAllProducts = async (
 
   return {
     data: dataWithWishlist,
-    meta: pagination, // Returning pagination details with the correct total
+    meta: pagination,
   };
 };
 

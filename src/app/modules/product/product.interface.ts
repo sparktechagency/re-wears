@@ -7,7 +7,7 @@ export type IProduct = {
   description: string;
   productImage: string[];
   condition: "Like New" | "Very Good" | "Good" | "Fair";
-  brand: Types.ObjectId;
+  brand: string;
   size: Types.ObjectId;
   category: {
     category: Types.ObjectId;
