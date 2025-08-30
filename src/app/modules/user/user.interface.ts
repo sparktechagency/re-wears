@@ -31,6 +31,7 @@ export type IUser = {
   facebookId?: string;
   createdAt?: Date;
   updatedAt?: Date;
+  // singUpWith?: "email" | "google" | "facebook";
 };
 
 export type UserModal = {

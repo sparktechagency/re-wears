@@ -41,6 +41,7 @@ const createUserToDB = async (payload: Partial<IUser>): Promise<IUser> => {
   if (!payload.userName) {
     delete payload.userName;
   }
+  payload.provider = "email";
   // Check if the email already exists
   const existingUser = await User.findOne({ email: payload.email });
   if (existingUser) {

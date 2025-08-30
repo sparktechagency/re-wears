@@ -86,6 +86,11 @@ const userSchema = new Schema<IUser, UserModal>(
       type: Boolean,
       default: false,
     },
+    // singUpWith: {
+    //   type: String,
+    //   enum: ["email", "google", "facebook"],
+    //   required: false,
+    // },
     authentication: {
       type: {
         isResetPassword: {
